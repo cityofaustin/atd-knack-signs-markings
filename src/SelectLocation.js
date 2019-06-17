@@ -258,7 +258,10 @@ export default class SelectLocation extends Component {
     event.preventDefault();
     // TODO add post to Knack API
     console.log("Submit clicked", this.state);
-    const url = "";
+    const sceneId = "";
+    const viewId = "";
+    const id = "";
+    const url = `https://us-api.knack.com/v1/scenes/${sceneId}/views/${viewId}/records/${id}`;
     const data = {};
     axios
       .post(url, data)
