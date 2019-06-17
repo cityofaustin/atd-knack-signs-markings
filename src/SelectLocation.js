@@ -275,6 +275,18 @@ export default class SelectLocation extends Component {
       });
   };
 
+  getHeaders = () => {
+    return {
+      headers: {
+        "X-Knack-Application-Id": "5c5c85a54d1a9a565f861ba2",
+        "X-Knack-REST-API-KEY": "knack",
+        // TODO Get knackUserToken
+        // Authorization: Cookies.get("knackUserToken"),
+        "content-type": "application/json"
+      }
+    };
+  };
+
   render() {
     const pinDrop = this.state.showPin ? "show" : "hide";
 
