@@ -253,6 +253,12 @@ export default class SelectLocation extends Component {
     this.reverseGeocode({ lngLat });
   }
 
+  submitLocation = event => {
+    event.preventDefault();
+    // TODO add post to Knack API
+    console.log("Submit clicked", this.state);
+  };
+
   render() {
     const pinDrop = this.state.showPin ? "show" : "hide";
 
@@ -311,6 +317,7 @@ export default class SelectLocation extends Component {
                 <button
                   type="submit"
                   className="btn btn-success mb-2 submit-button"
+                  onClick={this.submitLocation}
                 >
                   Submit
                 </button>
