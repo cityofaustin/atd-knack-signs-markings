@@ -294,7 +294,7 @@ $(document).on("knack-view-render.view_2465", function(event, page) {
 
 function loadIframeMapMessenger(viewId) {
   var url =
-    "https://dnb4pix4gcpf6.cloudfront.net/atd-knack-signs-markings/168_update_popup_link/iframeMapMessenger.js";
+    "https://dnb4pix4gcpf6.cloudfront.net/atd-knack-signs-markings/production/iframeMapMessenger.js";
   $.getScript(url, function(data, textStatus, jqxhr) {
     console.log(data); // Data returned
     console.log(textStatus); // Success
@@ -341,6 +341,8 @@ $(document).on("knack-scene-render.scene_1028", function(event, scene) {
   $form.attr("id", "lat-lon-form");
   $form.detach();
   $("#view_2572").prepend($form);
+  // Hide Latitude/Longitude fields and labels overlaying map
+  $("#kn-input-field_3300 > div").hide();
 });
 
 $(document).on("knack-view-render.view_2607", function(event, scene) {
@@ -555,16 +557,87 @@ $(document).on("knack-view-render.view_2904", function(event, page) {
 });
 // END: Custom Buttons
 
-$(document).on("knack-scene-render.scene_879", function(event, page) {
-  var $iframeContainer = $(
-    '<div>', {
-      class: "iframe-container",
-      style: "position: relative; width: 100%; height: 0; overflow: hidden; padding-top: 515%;"
-    }).appendTo('#kn-scene_879');
+function hideFieldIfRole(selector, roleObjectId) {
+  //  function to hide a field based on if the user does not have a given role
+  if (Knack.getUserRoles(roleObjectId)) {
+    $(selector).hide();
+  }
+}
+
+$(document).on("knack-view-render.view_2566", function(event, page) {
+  // hide fields if technician user
+  hideFieldIfRole(".kn-detail.field_3252", "object_152"); // Printed Date (field_3252)
+  hideFieldIfRole(".kn-detail.field_3203", "object_152"); // Created Date (field_3203)
+  hideFieldIfRole(".kn-detail.field_3206", "object_152"); // Modified Date (field_3206)
+  hideFieldIfRole(".kn-detail.field_3283", "object_152"); // Modified By (field_3283)
+  hideFieldIfRole(".kn-detail.field_3215", "object_152"); // Work Type (field_3215)
+  hideFieldIfRole(".kn-detail.field_3214", "object_152"); // Work Order ID (field_3214)
+}); /* #214 Increase default menu button size */
+
+/* #214 Increase default menu button size */
+function updateButtonIconSizes(viewId) {
+  $("#" + viewId + " .kn-button .icon").each(function(item) {
+    this.classList.remove("is-small");
+  });
+}
+$(document).on("knack-view-render.view_2901", function() {
+  updateButtonIconSizes("view_2901");
+});
+
+$(document).on("knack-view-render.view_2684", function() {
+  updateButtonIconSizes("view_2684");
+});
+
+$(document).on("knack-view-render.view_2123", function() {
+  updateButtonIconSizes("view_2123");
+});
+
+$(document).on("knack-view-render.view_2661", function() {
+  updateButtonIconSizes("view_2661");
+});
+
+$(document).on("knack-view-render.view_1912", function() {
+  updateButtonIconSizes("view_1912");
+});
+
+$(document).on("knack-view-render.view_2307", function() {
+  updateButtonIconSizes("view_2307");
+});
+
+$(document).on("knack-view-render.view_2741", function() {
+  updateButtonIconSizes("view_2741");
+});
+/* END #214 */
+
+// #213
+$(document).on("knack-scene-render.scene_1028", function() {
+  $backToTop = $(".kn-back-link").append(
+    "<span class='back-to-top-link'> Back to top</span>"
+  );
+  $backToTop.on("click", function() {
+    $("html, body").animate({ scrollTop: 0 }, "slow");
+  });
+  $(".kn-back-link a").hide();
+});
+// END #213
+
+// Embed JS Calc for view_2267
+$(document).on("knack-view-render.view_2267", function() {
+  $("#view_2267").html(
+    '<iframe src="https://atd-knack-signs-markings.netlify.com/calcs" scrolling="no" frameborder="0" height="3000px" width="100%"></iframe>'
+  );
+});
+// End JS Calc
+
+// #233
+$(document).on("knack-view-render.view_2985", function() {
   $(
-    '<iframe>', {
-    src: 'https://deploy-preview-179--atd-geo-knack-ui.netlify.com/calcs',
-    id:  'js-calc',
-    style: "position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0"
-    }).appendTo($iframeContainer);
-})
+    '<label for="field_2405_upload" class="custom-file-upload kn-button is-secondary">Choose File</label>'
+  ).insertBefore("#field_2405_upload");
+});
+$(document).on("knack-view-render.view_2742", function() {
+  $(
+    '<label for="field_3378_upload" class="custom-file-upload kn-button is-secondary">Choose File</label>'
+  ).insertBefore("#field_3378_upload");
+});
+// END #233
