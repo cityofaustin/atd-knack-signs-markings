@@ -12,6 +12,7 @@ $(document).on("knack-page-render.any", function(event, page) {
 });
 
 $(document).on("knack-scene-render.scene_1014", function(event, page) {
+  // CSR issue - markings details
   // update iframe src from detail field
   var iframe_url = $("span:contains('apps/webappviewer')").text();
   $("#csr_view").attr("src", iframe_url);
@@ -21,6 +22,7 @@ $(document).on("knack-scene-render.scene_1014", function(event, page) {
 });
 
 $(document).on("knack-scene-render.scene_1264", function(event, page) {
+  // CSR issue - signs details
   // update iframe src from detail field
   var iframe_url = $("span:contains('apps/webappviewer')").text();
   $("#csr_view").attr("src", iframe_url);
@@ -232,6 +234,7 @@ function setUOM(element) {
 }
 
 $(document).on("knack-scene-render.scene_716", function(event, page) {
+  // set the UOM entry box on markings materials
   //  handle a click
   $("#view_1929_field_2220_chzn").click(function() {
     setUOM(this);
