@@ -31,61 +31,6 @@ $(document).on("knack-scene-render.scene_1264", function(event, page) {
   $("#view_3145").hide();
 });
 
-function insertRecord(data, scene, view) {
-  var url =
-    "https://api.knack.com/v1/pages/" + scene + "/views/" + view + "/records";
-
-  var user = Knack.getUserToken();
-  var app_id = Knack.application_id;
-
-  $.ajax({
-    url: url,
-    type: "POST",
-    headers: {
-      Authorization: Knack.getUserToken(),
-      "X-Knack-Application-Id": Knack.application_id,
-      "X-Knack-REST-API-Key": "knack",
-      "Content-Type": "application/json"
-    },
-    data: JSON.stringify(data),
-    success: function(response) {
-      Knack.hideSpinner();
-    },
-    error: function(xhr, ajaxOptions, thrownError) {
-      console.log(xhr.status);
-      console.log(thrownError);
-    }
-  });
-}
-
-$(document).on("knack-form-submit.view_1440", function(event, view, record) {
-  //  prepare "Dispatch Technican" activity to be added on work order create
-  //  https://builder.knack.com/atd/amd#pages/scene_428/views/view_1440
-  var tmc_activity = {};
-  var tmc_issue_id = record.field_1235_raw[0].id; //  tmc_issue connection field
-  var wo_id = record.id; // work order database id
-  var creaded_by = "do something to get user id....";
-  tmc_activity["field_1668"] = [tmc_issue_id]; // tmc issue connetion
-  tmc_activity["field_1755"] = [wo_id]; //  work order connection
-  tmc_activity["field_1053"] = "Dispatch Technician"; //  activity
-  tmc_activity["field_1874"] = "in_progress"; //  issue status snapshot
-  tmc_activity["field_1056"] = [creaded_by]; // created by
-  //  insert activity via form on same page
-  console.log(tmc_activity);
-  insertRecord(tmc_activity, "scene_428", "view_1437");
-});
-
-function changeFieldColor(field, color_map) {
-  var child_field = $(field).find(".kn-detail-body");
-  var value = child_field.text();
-  if (color_map[value]) {
-    $(child_field).css({
-      "background-color": color_map[value].background_color,
-      color: color_map[value].color
-    });
-  }
-}
-
 var colorMapOne = {
   "NEED TO BE ISSUED": { background_color: "#e41a1c", color: "#fff" },
   "ON HOLD": { background_color: "#aeaeae", color: "#fff" },
