@@ -42,11 +42,30 @@ function changeFieldColor(field, color_map) {
   }
 }
 
+// Change table data background colors (SERVICE REQUESTS | Markings | Work Order Status)
+function changeTableFieldColor(field, color_map) {
+  var fields = $(field);
+  fields.each(function() {
+    var value = this.innerText;
+    if (color_map[value]) {
+      $(this).css({
+        "background-color": color_map[value].background_color,
+        color: color_map[value].color
+      });
+    }
+  });
+}
+
 var colorMapOne = {
   "NEED TO BE ISSUED": { background_color: "#e41a1c", color: "#fff" },
   "ON HOLD": { background_color: "#aeaeae", color: "#fff" },
   ISSUED: { background_color: "#377eb8", color: "#fff" },
   "NEEDS GIS": { background_color: "#984ea3", color: "#fff" },
+  "FINAL REVIEW": { background_color: "#4daf4a", color: "#fff" }
+};
+
+// Color map for SERVICE REQUESTS | Markings | Work Order Status highlighting
+var colorMapServiceRequestsStatus = {
   "FINAL REVIEW": { background_color: "#4daf4a", color: "#fff" }
 };
 
@@ -59,6 +78,11 @@ $(document).on("knack-scene-render.any", function() {
 
   //  SIGNS Work Orders Details Status
   changeFieldColor(".field_3265", colorMapOne);
+});
+
+$(document).on("knack-view-render.any", function() {
+  // SERVICE REQUESTS | Markings | Work Order Status
+  changeTableFieldColor("td.field_2181", colorMapServiceRequestsStatus);
 });
 
 function replaceAttachmentFilenameWithFileType(fileFieldId, typeFieldId) {
