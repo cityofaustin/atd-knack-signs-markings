@@ -468,6 +468,19 @@ $(document).on("knack-view-render.view_2621", function(event, page) {
   );
 });
 
+$(document).on("knack-view-render.view_3178", function(event, page) {
+  // create large button on the home page
+  customButton(
+    "work-orders-markings",
+    "view_3178",
+    "https://atd.knack.com/signs-markings#service-requests-markings/",
+    "comments",
+    "Markings | Service Requests",
+    "big-button",
+    "big-button-container"
+  );
+});
+
 $(document).on("knack-view-render.view_2628", function(event, page) {
   // create large button on the home page
   customButton(
