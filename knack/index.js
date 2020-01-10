@@ -468,6 +468,19 @@ $(document).on("knack-view-render.view_2621", function(event, page) {
   );
 });
 
+$(document).on("knack-view-render.view_3178", function(event, page) {
+  // create large button on the home page
+  customButton(
+    "work-orders-markings",
+    "view_3178",
+    "https://atd.knack.com/signs-markings#service-requests-markings/",
+    "comments",
+    "Markings | Service Requests",
+    "big-button",
+    "big-button-container"
+  );
+});
+
 $(document).on("knack-view-render.view_2628", function(event, page) {
   // create large button on the home page
   customButton(
@@ -618,3 +631,22 @@ $(document).on("knack-view-render.view_2742", function() {
   ).insertBefore("#field_3378_upload");
 });
 // END #233
+
+
+///////////////////////////////////
+//// atd-knack-api integration ////
+///////////////////////////////////
+
+$(document).on('knack-form-submit.view_3158', function(event, view, txn) {
+    // on submission of "assign to" form in markins SR manager
+  	// posts to the work_order_flext_notes endpoint, which fires a script that
+    // attaches flex notes to created work orders
+    var endpoint = "https://ywx4jkcwrh.execute-api.us-east-1.amazonaws.com/dev/work_order_flex_notes";
+    var src = Knack.application_id; // markings prod
+    var url = endpoint + "?src=" + src;
+
+    // post inventory request
+    $.post(url).done(function (response) {
+        console.log(response);
+    });
+})
