@@ -1,5 +1,18 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Local development
+
+To start the React app, you can run:
+
+### `npm run proxy`
+
+TODO:
+
+1. Document how to run and develop locally
+   a. Update netlify address in iFrameMapMessenger.js
+   b. Update address for iFrameMapMessenger.js in Knack JS (Cloudfront)
+   c. Note on how iFrames require https locally for development
+
 ## Available Scripts
 
 In the project directory, you can run:
