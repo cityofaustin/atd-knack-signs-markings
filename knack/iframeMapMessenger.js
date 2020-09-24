@@ -1,4 +1,4 @@
-(function() {
+(function () {
   var myView = window.viewIdsArray.shift(0);
 
   // Import jQuery into this file from CDN
@@ -10,11 +10,11 @@
   document.getElementsByTagName("head")[0].appendChild(script);
 
   // Create polling function for made sure jQuery is loaded and ready...
-  var checkReady = function(callback) {
+  var checkReady = function (callback) {
     if (window.jQuery) {
       callback(jQuery);
     } else {
-      window.setTimeout(function() {
+      window.setTimeout(function () {
         checkReady(callback);
       }, 20);
     }
@@ -28,13 +28,13 @@
   }
 
   // Start polling...
-  checkReady(function($) {
+  checkReady(function ($) {
     var $viewSelector = $(myView);
 
     // Add React app as iframe if iframe doesn't already exist
     if ($(myView + " #mapIFrame").length === 0) {
       https: $(
-        '<iframe src="https://atd-knack-signs-markings.netlify.com/" frameborder="0" scrolling="yes" id="mapIFrame" \
+        '<iframe src="https://localhost:9001/" frameborder="0" scrolling="yes" id="mapIFrame" \
     style="width: 100%;height: 523px;"></iframe>'
       ).appendTo($viewSelector);
     }
@@ -46,7 +46,7 @@
     }
 
     // Listen for lat/lon changes
-    window.addEventListener("message", function(event) {
+    window.addEventListener("message", function (event) {
       console.log("message received:  " + event.data, event);
       var data = event.data;
       if (data.message === "LAT_LON_FIELDS") {
@@ -79,12 +79,12 @@
       sendMessageToApp(markerMessage, locationViewIFrame);
     }
     // Location Details Page - Editable
-    $("#view_2609 #mapIFrame").on("load", function() {
+    $("#view_2609 #mapIFrame").on("load", function () {
       locationDetailsMapMessage("view_2609");
     });
 
     // Location Details Page - Viewer
-    $("#view_2733 #mapIFrame").on("load", function() {
+    $("#view_2733 #mapIFrame").on("load", function () {
       locationDetailsMapMessage("view_2733");
     });
 
@@ -109,16 +109,16 @@
       sendMessageToApp(markerMessage, workOrderDetailsIFrame);
     }
     // Work Order Details Page - Editable
-    $("#view_2573 #mapIFrame").on("load", function() {
+    $("#view_2573 #mapIFrame").on("load", function () {
       workOrdersDetialsMapMessage("view_2573");
     });
     // Work Order Details Page - Viewable
-    $("#view_2619 #mapIFrame").on("load", function() {
+    $("#view_2619 #mapIFrame").on("load", function () {
       workOrdersDetialsMapMessage("view_2619");
     });
 
     // Edit Location Page
-    $("#view_2682 #mapIFrame").on("load", function() {
+    $("#view_2682 #mapIFrame").on("load", function () {
       // Use crumbtrail to get Location record ID
       var crumbtrailArray = $(".kn-crumbtrail")
         .children()
@@ -140,7 +140,7 @@
     });
 
     // Get the current location from browser.
-    navigator.geolocation.getCurrentPosition(function(position) {
+    navigator.geolocation.getCurrentPosition(function (position) {
       // create message object for React App
       const geolocationMessage = {
         message: "KNACK_GEOLOCATION",
@@ -149,7 +149,7 @@
       };
 
       // envoke message once the iframe is loaded
-      $("#mapIFrame").on("load", function() {
+      $("#mapIFrame").on("load", function () {
         AutozoomSendMessageToApp(geolocationMessage);
       });
     });

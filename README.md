@@ -1,17 +1,24 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Knack Geolocation Selector
+
+This React app creates a geospatial picker that can display, drop, and edit location pins in the Knack Signs and Markings application. Data about the points is passed between the Knack app and the React app using iframe messaging.
 
 ## Local development
+
+Clone this repo and create a feature branch
+
+In `iFrameMapMessenger.js` of the new branch, update the iframe `src` to https://localhost:9001/
+
+Push your branch to Github. This is necessary for the custom JS in Knack (stored in `/knack/index.js`) to load code that will point the Knack app to the locally hosted React app.
+
+Working from a test instance of the Signs & Markings Knack application, update `production` in the `url` variable in `loadIframeMapMessenger()` to the name of your branch.
 
 To start the React app, you can run:
 
 ### `npm run proxy`
 
-TODO:
+The proxy is necessary for the iFrame messages to push back and forth between the React app and Knack.
 
-1. Document how to run and develop locally
-   a. Update netlify address in iFrameMapMessenger.js
-   b. Update address for iFrameMapMessenger.js in Knack JS (Cloudfront)
-   c. Note on how iFrames require https locally for development
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
 
