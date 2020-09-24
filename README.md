@@ -12,9 +12,13 @@ Push your branch to Github. This is necessary for the custom JS in Knack (stored
 
 Working from a test instance of the Signs & Markings Knack application, update `production` in the `url` variable in `loadIframeMapMessenger()` to the name of your branch.
 
-To start the React app, you can run:
+To start the React app, start the proxy by running:
 
 ### `npm run proxy`
+
+and then, in a separate tab or terminal, start the React app by running:
+
+### `npm start`
 
 The proxy is necessary for the iFrame messages to push back and forth between the React app and Knack.
 
