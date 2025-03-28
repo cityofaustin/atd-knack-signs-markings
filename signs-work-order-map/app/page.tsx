@@ -2,6 +2,8 @@
 import styles from "./page.module.css";
 import MapGL from "react-map-gl/mapbox";
 
+import GeocoderControl from "@/components/MapGeocoderControl";
+
 import { DEFAULT_MAP_PARAMS, DEFAULT_MAP_PAN_ZOOM } from "@/config/map";
 
 export default function Home() {
@@ -16,7 +18,9 @@ export default function Home() {
               zoom: DEFAULT_MAP_PAN_ZOOM.zoom,
             }}
             {...DEFAULT_MAP_PARAMS}
-          />
+          >
+            <GeocoderControl position="top-left" />
+          </MapGL>
         </div>
       </main>
       <footer className={styles.footer}></footer>
