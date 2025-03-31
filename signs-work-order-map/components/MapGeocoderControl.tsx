@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {ReactElement, useState} from 'react';
 import {useControl, Marker, MarkerProps, ControlPosition} from 'react-map-gl/mapbox';
 import MapboxGeocoder, {GeocoderOptions} from '@mapbox/mapbox-gl-geocoder'
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
@@ -18,7 +18,7 @@ type GeocoderControlProps = Omit<GeocoderOptions, 'accessToken' | 'mapboxgl' | '
   const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;  
   /* eslint-disable complexity,max-statements */
   export default function GeocoderControl(props: GeocoderControlProps) {
-    const [marker, setMarker] = useState(null);
+    const [marker, setMarker] = useState<ReactElement | null>(null);
   
     const geocoder = useControl<MapboxGeocoder>(
       () => {
@@ -38,7 +38,7 @@ type GeocoderControlProps = Omit<GeocoderOptions, 'accessToken' | 'mapboxgl' | '
             (result.center || (result.geometry?.type === 'Point' && result.geometry.coordinates));
           if (location && props.marker) {
             const markerProps = typeof props.marker === 'object' ? props.marker : {};
-            // setMarker(<Marker {...markerProps} longitude={location[0]} latitude={location[1]} />);
+            setMarker(<Marker {...markerProps} longitude={location[0]} latitude={location[1]} />);
           } else {
             setMarker(null);
           }

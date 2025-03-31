@@ -19,7 +19,7 @@ export default function Home() {
             }}
             {...DEFAULT_MAP_PARAMS}
           >
-            <GeocoderControl position="top-left" />
+            <GeocoderControl position="top-left" marker={true} />
           </MapGL>
         </div>
       </main>
