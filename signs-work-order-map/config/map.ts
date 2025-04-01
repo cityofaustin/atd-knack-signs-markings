@@ -121,4 +121,3 @@ export const MAP_MAX_BOUNDS: [[number, number], [number, number]] = [
     },
     layers: LAYERS,
   };
-  
