@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   output: "export", // Forces static export (acts like a SPA)
   reactStrictMode: true, // Enables React Strict Mode
   trailingSlash: true, // Ensures static file paths end with `/`
-  swcMinify: true, // Optimizes JavaScript
+  // swcMinify: true, // Optimizes JavaScript -- this gave me an error
 };
 
 export default nextConfig;
