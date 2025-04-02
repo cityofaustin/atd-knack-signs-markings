@@ -1,11 +1,15 @@
-"use client"; // why is it telling me to do this
+"use client";
 import { useCallback, useState } from "react";
 import styles from "./page.module.css";
 import MapGL, { Marker, ViewStateChangeEvent } from "react-map-gl/mapbox";
 
 import GeocoderControl from "@/components/MapGeocoderControl";
 
-import { DEFAULT_MAP_PARAMS, DEFAULT_MAP_PAN_ZOOM } from "@/config/map";
+import {
+  DEFAULT_MAP_PARAMS,
+  DEFAULT_MAP_PAN_ZOOM,
+  MAP_COORDINATE_PRECISION,
+} from "@/config/map";
 
 interface LatLon {
   latitude: number;
@@ -14,9 +18,9 @@ interface LatLon {
 
 export default function Home() {
   const onMoveEnd = useCallback((e: ViewStateChangeEvent) => {
-    // truncate values to our preferred precision // store as var?
-    const latitude = +e.viewState.latitude.toFixed(8);
-    const longitude = +e.viewState.longitude.toFixed(8);
+    // truncate values to our preferred precision
+    const latitude = +e.viewState.latitude.toFixed(MAP_COORDINATE_PRECISION);
+    const longitude = +e.viewState.longitude.toFixed(MAP_COORDINATE_PRECISION);
     console.log(latitude, longitude);
     setMapLatLon({
       latitude,
@@ -51,7 +55,6 @@ export default function Home() {
           </MapGL>
         </div>
       </main>
-      <footer className={styles.footer}></footer>
     </div>
   );
 }
