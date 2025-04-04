@@ -17,7 +17,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-map-gl": "^8.0.1",
-    "react-map-gl-geocoder": "^2.2.0"
+    "react-map-gl-geocoder": "^2.2.0",
+    "sass": "^1.86.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
