@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3003",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -16,8 +16,7 @@
     "next": "15.2.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-map-gl": "^8.0.1",
-    "sass": "^1.86.3"
+    "react-map-gl": "^8.0.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -26,6 +25,9 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.2.4",
+    "eslint-config-prettier": "^10.1.1",
+    "prettier": "^3.5.3",
+    "sass": "^1.86.3",
     "typescript": "^5"
   }
 }

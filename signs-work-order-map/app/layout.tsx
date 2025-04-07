@@ -4,7 +4,7 @@ import "./globals.scss";
 export const metadata: Metadata = {
   // todo: what should this say
   title: "Signs and Markings Operations",
-  description: "City of Austin Transportation Public Works",
+  description: "City of Austin Transportation and Public Works",
 };
 
 export default function RootLayout({
