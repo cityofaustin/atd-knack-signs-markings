@@ -10,12 +10,12 @@ import {
 } from "@/config/map";
 
 interface LatLon {
-    latitude: number;
-    longitude: number;
-  }
-  
+  latitude: number;
+  longitude: number;
+}
+
 export default function Map() {
-  const onMoveEnd = useCallback((e: ViewStateChangeEvent) => {
+  const onDrag = useCallback((e: ViewStateChangeEvent) => {
     // truncate values to our preferred precision
     const latitude = +e.viewState.latitude.toFixed(MAP_COORDINATE_PRECISION);
     const longitude = +e.viewState.longitude.toFixed(MAP_COORDINATE_PRECISION);
@@ -38,15 +38,14 @@ export default function Map() {
         zoom: DEFAULT_MAP_PAN_ZOOM.zoom,
       }}
       {...DEFAULT_MAP_PARAMS}
-      // onMoveEnd={onMoveEnd}
+      onDrag={onDrag}
     >
-      {/* <Marker
+      <Marker
         longitude={mapLatLon.longitude}
         latitude={mapLatLon.latitude}
         // draggable
-      /> */}
-      {/* <GeocoderControl position="top-left" marker={true} />
-      */}
+      />
+      <GeocoderControl position="top-left" marker={true} />
     </MapGL>
   );
 }
