@@ -65,25 +65,12 @@ const objectProps = {
 };
 
 export const defaultDivisors = {
-  thermo60: {
-    divisor: 17.5609756097561,
-  },
-  thermo90: {
-    divisor: 12.1951219512195,
-  },
-  beadsExtruded: {
-    divisor: 120,
-  },
-  primer: {
-    divisor: 3600,
-  },
-  paintGallons: {
-    divisor: 19250,
-  },
-  beadsPaint: {
-    divisor: 212.4,
-  },
-  adhesive: {
-    divisor: 3,
-  },
+  thermo60: 17.5609756097561,
+  thermo90: 12.1951219512195,
+  beadsExtruded: 120,
+  primer: 3600,
+  paintGallons: 19250,
+  beadsPaint: 212.4,
+  adhesive: 3,
 };
+
