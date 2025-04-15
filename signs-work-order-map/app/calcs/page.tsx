@@ -2,8 +2,10 @@
 import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import Form from "react-bootstrap/Form";
+import Container from "react-bootstrap/Container";
+import { Col, Row } from "react-bootstrap";
 import SliderAndNumberInput from "@/components/SliderAndNumberInput";
-import { defaultDivisors } from "@/config/calcs";
+import { defaultDivisors, useCalculation } from "@/config/calcs";
 import "./calc.css";
 
 const defaultCalcValues = {
@@ -64,55 +66,69 @@ export default function Calcs() {
     "thermo60LinearFeet",
   ]);
 
-  useEffect(() => {
-    const valueToSet =
-      Number(thermo60Width) *
-      (Number(thermo60LinearFeet) / defaultDivisors["thermo60"]);
-
-    setValue("thermo60Output", valueToSet);
-  }, [thermo60Width, thermo60LinearFeet, setValue]);
+  useCalculation({
+    width: thermo60Width,
+    length: thermo60LinearFeet,
+    calculationName: "thermo60",
+    setValue,
+    outputFieldName: "thermo60Output",
+  });
 
   return (
     <div>
       <form>
         <h1 className="calc-header">Thermoplastic - extruded machine</h1>
-        <Controller
-          control={control}
-          name={"thermo60Width"}
-          render={({ field: { onChange, value } }) => (
-            <SliderAndNumberInput
-              value={value}
-              onChange={onChange}
-              valueMaximum={MAXWIDTH}
-              name="thermo60"
-              label="Width (inches):"
-            />
-          )}
-        />
-        <Controller
-          control={control}
-          name="thermo60LinearFeet"
-          render={({ field: { onChange, value } }) => (
-            <SliderAndNumberInput
-              value={value}
-              onChange={onChange}
-              valueMaximum={MAXFEET}
-              name="thermo60"
-              label="Linear feet"
-            />
-          )}
-        />
-
-        <Controller
-          control={control}
-          name="thermo60Output"
-          render={({ field: { value } }) => (
-            <>
-              <Form.Label>Pounds of material</Form.Label>
-              <Form.Label>{value}</Form.Label>
-            </>
-          )}
-        />
+        <Container className="m-3 p-3">
+          <Row>
+            <h4>60 mils thick (maintenance)</h4>
+          </Row>
+          <Row>
+            <Col>
+              <Controller
+                control={control}
+                name={"thermo60Width"}
+                render={({ field: { onChange, value } }) => (
+                  <SliderAndNumberInput
+                    value={value}
+                    onChange={onChange}
+                    valueMaximum={MAXWIDTH}
+                    name="thermo60"
+                    label="Width (inches):"
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="thermo60LinearFeet"
+                render={({ field: { onChange, value } }) => (
+                  <SliderAndNumberInput
+                    value={value}
+                    onChange={onChange}
+                    valueMaximum={MAXFEET}
+                    name="thermo60"
+                    label="Linear feet"
+                  />
+                )}
+              />
+            </Col>
+            <Col>
+              <Controller
+                control={control}
+                name="thermo60Output"
+                render={({ field: { value } }) => (
+                  <Form.Group>
+                    <Row>
+                      <Form.Label>Pounds of allkyd material</Form.Label>
+                    </Row>
+                    <Row>
+                      <Form.Label>{value}</Form.Label>
+                    </Row>
+                  </Form.Group>
+                )}
+              />
+            </Col>
+          </Row>
+        </Container>
       </form>
     </div>
   );

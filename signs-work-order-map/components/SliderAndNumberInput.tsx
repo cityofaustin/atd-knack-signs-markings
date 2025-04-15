@@ -8,9 +8,10 @@ export default function SliderAndNumberInput({
   label,
 }) {
   return (
-    <div className="d-flex justify-content-between col-6">
+    <div className="d-flex justify-content-between">
       <Form.Label>{label}</Form.Label>
         <Form.Range
+        className="m-2"
           max={valueMaximum}
           value={value}
           onChange={(evt) => onChange(evt.target.value)}
@@ -18,6 +19,7 @@ export default function SliderAndNumberInput({
         />
         <Form.Control
           type="number"
+          className="m-2"
           max={valueMaximum}
           value={value}
           onChange={(evt) => onChange(evt.target.value)}

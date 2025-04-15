@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 const objectProps = {
   thermo60: {
     type: "Width,LinearFeet",
@@ -74,3 +76,17 @@ export const defaultDivisors = {
   adhesive: 3,
 };
 
+export const useCalculation = ({
+  width,
+  length,
+  calculationName,
+  setValue,
+  outputFieldName,
+}) => {
+  useEffect(() => {
+    const valueToSet =
+      Number(width) * (Number(length) / defaultDivisors[calculationName]);
+
+    setValue(outputFieldName, valueToSet);
+  }, [width, length, setValue, calculationName]);
+};
