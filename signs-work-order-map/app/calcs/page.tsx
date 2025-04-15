@@ -1,5 +1,4 @@
 "use client";
-import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import Form from "react-bootstrap/Form";
 import Container from "react-bootstrap/Container";
@@ -51,9 +50,11 @@ export default function Calcs() {
     mode: "onChange",
   });
 
-  const [thermo60Width, thermo60LinearFeet] = watch([
+  const [thermo60Width, thermo60LinearFeet, thermo90Width, thermo90LinearFeet] = watch([
     "thermo60Width",
     "thermo60LinearFeet",
+    "thermo90Width",
+    "thermo90LinearFeet"
   ]);
 
   useCalculation({
@@ -62,6 +63,14 @@ export default function Calcs() {
     calculationName: "thermo60",
     setValue,
     outputFieldName: "thermo60Output",
+  });
+
+  useCalculation({
+    width: thermo90Width,
+    length: thermo90LinearFeet,
+    calculationName: "thermo90",
+    setValue,
+    outputFieldName: "thermo90Output",
   });
 
   return (
@@ -74,35 +83,60 @@ export default function Calcs() {
           </Row>
           <Row>
             <Col>
-              <Controller
+              <SliderAndNumberInput
                 control={control}
                 name={"thermo60Width"}
-                render={({ field: { onChange, value } }) => (
-                  <SliderAndNumberInput
-                    value={value}
-                    onChange={onChange}
-                    valueMaximum={MAXWIDTH}
-                    label="Width (inches):"
-                  />
-                )}
+                valueMaximum={MAXWIDTH}
+                label="Width (inches):"
               />
-              <Controller
+              <SliderAndNumberInput
                 control={control}
                 name="thermo60LinearFeet"
-                render={({ field: { onChange, value } }) => (
-                  <SliderAndNumberInput
-                    value={value}
-                    onChange={onChange}
-                    valueMaximum={MAXFEET}
-                    label="Linear feet"
-                  />
-                )}
+                valueMaximum={MAXFEET}
+                label="Linear feet"
               />
             </Col>
             <Col>
               <Controller
                 control={control}
                 name="thermo60Output"
+                render={({ field: { value } }) => (
+                  <Form.Group>
+                    <Row>
+                      <Form.Label>Pounds of allkyd material</Form.Label>
+                    </Row>
+                    <Row>
+                      <Form.Label>{value}</Form.Label>
+                    </Row>
+                  </Form.Group>
+                )}
+              />
+            </Col>
+          </Row>
+        </Container>
+        <Container className="m-3 p-3">
+          <Row>
+            <h4>90 mils thick (maintenance)</h4>
+          </Row>
+          <Row>
+            <Col>
+              <SliderAndNumberInput
+                control={control}
+                name={"thermo90Width"}
+                valueMaximum={MAXWIDTH}
+                label="Width (inches):"
+              />
+              <SliderAndNumberInput
+                control={control}
+                name="thermo90LinearFeet"
+                valueMaximum={MAXFEET}
+                label="Linear feet"
+              />
+            </Col>
+            <Col>
+              <Controller
+                control={control}
+                name="thermo90Output"
                 render={({ field: { value } }) => (
                   <Form.Group>
                     <Row>
