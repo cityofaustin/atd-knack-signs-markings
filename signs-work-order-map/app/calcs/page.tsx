@@ -3,7 +3,7 @@ import { useForm, Controller } from "react-hook-form";
 import Form from "react-bootstrap/Form";
 import Container from "react-bootstrap/Container";
 import { Col, Row } from "react-bootstrap";
-import SliderAndNumberInput from "@/components/SliderAndNumberInput";
+import CalcWidthLengthComponent from "@/components/CalcWidthLengthComponent";
 import { useCalculation } from "@/config/calcs";
 import "./calc.css";
 
@@ -39,22 +39,26 @@ const defaultCalcValues = {
   },
 };
 
-const MAXWIDTH = 12;
-const MAXFEET = 1000;
-const MAXTHICKNESS = 15;
-const MAXRPMS = 100;
-
 export default function Calcs() {
   const { control, watch, setValue } = useForm({
     defaultValues: defaultCalcValues,
     mode: "onChange",
   });
 
-  const [thermo60Width, thermo60LinearFeet, thermo90Width, thermo90LinearFeet] = watch([
+  const [
+    thermo60Width,
+    thermo60LinearFeet,
+    thermo90Width,
+    thermo90LinearFeet,
+    beadsExtrudedWidth,
+    beadsExtrudedLinearFeet,
+  ] = watch([
     "thermo60Width",
     "thermo60LinearFeet",
     "thermo90Width",
-    "thermo90LinearFeet"
+    "thermo90LinearFeet",
+    "beadsExtrudedWidth",
+    "beadsExtrudedLinearFeet",
   ]);
 
   useCalculation({
@@ -73,84 +77,42 @@ export default function Calcs() {
     outputFieldName: "thermo90Output",
   });
 
+  useCalculation({
+    width: beadsExtrudedWidth,
+    length: beadsExtrudedLinearFeet,
+    calculationName: "beadsExtruded",
+    setValue,
+    outputFieldName: "beadsExtrudedOutput",
+  });
+
   return (
     <div>
       <form>
         <h1 className="calc-header">Thermoplastic - extruded machine</h1>
-        <Container className="m-3 p-3">
-          <Row>
-            <h4>60 mils thick (maintenance)</h4>
-          </Row>
-          <Row>
-            <Col>
-              <SliderAndNumberInput
-                control={control}
-                name={"thermo60Width"}
-                valueMaximum={MAXWIDTH}
-                label="Width (inches):"
-              />
-              <SliderAndNumberInput
-                control={control}
-                name="thermo60LinearFeet"
-                valueMaximum={MAXFEET}
-                label="Linear feet"
-              />
-            </Col>
-            <Col>
-              <Controller
-                control={control}
-                name="thermo60Output"
-                render={({ field: { value } }) => (
-                  <Form.Group>
-                    <Row>
-                      <Form.Label>Pounds of allkyd material</Form.Label>
-                    </Row>
-                    <Row>
-                      <Form.Label>{value}</Form.Label>
-                    </Row>
-                  </Form.Group>
-                )}
-              />
-            </Col>
-          </Row>
-        </Container>
-        <Container className="m-3 p-3">
-          <Row>
-            <h4>90 mils thick (maintenance)</h4>
-          </Row>
-          <Row>
-            <Col>
-              <SliderAndNumberInput
-                control={control}
-                name={"thermo90Width"}
-                valueMaximum={MAXWIDTH}
-                label="Width (inches):"
-              />
-              <SliderAndNumberInput
-                control={control}
-                name="thermo90LinearFeet"
-                valueMaximum={MAXFEET}
-                label="Linear feet"
-              />
-            </Col>
-            <Col>
-              <Controller
-                control={control}
-                name="thermo90Output"
-                render={({ field: { value } }) => (
-                  <Form.Group>
-                    <Row>
-                      <Form.Label>Pounds of allkyd material</Form.Label>
-                    </Row>
-                    <Row>
-                      <Form.Label>{value}</Form.Label>
-                    </Row>
-                  </Form.Group>
-                )}
-              />
-            </Col>
-          </Row>
-        </Container>
+        <CalcWidthLengthComponent
+          title="60 mils thick (maintenance)"
+          control={control}
+          inputWidthName="thermo60Width"
+          inputLengthName="thermo60LinearFeet"
+          outputName="thermo60Output"
+          outputLabel="Pounds of allkyd material:"
+        />
+        <CalcWidthLengthComponent
+          title="90 mils thick (maintenance)"
+          control={control}
+          inputWidthName="thermo90Width"
+          inputLengthName="thermo90LinearFeet"
+          outputName="thermo90Output"
+          outputLabel="Pounds of allkyd material:"
+        />
+        <CalcWidthLengthComponent
+          title="Beads - for extruded machine"
+          control={control}
+          inputWidthName="beadsExtrudedWidth"
+          inputLengthName="beadsExtrudedLinearFeet"
+          outputName="beadsExtrudedOutput"
+          outputLabel="Pounds of beads:"
+        />
       </form>
     </div>
   );

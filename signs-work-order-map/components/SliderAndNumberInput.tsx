@@ -20,7 +20,7 @@ export default function SliderAndNumberInput({
       name={name}
       render={({ field: { onChange, value } }) => (
         <div className="d-flex justify-content-between">
-          <Form.Label>{label}</Form.Label>
+          <Form.Label className="col-2">{label}</Form.Label>
           <Form.Range
             className="m-2"
             max={valueMaximum}

@@ -67,36 +67,41 @@ const objectProps = {
   },
 };
 
+export const MAXWIDTH = 12;
+export const MAXFEET = 1000;
+export const MAXTHICKNESS = 15;
+export const MAXRPMS = 100;
+
 type CalculationInputsType = {
-    thermo60Width: number,
-    thermo60LinearFeet: number,
-    thermo60Output: number,
-    thermo90Width: number,
-    thermo90LinearFeet: number,
-    thermo90Output: number,
-        beadsExtrudedWidth: number,
-        beadsExtrudedLinearFeet: number,
-        beadsExtrudedOutput: number,
-    primer: {
-      inputWidth: 0,
-      inputLinearFeet: 0,
-      output: 0,
-    },
-    paintGallons: {
-      inputWidth: 0,
-      inputLinearFeet: 0,
-      inputThickness: 0,
-      output: 0,
-    },
-    beadsPaint: {
-      inputWidth: 0,
-      inputLinearFeet: 0,
-      output: 0,
-    },
-    adhesive: {
-      inputRPMS: 0,
-      output: 0,
-    },
+  thermo60Width: number;
+  thermo60LinearFeet: number;
+  thermo60Output: number;
+  thermo90Width: number;
+  thermo90LinearFeet: number;
+  thermo90Output: number;
+  beadsExtrudedWidth: number;
+  beadsExtrudedLinearFeet: number;
+  beadsExtrudedOutput: number;
+  primer: {
+    inputWidth: 0;
+    inputLinearFeet: 0;
+    output: 0;
+  };
+  paintGallons: {
+    inputWidth: 0;
+    inputLinearFeet: 0;
+    inputThickness: 0;
+    output: 0;
+  };
+  beadsPaint: {
+    inputWidth: 0;
+    inputLinearFeet: 0;
+    output: 0;
+  };
+  adhesive: {
+    inputRPMS: 0;
+    output: 0;
+  };
 };
 
 interface useCalculationType {
