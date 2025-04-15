@@ -5,29 +5,19 @@ import Form from "react-bootstrap/Form";
 import Container from "react-bootstrap/Container";
 import { Col, Row } from "react-bootstrap";
 import SliderAndNumberInput from "@/components/SliderAndNumberInput";
-import { defaultDivisors, useCalculation } from "@/config/calcs";
+import { useCalculation } from "@/config/calcs";
 import "./calc.css";
 
 const defaultCalcValues = {
-  unnested: 0,
   thermo60Width: 0,
   thermo60LinearFeet: 0,
   thermo60Output: 0,
-  thermo60: {
-    inputWidth: 0,
-    inputLinearFeet: 0,
-    output: 0,
-  },
-  thermo90: {
-    inputWidth: 0,
-    inputLinearFeet: 0,
-    output: 0,
-  },
-  beadsExtruded: {
-    inputWidth: 0,
-    inputLinearFeet: 0,
-    output: 0,
-  },
+  thermo90Width: 0,
+  thermo90LinearFeet: 0,
+  thermo90Output: 0,
+  beadsExtrudedWidth: 0,
+  beadsExtrudedLinearFeet: 0,
+  beadsExtrudedOutput: 0,
   primer: {
     inputWidth: 0,
     inputLinearFeet: 0,
@@ -92,7 +82,6 @@ export default function Calcs() {
                     value={value}
                     onChange={onChange}
                     valueMaximum={MAXWIDTH}
-                    name="thermo60"
                     label="Width (inches):"
                   />
                 )}
@@ -105,7 +94,6 @@ export default function Calcs() {
                     value={value}
                     onChange={onChange}
                     valueMaximum={MAXFEET}
-                    name="thermo60"
                     label="Linear feet"
                   />
                 )}

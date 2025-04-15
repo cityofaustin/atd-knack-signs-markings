@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { UseFormSetValue } from "react-hook-form";
 
 const objectProps = {
   thermo60: {
@@ -66,7 +67,47 @@ const objectProps = {
   },
 };
 
-export const defaultDivisors = {
+type CalculationInputsType = {
+    thermo60Width: number,
+    thermo60LinearFeet: number,
+    thermo60Output: number,
+    thermo90Width: number,
+    thermo90LinearFeet: number,
+    thermo90Output: number,
+        beadsExtrudedWidth: number,
+        beadsExtrudedLinearFeet: number,
+        beadsExtrudedOutput: number,
+    primer: {
+      inputWidth: 0,
+      inputLinearFeet: 0,
+      output: 0,
+    },
+    paintGallons: {
+      inputWidth: 0,
+      inputLinearFeet: 0,
+      inputThickness: 0,
+      output: 0,
+    },
+    beadsPaint: {
+      inputWidth: 0,
+      inputLinearFeet: 0,
+      output: 0,
+    },
+    adhesive: {
+      inputRPMS: 0,
+      output: 0,
+    },
+};
+
+interface useCalculationType {
+  width: number;
+  length: number;
+  calculationName: string;
+  setValue: UseFormSetValue<CalculationInputsType>;
+  outputFieldName: string;
+}
+
+export const defaultDivisors: { [key: string]: number } = {
   thermo60: 17.5609756097561,
   thermo90: 12.1951219512195,
   beadsExtruded: 120,
@@ -82,7 +123,7 @@ export const useCalculation = ({
   calculationName,
   setValue,
   outputFieldName,
-}) => {
+}: useCalculationType) => {
   useEffect(() => {
     const valueToSet =
       Number(width) * (Number(length) / defaultDivisors[calculationName]);
