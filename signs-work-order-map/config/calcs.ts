@@ -68,21 +68,21 @@ export type CalculationInputsType = {
   primerWidth: number,
   primerLinearFeet: number,
   primerOutput: number,
-  paintGallons: {
-    inputWidth: 0;
-    inputLinearFeet: 0;
-    inputThickness: 0;
-    output: 0;
-  };
-  beadsPaint: {
-    inputWidth: 0;
-    inputLinearFeet: 0;
-    output: 0;
-  };
-  adhesive: {
-    inputRPMS: 0;
-    output: 0;
-  };
+  // paintGallons: {
+  //   inputWidth: 0;
+  //   inputLinearFeet: 0;
+  //   inputThickness: 0;
+  //   output: 0;
+  // };
+  // beadsPaint: {
+  //   inputWidth: 0;
+  //   inputLinearFeet: 0;
+  //   output: 0;
+  // };
+  // adhesive: {
+  //   inputRPMS: 0;
+  //   output: 0;
+  // };
 };
 
 interface useCalculationType {

@@ -1,18 +1,23 @@
 import Form from "react-bootstrap/Form";
-import { UseFormSetValue, UseFormWatch } from "react-hook-form";
+import { UseFormSetValue, UseFormWatch, Control } from "react-hook-form";
 import Container from "react-bootstrap/Container";
 import { Col, Row } from "react-bootstrap";
 import { Controller } from "react-hook-form";
 import SliderAndNumberInput from "@/components/SliderAndNumberInput";
-import { MAXFEET, MAXWIDTH, useCalculation, CalculationInputsType } from "@/config/calcs";
+import {
+  MAXFEET,
+  MAXWIDTH,
+  useCalculation,
+  CalculationInputsType,
+} from "@/config/calcs";
 
 interface CalcWidthLengthComponentProps {
   title: string;
-  control: any; // todo update
-  watch:  UseFormWatch<CalculationInputsType>;
-  setValue:  UseFormSetValue<CalculationInputsType>;
-  inputWidthName: string;
-  inputLengthName: string;
+  control: Control<CalculationInputsType>;
+  watch: UseFormWatch<CalculationInputsType>;
+  setValue: UseFormSetValue<CalculationInputsType>;
+  inputWidthName: keyof CalculationInputsType;
+  inputLengthName: keyof CalculationInputsType;
   outputName: keyof CalculationInputsType;
   outputLabel: string;
   calculationName: string;
