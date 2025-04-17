@@ -3,7 +3,7 @@ import { UseFormSetValue, UseFormWatch, Control } from "react-hook-form";
 import Container from "react-bootstrap/Container";
 import { Col, Row } from "react-bootstrap";
 import { Controller } from "react-hook-form";
-import SliderAndNumberInput from "@/components/SliderAndNumberInput";
+import ControlledNumberInput from "@/components/ControlledNumberInput";
 import {
   MAXFEET,
   MAXWIDTH,
@@ -51,13 +51,13 @@ export default function CalcWidthLengthComponent({
       </Row>
       <Row>
         <Col>
-          <SliderAndNumberInput
+          <ControlledNumberInput
             control={control}
             name={inputWidthName}
             valueMaximum={MAXWIDTH}
             label="Width (inches):"
           />
-          <SliderAndNumberInput
+          <ControlledNumberInput
             control={control}
             name={inputLengthName}
             valueMaximum={MAXFEET}
