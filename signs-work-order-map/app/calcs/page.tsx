@@ -23,11 +23,9 @@ const defaultCalcValues = {
   //   inputThickness: 0,
   //   output: 0,
   // },
-  // beadsPaint: {
-  //   inputWidth: 0,
-  //   inputLinearFeet: 0,
-  //   output: 0,
-  // },
+  beadsPaintWidth: 0,
+  beadsPaintLinearFeet: 0,
+  beadsPaintOutput: 0,
   // adhesive: {
   //   inputRPMS: 0,
   //   output: 0,
@@ -89,6 +87,17 @@ export default function Calcs() {
           calculationName="primer"
         />
         <h1 className="calc-header">Paint</h1>
+        <CalcWidthLengthComponent
+          title="Beads (Pounds of beads)"
+          control={control}
+          watch={watch}
+          setValue={setValue}
+          inputWidthName="beadsPaintWidth"
+          inputLengthName="beadsPaintLinearFeet"
+          outputName="beadsPaintOutput"
+          outputLabel="Pounds of beads:"
+          calculationName="beadsPaint"
+        />
       </form>
     </div>
   );

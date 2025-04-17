@@ -2,15 +2,6 @@ import { useEffect } from "react";
 import { UseFormSetValue } from "react-hook-form";
 
 const objectProps = {
-  primer: {
-    type: "Width,LinearFeet",
-    heading: "Thermoplastic: Primer (sealant) - for extruded machine",
-    label: "Gallons of primer",
-    inputWidth: 0,
-    inputLinearFeet: 0,
-    divisor: 3600,
-    output: 0,
-  },
   paintGallons: {
     type: "Width,LinearFeet,Thickness",
     heading: "Gallons Paint Used",
@@ -19,15 +10,6 @@ const objectProps = {
     inputLinearFeet: 0,
     inputThickness: 0,
     divisor: 19250,
-    output: 0,
-  },
-  beadsPaint: {
-    type: "Width,LinearFeet",
-    heading: "Beads (Pounds of beads)",
-    label: "Pounds of beads",
-    inputWidth: 0,
-    inputLinearFeet: 0,
-    divisor: 212.4,
     output: 0,
   },
   adhesive: {
@@ -74,11 +56,9 @@ export type CalculationInputsType = {
   //   inputThickness: 0;
   //   output: 0;
   // };
-  // beadsPaint: {
-  //   inputWidth: 0;
-  //   inputLinearFeet: 0;
-  //   output: 0;
-  // };
+  beadsPaintWidth: number,
+  beadsPaintLinearFeet: number,
+  beadsPaintOutput: number,
   // adhesive: {
   //   inputRPMS: 0;
   //   output: 0;
