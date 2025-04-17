@@ -2,33 +2,6 @@ import { useEffect } from "react";
 import { UseFormSetValue } from "react-hook-form";
 
 const objectProps = {
-  thermo60: {
-    type: "Width,LinearFeet",
-    heading: "60 mils thick (maintenance)",
-    label: "Pounds of alkyd material",
-    inputWidth: 0,
-    inputLinearFeet: 0,
-    divisor: 17.5609756097561,
-    output: 0,
-  },
-  thermo90: {
-    type: "Width,LinearFeet",
-    heading: "90 mils thick (maintenance)",
-    label: "Pounds of alkyd material",
-    inputWidth: 0,
-    inputLinearFeet: 0,
-    divisor: 12.1951219512195,
-    output: 0,
-  },
-  beadsExtruded: {
-    type: "Width,LinearFeet",
-    heading: "Beads - for extruded machine",
-    label: "Pounds of beads",
-    inputWidth: 0,
-    inputLinearFeet: 0,
-    divisor: 120,
-    output: 0,
-  },
   primer: {
     type: "Width,LinearFeet",
     heading: "Thermoplastic: Primer (sealant) - for extruded machine",
@@ -72,7 +45,17 @@ export const MAXFEET = 1000;
 export const MAXTHICKNESS = 15;
 export const MAXRPMS = 100;
 
-type CalculationInputsType = {
+export const defaultDivisors: { [key: string]: number } = {
+  thermo60: 17.5609756097561,
+  thermo90: 12.1951219512195,
+  beadsExtruded: 120,
+  primer: 3600,
+  paintGallons: 19250,
+  beadsPaint: 212.4,
+  adhesive: 3,
+};
+
+export type CalculationInputsType = {
   thermo60Width: number;
   thermo60LinearFeet: number;
   thermo60Output: number;
@@ -82,11 +65,9 @@ type CalculationInputsType = {
   beadsExtrudedWidth: number;
   beadsExtrudedLinearFeet: number;
   beadsExtrudedOutput: number;
-  primer: {
-    inputWidth: 0;
-    inputLinearFeet: 0;
-    output: 0;
-  };
+  primerWidth: number,
+  primerLinearFeet: number,
+  primerOutput: number,
   paintGallons: {
     inputWidth: 0;
     inputLinearFeet: 0;
@@ -109,18 +90,8 @@ interface useCalculationType {
   length: number;
   calculationName: string;
   setValue: UseFormSetValue<CalculationInputsType>;
-  outputFieldName: string;
+  outputFieldName: keyof CalculationInputsType;
 }
-
-export const defaultDivisors: { [key: string]: number } = {
-  thermo60: 17.5609756097561,
-  thermo90: 12.1951219512195,
-  beadsExtruded: 120,
-  primer: 3600,
-  paintGallons: 19250,
-  beadsPaint: 212.4,
-  adhesive: 3,
-};
 
 export const useCalculation = ({
   width,
