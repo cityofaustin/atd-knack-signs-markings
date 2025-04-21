@@ -37,11 +37,13 @@ export default function CalcWidthLengthComponent({
   outputLabel,
   calculationName,
 }: CalcWidthLengthComponentProps) {
-  const [widthField, lengthField, thicknessField] = watch([
-    inputWidthName,
-    inputLengthName,
-    inputThicknessName,
-  ]);
+  const [widthField, lengthField] = watch([inputWidthName, inputLengthName]);
+
+  let thicknessField = undefined;
+
+  if (inputThicknessName) {
+    [thicknessField] = watch([inputThicknessName]);
+  }
 
   useCalculation({
     width: widthField,
