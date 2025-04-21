@@ -51,6 +51,26 @@ export const thermoplasticCalculations: Array<CalcComponentTypeDef> = [
   },
 ];
 
+export const paintCalculations: Array<CalcComponentTypeDef> = [
+  {
+    title: "Gallons Paint Used",
+    inputWidthName: "paintGallonsWidth",
+    inputLengthName: "paintGallonsLinearFeet",
+    inputThicknessName: "paintGallonsThickness",
+    outputName: "paintGallonsOutput",
+    outputLabel: "Gallons needed: ",
+    calculationName: "paintGallons",
+  },
+  {
+    title: "Beads (Pounds of beads)",
+    inputWidthName: "beadsPaintWidth",
+    inputLengthName: "beadsPaintLinearFeet",
+    outputName: "beadsPaintOutput",
+    outputLabel: "Pounds of beads: ",
+    calculationName: "beadsPaint",
+  },
+];
+
 //
 // const objectProps = {
 //   adhesive: {

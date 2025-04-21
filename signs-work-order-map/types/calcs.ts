@@ -28,11 +28,12 @@ export type CalculationInputsType = {
 
 export interface CalcComponentTypeDef {
   title: string;
-  inputWidthName:  keyof CalculationInputsType;
-  inputLengthName:  keyof CalculationInputsType;
-  outputName:  keyof CalculationInputsType;
+  inputWidthName: keyof CalculationInputsType;
+  inputLengthName: keyof CalculationInputsType;
+  inputThicknessName?: keyof CalculationInputsType;
+  outputName: keyof CalculationInputsType;
   outputLabel: string;
-  calculationName: string,
+  calculationName: string;
 }
 
 export interface useCalculationType {

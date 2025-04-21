@@ -2,7 +2,7 @@
 import { useForm } from "react-hook-form";
 import CalcWidthLengthComponent from "@/components/CalcWidthLengthComponent";
 import { CalculationInputsType } from "@/types/calcs";
-import { thermoplasticCalculations } from "@/config/calcs";
+import { thermoplasticCalculations, paintCalculations } from "@/config/calcs";
 import "./calc.css";
 
 const defaultCalcValues = {
@@ -56,29 +56,21 @@ export default function Calcs() {
           />
         ))}
         <h1 className="calc-header">Paint</h1>
-        <CalcWidthLengthComponent
-          title="Gallons Paint Used"
-          control={control}
-          watch={watch}
-          setValue={setValue}
-          inputWidthName="paintGallonsWidth"
-          inputLengthName="paintGallonsLinearFeet"
-          inputThicknessName="paintGallonsThickness"
-          outputName="paintGallonsOutput"
-          outputLabel="Gallons needed:"
-          calculationName="paintGallons"
-        />
-        <CalcWidthLengthComponent
-          title="Beads (Pounds of beads)"
-          control={control}
-          watch={watch}
-          setValue={setValue}
-          inputWidthName="beadsPaintWidth"
-          inputLengthName="beadsPaintLinearFeet"
-          outputName="beadsPaintOutput"
-          outputLabel="Pounds of beads:"
-          calculationName="beadsPaint"
-        />
+        {paintCalculations.map((calculation) => (
+          <CalcWidthLengthComponent
+            key={calculation.calculationName}
+            title={calculation.title}
+            control={control}
+            watch={watch}
+            setValue={setValue}
+            inputWidthName={calculation.inputWidthName}
+            inputLengthName={calculation.inputLengthName}
+            inputThicknessName={calculation.inputThicknessName}
+            outputName={calculation.outputName}
+            outputLabel={calculation.outputLabel}
+            calculationName={calculation.calculationName}
+          />
+        ))}
       </form>
     </div>
   );
