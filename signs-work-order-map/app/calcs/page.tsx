@@ -2,6 +2,7 @@
 import { useForm } from "react-hook-form";
 import CalcWidthLengthComponent from "@/components/CalcWidthLengthComponent";
 import { CalculationInputsType } from "@/types/calcs";
+import { thermoplasticCalculations } from "@/config/calcs";
 import "./calc.css";
 
 const defaultCalcValues = {
@@ -40,50 +41,20 @@ export default function Calcs() {
     <div>
       <form>
         <h1 className="calc-header">Thermoplastic - extruded machine</h1>
-        <CalcWidthLengthComponent
-          title="60 mils thick (maintenance)"
-          control={control}
-          watch={watch}
-          setValue={setValue}
-          inputWidthName="thermo60Width"
-          inputLengthName="thermo60LinearFeet"
-          outputName="thermo60Output"
-          outputLabel="Pounds of allkyd material:"
-          calculationName="thermo60"
-        />
-        <CalcWidthLengthComponent
-          title="90 mils thick (maintenance)"
-          control={control}
-          watch={watch}
-          setValue={setValue}
-          inputWidthName="thermo90Width"
-          inputLengthName="thermo90LinearFeet"
-          outputName="thermo90Output"
-          outputLabel="Pounds of allkyd material:"
-          calculationName="thermo90"
-        />
-        <CalcWidthLengthComponent
-          title="Beads - for extruded machine"
-          control={control}
-          watch={watch}
-          setValue={setValue}
-          inputWidthName="beadsExtrudedWidth"
-          inputLengthName="beadsExtrudedLinearFeet"
-          outputName="beadsExtrudedOutput"
-          outputLabel="Pounds of beads:"
-          calculationName="beadsExtruded"
-        />
-        <CalcWidthLengthComponent
-          title="Thermoplastic: Primer (sealant) - for extruded machine"
-          control={control}
-          watch={watch}
-          setValue={setValue}
-          inputWidthName="primerWidth"
-          inputLengthName="primerLinearFeet"
-          outputName="primerOutput"
-          outputLabel="Gallons of primer:"
-          calculationName="primer"
-        />
+        {thermoplasticCalculations.map((calculation) => (
+          <CalcWidthLengthComponent
+            key={calculation.calculationName}
+            title={calculation.title}
+            control={control}
+            watch={watch}
+            setValue={setValue}
+            inputWidthName={calculation.inputWidthName}
+            inputLengthName={calculation.inputLengthName}
+            outputName={calculation.outputName}
+            outputLabel={calculation.outputLabel}
+            calculationName={calculation.calculationName}
+          />
+        ))}
         <h1 className="calc-header">Paint</h1>
         <CalcWidthLengthComponent
           title="Gallons Paint Used"

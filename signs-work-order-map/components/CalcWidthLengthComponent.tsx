@@ -1,5 +1,4 @@
 import Form from "react-bootstrap/Form";
-import { UseFormSetValue, UseFormWatch, Control } from "react-hook-form";
 import Container from "react-bootstrap/Container";
 import { Col, Row } from "react-bootstrap";
 import { Controller } from "react-hook-form";
@@ -10,20 +9,7 @@ import {
   MAXTHICKNESS,
   useCalculation,
 } from "@/config/calcs";
-import { CalculationInputsType } from "@/types/calcs";
-
-interface CalcWidthLengthComponentProps {
-  title: string;
-  control: Control<CalculationInputsType>;
-  watch: UseFormWatch<CalculationInputsType>;
-  setValue: UseFormSetValue<CalculationInputsType>;
-  inputWidthName: keyof CalculationInputsType;
-  inputLengthName: keyof CalculationInputsType;
-  inputThicknessName?: keyof CalculationInputsType;
-  outputName: keyof CalculationInputsType;
-  outputLabel: string;
-  calculationName: string;
-}
+import { CalcWidthLengthComponentProps } from "@/types/calcs";
 
 export default function CalcWidthLengthComponent({
   title,
