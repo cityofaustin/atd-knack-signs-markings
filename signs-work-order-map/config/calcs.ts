@@ -2,16 +2,6 @@ import { useEffect } from "react";
 import { UseFormSetValue } from "react-hook-form";
 
 const objectProps = {
-  paintGallons: {
-    type: "Width,LinearFeet,Thickness",
-    heading: "Gallons Paint Used",
-    label: "Gallons needed",
-    inputWidth: 0,
-    inputLinearFeet: 0,
-    inputThickness: 0,
-    divisor: 19250,
-    output: 0,
-  },
   adhesive: {
     type: "RPMS",
     heading: '4" RPMS',
@@ -47,18 +37,16 @@ export type CalculationInputsType = {
   beadsExtrudedWidth: number;
   beadsExtrudedLinearFeet: number;
   beadsExtrudedOutput: number;
-  primerWidth: number,
-  primerLinearFeet: number,
-  primerOutput: number,
-  // paintGallons: {
-  //   inputWidth: 0;
-  //   inputLinearFeet: 0;
-  //   inputThickness: 0;
-  //   output: 0;
-  // };
-  beadsPaintWidth: number,
-  beadsPaintLinearFeet: number,
-  beadsPaintOutput: number,
+  primerWidth: number;
+  primerLinearFeet: number;
+  primerOutput: number;
+  paintGallonsWidth: number;
+  paintGallonsLinearFeet: number;
+  paintGallonsThickness: number;
+  paintGallonsOutput: number;
+  beadsPaintWidth: number;
+  beadsPaintLinearFeet: number;
+  beadsPaintOutput: number;
   // adhesive: {
   //   inputRPMS: 0;
   //   output: 0;
@@ -68,6 +56,7 @@ export type CalculationInputsType = {
 interface useCalculationType {
   width: number;
   length: number;
+  thickness?: number;
   calculationName: string;
   setValue: UseFormSetValue<CalculationInputsType>;
   outputFieldName: keyof CalculationInputsType;
@@ -76,14 +65,19 @@ interface useCalculationType {
 export const useCalculation = ({
   width,
   length,
+  thickness,
   calculationName,
   setValue,
   outputFieldName,
 }: useCalculationType) => {
   useEffect(() => {
-    const valueToSet =
-      Number(width) * (Number(length) / defaultDivisors[calculationName]);
+    let valueToSet = 0;
+    if (!!thickness) {
+      valueToSet = (width * length * thickness) / defaultDivisors[calculationName]
+    } else {
+      valueToSet = width * (length / defaultDivisors[calculationName]);
+    }
 
     setValue(outputFieldName, valueToSet);
-  }, [width, length, setValue, calculationName]);
+  }, [width, length, thickness, setValue, calculationName]);
 };

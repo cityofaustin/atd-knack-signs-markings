@@ -17,12 +17,10 @@ const defaultCalcValues = {
   primerWidth: 0,
   primerLinearFeet: 0,
   primerOutput: 0,
-  // paintGallons: {
-  //   inputWidth: 0,
-  //   inputLinearFeet: 0,
-  //   inputThickness: 0,
-  //   output: 0,
-  // },
+  paintGallonsWidth: 0,
+  paintGallonsLinearFeet: 0,
+  paintGallonsThickness: 0,
+  paintGallonsOutput: 0,
   beadsPaintWidth: 0,
   beadsPaintLinearFeet: 0,
   beadsPaintOutput: 0,
@@ -87,6 +85,18 @@ export default function Calcs() {
           calculationName="primer"
         />
         <h1 className="calc-header">Paint</h1>
+        <CalcWidthLengthComponent
+          title="Gallons Paint Used"
+          control={control}
+          watch={watch}
+          setValue={setValue}
+          inputWidthName="paintGallonsWidth"
+          inputLengthName="paintGallonsLinearFeet"
+          inputThicknessName="paintGallonsThickness"
+          outputName="paintGallonsOutput"
+          outputLabel="Gallons needed:"
+          calculationName="paintGallons"
+        />
         <CalcWidthLengthComponent
           title="Beads (Pounds of beads)"
           control={control}

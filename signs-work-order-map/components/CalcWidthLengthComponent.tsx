@@ -7,6 +7,7 @@ import ControlledNumberInput from "@/components/ControlledNumberInput";
 import {
   MAXFEET,
   MAXWIDTH,
+  MAXTHICKNESS,
   useCalculation,
   CalculationInputsType,
 } from "@/config/calcs";
@@ -18,6 +19,7 @@ interface CalcWidthLengthComponentProps {
   setValue: UseFormSetValue<CalculationInputsType>;
   inputWidthName: keyof CalculationInputsType;
   inputLengthName: keyof CalculationInputsType;
+  inputThicknessName?: keyof CalculationInputsType;
   outputName: keyof CalculationInputsType;
   outputLabel: string;
   calculationName: string;
@@ -30,15 +32,21 @@ export default function CalcWidthLengthComponent({
   setValue,
   inputWidthName,
   inputLengthName,
+  inputThicknessName,
   outputName,
   outputLabel,
   calculationName,
 }: CalcWidthLengthComponentProps) {
-  const [widthField, lengthField] = watch([inputWidthName, inputLengthName]);
+  const [widthField, lengthField, thicknessField] = watch([
+    inputWidthName,
+    inputLengthName,
+    inputThicknessName,
+  ]);
 
   useCalculation({
     width: widthField,
     length: lengthField,
+    thickness: thicknessField,
     calculationName: calculationName,
     setValue,
     outputFieldName: outputName,
@@ -63,6 +71,14 @@ export default function CalcWidthLengthComponent({
             valueMaximum={MAXFEET}
             label="Linear feet"
           />
+          {!!inputThicknessName && (
+            <ControlledNumberInput
+              control={control}
+              name={inputThicknessName}
+              valueMaximum={MAXTHICKNESS}
+              label="Mil Thickness Desired:"
+            />
+          )}
         </Col>
         <Col>
           <Controller
