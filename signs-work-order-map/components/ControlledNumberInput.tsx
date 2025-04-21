@@ -1,9 +1,10 @@
 import Form from "react-bootstrap/Form";
-import { Controller } from "react-hook-form";
+import { Controller, Control } from "react-hook-form";
+import { CalculationInputsType } from "@/types/calcs";
 
 interface ControlledNumberInputProps {
-  name: string;
-  control: any; // update this
+  name: keyof CalculationInputsType;
+  control: Control<CalculationInputsType>;
   valueMaximum: number;
   label: string;
 }
