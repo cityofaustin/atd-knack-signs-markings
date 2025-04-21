@@ -1,7 +1,7 @@
 "use client";
 import { useForm } from "react-hook-form";
 import CalcWidthLengthComponent from "@/components/CalcWidthLengthComponent";
-import { CalculationInputsType } from "@/config/calcs";
+import { CalculationInputsType } from "@/types/calcs";
 import "./calc.css";
 
 const defaultCalcValues = {

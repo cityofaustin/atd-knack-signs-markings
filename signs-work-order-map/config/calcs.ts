@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { UseFormSetValue } from "react-hook-form";
+import { useCalculationType } from "@/types/calcs";
 
 const objectProps = {
   adhesive: {
@@ -26,41 +26,6 @@ export const defaultDivisors: { [key: string]: number } = {
   beadsPaint: 212.4,
   adhesive: 3,
 };
-
-export type CalculationInputsType = {
-  thermo60Width: number;
-  thermo60LinearFeet: number;
-  thermo60Output: number;
-  thermo90Width: number;
-  thermo90LinearFeet: number;
-  thermo90Output: number;
-  beadsExtrudedWidth: number;
-  beadsExtrudedLinearFeet: number;
-  beadsExtrudedOutput: number;
-  primerWidth: number;
-  primerLinearFeet: number;
-  primerOutput: number;
-  paintGallonsWidth: number;
-  paintGallonsLinearFeet: number;
-  paintGallonsThickness: number;
-  paintGallonsOutput: number;
-  beadsPaintWidth: number;
-  beadsPaintLinearFeet: number;
-  beadsPaintOutput: number;
-  // adhesive: {
-  //   inputRPMS: 0;
-  //   output: 0;
-  // };
-};
-
-interface useCalculationType {
-  width: number;
-  length: number;
-  thickness?: number;
-  calculationName: string;
-  setValue: UseFormSetValue<CalculationInputsType>;
-  outputFieldName: keyof CalculationInputsType;
-}
 
 export const useCalculation = ({
   width,

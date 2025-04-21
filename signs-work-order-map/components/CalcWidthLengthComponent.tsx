@@ -9,8 +9,8 @@ import {
   MAXWIDTH,
   MAXTHICKNESS,
   useCalculation,
-  CalculationInputsType,
 } from "@/config/calcs";
+import { CalculationInputsType } from "@/types/calcs";
 
 interface CalcWidthLengthComponentProps {
   title: string;
