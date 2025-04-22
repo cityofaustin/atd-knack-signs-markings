@@ -1,6 +1,7 @@
 "use client";
 import { useForm } from "react-hook-form";
 import CalcWidthLengthComponent from "@/components/CalcWidthLengthComponent";
+import CalcRPMSComponent from "@/components/CalcRPMSComponent";
 import { CalculationInputsType } from "@/types/calcs";
 import { thermoplasticCalculations, paintCalculations } from "@/config/calcs";
 import "./calc.css";
@@ -25,10 +26,8 @@ const defaultCalcValues = {
   beadsPaintWidth: 0,
   beadsPaintLinearFeet: 0,
   beadsPaintOutput: 0,
-  // adhesive: {
-  //   inputRPMS: 0,
-  //   output: 0,
-  // },
+  adhesiveInputRPMS: 0,
+  adhesiveOutput: 0,
 };
 
 export default function Calcs() {
@@ -71,6 +70,17 @@ export default function Calcs() {
             calculationName={calculation.calculationName}
           />
         ))}
+        <h1 className="calc-header">Bituminous adhesive</h1>
+        <CalcRPMSComponent
+          title={'4" RPMS'}
+          control={control}
+          watch={watch}
+          setValue={setValue}
+          inputName={"adhesiveInputRPMS"}
+          outputName={"adhesiveOutput"}
+          calculationName={"adhesive"}
+          outputLabel="Pounds of bituminous adhesive:"
+        />
       </form>
     </div>
   );

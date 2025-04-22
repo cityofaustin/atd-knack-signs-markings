@@ -1,5 +1,9 @@
 import { useEffect } from "react";
-import { useCalculationType, CalcComponentTypeDef } from "@/types/calcs";
+import {
+  useCalculationType,
+  useSimpleCalculationType,
+  CalcComponentTypeDef,
+} from "@/types/calcs";
 
 export const MAXWIDTH = 12;
 export const MAXFEET = 1000;
@@ -71,18 +75,6 @@ export const paintCalculations: Array<CalcComponentTypeDef> = [
   },
 ];
 
-//
-// const objectProps = {
-//   adhesive: {
-//     type: "RPMS",
-//     heading: '4" RPMS',
-//     label: "Pounds of bituminous adhesive",
-//     inputRPMS: 0,
-//     divisor: 3,
-//     output: 0,
-//   },
-// };
-
 export const useCalculation = ({
   width,
   length,
@@ -102,4 +94,17 @@ export const useCalculation = ({
 
     setValue(outputFieldName, valueToSet);
   }, [width, length, thickness, setValue, calculationName]);
+};
+
+export const useSimpleCalculation = ({
+  input,
+  calculationName,
+  setValue,
+  outputFieldName,
+}: useSimpleCalculationType) => {
+  useEffect(() => {
+    const valueToSet = input / defaultDivisors[calculationName];
+
+    setValue(outputFieldName, valueToSet);
+  }, [input, setValue, calculationName]);
 };

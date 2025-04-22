@@ -20,10 +20,8 @@ export type CalculationInputsType = {
   beadsPaintWidth: number;
   beadsPaintLinearFeet: number;
   beadsPaintOutput: number;
-  // adhesive: {
-  //   inputRPMS: 0;
-  //   output: 0;
-  // };
+  adhesiveInputRPMS: number;
+  adhesiveOutput: number;
 };
 
 export interface CalcComponentTypeDef {
@@ -45,6 +43,13 @@ export interface useCalculationType {
   outputFieldName: keyof CalculationInputsType;
 }
 
+export interface useSimpleCalculationType {
+  input: number;
+  calculationName: string;
+  setValue: UseFormSetValue<CalculationInputsType>;
+  outputFieldName: keyof CalculationInputsType;
+}
+
 export interface CalcWidthLengthComponentProps {
   title: string;
   control: Control<CalculationInputsType>;
@@ -53,6 +58,17 @@ export interface CalcWidthLengthComponentProps {
   inputWidthName: keyof CalculationInputsType;
   inputLengthName: keyof CalculationInputsType;
   inputThicknessName?: keyof CalculationInputsType;
+  outputName: keyof CalculationInputsType;
+  outputLabel: string;
+  calculationName: string;
+}
+
+export interface CalcRPMSComponentProps {
+  title: string;
+  control: Control<CalculationInputsType>;
+  watch: UseFormWatch<CalculationInputsType>;
+  setValue: UseFormSetValue<CalculationInputsType>;
+  inputName: keyof CalculationInputsType;
   outputName: keyof CalculationInputsType;
   outputLabel: string;
   calculationName: string;
