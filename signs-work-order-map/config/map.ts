@@ -1,8 +1,8 @@
 import "mapbox-gl/dist/mapbox-gl.css";
 // import { SymbolLayerSpecification, RasterLayerSpecification } from "mapbox-gl";
 
-// The Nearmap API key is managed by CTM. Contact help desk for maintenance and troubleshooting.
-const NEARMAP_KEY = process.env.NEXT_PUBLIC_NEARMAP_KEY;
+// // The Nearmap API key is managed by CTM. Contact help desk for maintenance and troubleshooting.
+// const NEARMAP_KEY = process.env.NEXT_PUBLIC_NEARMAP_KEY;
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
 export const MAP_COORDINATE_PRECISION = 8;
