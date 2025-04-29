@@ -24,9 +24,9 @@ type GeocoderControlProps = Omit<
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 const ATX_BOUNDING_BOX: [number, number, number, number] = [
-    -98.182, 29.987, -97.304, 30.663,
-  ];
-  
+  -98.182, 29.987, -97.304, 30.663,
+];
+
 /* eslint-disable complexity,max-statements */
 export default function GeocoderControl(props: GeocoderControlProps) {
   const [marker, setMarker] = useState<ReactElement | null>(null);
@@ -40,7 +40,6 @@ export default function GeocoderControl(props: GeocoderControlProps) {
         bbox: ATX_BOUNDING_BOX,
       });
       ctrl.on("result", (event) => {
-
         const { result } = event;
         const location =
           result &&
@@ -68,7 +67,7 @@ export default function GeocoderControl(props: GeocoderControlProps) {
     }
   );
 
-  // @ts-ignore (TS2339) private member
+  // @ts-expect-error (TS2339) private member
   if (geocoder._map) {
     if (
       geocoder.getProximity() !== props.proximity &&
