@@ -39,12 +39,9 @@ export default function GeocoderControl(props: GeocoderControlProps) {
         accessToken: MAPBOX_TOKEN || "",
         bbox: ATX_BOUNDING_BOX,
       });
-      // ctrl.on('loading', props.onLoading);
-      // ctrl.on('results', props.onResults);
-      ctrl.on("result", (evt) => {
-        // props.onResult(evt);
+      ctrl.on("result", (event) => {
 
-        const { result } = evt;
+        const { result } = event;
         const location =
           result &&
           (result.center ||
@@ -64,7 +61,6 @@ export default function GeocoderControl(props: GeocoderControlProps) {
         }
         console.log(result["place_name"]);
       });
-      // ctrl.on('error', props.onError);
       return ctrl;
     },
     {
