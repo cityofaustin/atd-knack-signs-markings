@@ -1,0 +1,7 @@
+[build]
+  base = "/signs-work-order-map"
+  publish = "/.next"
+  command = "next build"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
