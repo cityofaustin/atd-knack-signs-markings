@@ -15,10 +15,10 @@ interface LatLon {
 }
 
 export default function Map() {
-  const onDrag = useCallback((e: ViewStateChangeEvent) => {
+  const onDrag = useCallback((event: ViewStateChangeEvent) => {
     // truncate values to our preferred precision
-    const latitude = +e.viewState.latitude.toFixed(MAP_COORDINATE_PRECISION);
-    const longitude = +e.viewState.longitude.toFixed(MAP_COORDINATE_PRECISION);
+    const latitude = +event.viewState.latitude.toFixed(MAP_COORDINATE_PRECISION);
+    const longitude = +event.viewState.longitude.toFixed(MAP_COORDINATE_PRECISION);
     console.log(latitude, longitude);
     setMapLatLon({
       latitude,
