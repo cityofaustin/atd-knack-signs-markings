@@ -1,10 +1,10 @@
 "use client";
 import { useForm } from "react-hook-form";
+import { Container } from "react-bootstrap";
 import CalcWidthLengthComponent from "@/components/CalcWidthLengthComponent";
 import CalcRPMSComponent from "@/components/CalcRPMSComponent";
 import { CalculationInputsType } from "@/types/calcs";
 import { thermoplasticCalculations, paintCalculations } from "@/config/calcs";
-import "./calc.css";
 
 const defaultCalcValues = {
   thermo60Width: 0,
@@ -30,9 +30,9 @@ export default function Calcs() {
   });
 
   return (
-    <div>
+    <Container>
       <form>
-        <h1 className="calc-header">Thermoplastic - extruded machine</h1>
+        <h1 className="m-3">Thermoplastic - extruded machine</h1>
         {thermoplasticCalculations.map((calculation) => (
           <CalcWidthLengthComponent
             key={calculation.calculationName}
@@ -45,7 +45,7 @@ export default function Calcs() {
             divisor={calculation.divisor}
           />
         ))}
-        <h1 className="calc-header">Paint</h1>
+        <h1 className="m-3">Paint</h1>
         {paintCalculations.map((calculation) => (
           <CalcWidthLengthComponent
             key={calculation.calculationName}
@@ -59,7 +59,7 @@ export default function Calcs() {
             divisor={calculation.divisor}
           />
         ))}
-        <h1 className="calc-header">Bituminous adhesive</h1>
+        <h1 className="m-3">Bituminous adhesive</h1>
         <CalcRPMSComponent
           title={'4" RPMS'}
           control={control}
@@ -69,6 +69,6 @@ export default function Calcs() {
           divisor={3}
         />
       </form>
-    </div>
+    </Container>
   );
 }
