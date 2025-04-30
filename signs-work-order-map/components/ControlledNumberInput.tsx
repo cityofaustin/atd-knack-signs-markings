@@ -13,6 +13,9 @@ interface ControlledNumberInputProps {
   label: string;
 }
 
+/**
+ * Controlled numeric input with label used in Calculation Component
+ */
 export default function ControlledNumberInput({
   name,
   control,
