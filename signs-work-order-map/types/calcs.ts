@@ -18,12 +18,19 @@ export type CalculationInputsType = {
 };
 
 export interface CalcComponentTypeDef {
+  /** Title shown at top of calculation card */
   title: string;
+  /** Name of the width field */
   inputWidthName: keyof CalculationInputsType;
+  /** Name of the length field */
   inputLengthName: keyof CalculationInputsType;
+  /** Name of thickness field, optional */
   inputThicknessName?: keyof CalculationInputsType;
+  /** Label shown next to output */
   outputLabel: string;
+  /** Name of calculation */
   calculationName: string;
+  /** divisor used in the calculation */
   divisor: number;
 }
 

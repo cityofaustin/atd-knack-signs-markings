@@ -3,9 +3,13 @@ import { Controller, Control } from "react-hook-form";
 import { CalculationInputsType } from "@/types/calcs";
 
 interface ControlledNumberInputProps {
+  /** name for the input, must match the field name in CalculationInputsType */
   name: keyof CalculationInputsType;
+  /** Control from react-hook-form */
   control: Control<CalculationInputsType>;
+  /** Input value should not exceed this maximum */
   valueMaximum: number;
+  /** label to render in front of input */
   label: string;
 }
 
