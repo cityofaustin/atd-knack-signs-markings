@@ -23,7 +23,7 @@ export default function ControlledNumberInput({
         <div className="d-flex justify-content-between">
           <Form.Label className="col-3">{label}</Form.Label>
           <Form.Control
-            type="number"
+            type="numeric"
             className="m-2"
             max={valueMaximum}
             value={value}
