@@ -1,25 +1,17 @@
 import Form from "react-bootstrap/Form";
 import Container from "react-bootstrap/Container";
 import { Col, Row } from "react-bootstrap";
-import { Controller } from "react-hook-form";
 import ControlledNumberInput from "@/components/ControlledNumberInput";
-import {
-  MAXFEET,
-  MAXWIDTH,
-  MAXTHICKNESS,
-  useCalculation,
-} from "@/config/calcs";
+import { MAXFEET, MAXWIDTH, MAXTHICKNESS } from "@/config/calcs";
 import { CalcWidthLengthComponentProps } from "@/types/calcs";
 
 export default function CalcWidthLengthComponent({
   title,
   control,
   watch,
-  setValue,
   inputWidthName,
   inputLengthName,
   inputThicknessName,
-  outputName,
   outputLabel,
   divisor,
 }: CalcWidthLengthComponentProps) {
@@ -31,14 +23,9 @@ export default function CalcWidthLengthComponent({
     [thicknessField] = watch([inputThicknessName]);
   }
 
-  useCalculation({
-    width: widthField,
-    length: lengthField,
-    thickness: thicknessField,
-    divisor,
-    setValue,
-    outputFieldName: outputName,
-  });
+  const result = !!thicknessField
+    ? (widthField * lengthField * thicknessField) / divisor
+    : widthField * (lengthField / divisor);
 
   return (
     <Container className="m-3 p-3">
@@ -69,20 +56,14 @@ export default function CalcWidthLengthComponent({
           )}
         </Col>
         <Col>
-          <Controller
-            control={control}
-            name={outputName}
-            render={({ field: { value } }) => (
-              <Form.Group>
-                <Row>
-                  <Form.Label>{outputLabel}</Form.Label>
-                </Row>
-                <Row>
-                  <Form.Label>{value}</Form.Label>
-                </Row>
-              </Form.Group>
-            )}
-          />
+          <Form.Group>
+            <Row>
+              <Form.Label>{outputLabel}</Form.Label>
+            </Row>
+            <Row>
+              <Form.Label>{result}</Form.Label>
+            </Row>
+          </Form.Group>
         </Col>
       </Row>
     </Container>
