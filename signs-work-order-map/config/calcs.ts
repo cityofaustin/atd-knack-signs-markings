@@ -10,16 +10,6 @@ export const MAXFEET = 1000;
 export const MAXTHICKNESS = 15;
 export const MAXRPMS = 100;
 
-export const defaultDivisors: { [key: string]: number } = {
-  thermo60: 17.5609756097561,
-  thermo90: 12.1951219512195,
-  beadsExtruded: 120,
-  primer: 3600,
-  paintGallons: 19250,
-  beadsPaint: 212.4,
-  adhesive: 3,
-};
-
 export const thermoplasticCalculations: Array<CalcComponentTypeDef> = [
   {
     title: "60 mils thick (maintenance)",
@@ -28,6 +18,7 @@ export const thermoplasticCalculations: Array<CalcComponentTypeDef> = [
     outputName: "thermo60Output",
     outputLabel: "Pounds of allkyd material: ",
     calculationName: "thermo60",
+    divisor: 17.5609756097561,
   },
   {
     title: "90 mils thick (maintenance)",
@@ -36,6 +27,7 @@ export const thermoplasticCalculations: Array<CalcComponentTypeDef> = [
     outputName: "thermo90Output",
     outputLabel: "Pounds of allkyd material: ",
     calculationName: "thermo90",
+    divisor: 12.1951219512195,
   },
   {
     title: "Beads - for extruded machine",
@@ -44,6 +36,7 @@ export const thermoplasticCalculations: Array<CalcComponentTypeDef> = [
     outputName: "beadsExtrudedOutput",
     outputLabel: "Pounds of beads: ",
     calculationName: "beadsExtruded",
+    divisor: 120,
   },
   {
     title: "Thermoplastic: Primer (sealant) - for extruded machine",
@@ -52,6 +45,7 @@ export const thermoplasticCalculations: Array<CalcComponentTypeDef> = [
     outputName: "primerOutput",
     outputLabel: "Gallons of primer: ",
     calculationName: "primer",
+    divisor: 3600,
   },
 ];
 
@@ -64,6 +58,7 @@ export const paintCalculations: Array<CalcComponentTypeDef> = [
     outputName: "paintGallonsOutput",
     outputLabel: "Gallons needed: ",
     calculationName: "paintGallons",
+    divisor: 19250,
   },
   {
     title: "Beads (Pounds of beads)",
@@ -72,6 +67,7 @@ export const paintCalculations: Array<CalcComponentTypeDef> = [
     outputName: "beadsPaintOutput",
     outputLabel: "Pounds of beads: ",
     calculationName: "beadsPaint",
+    divisor: 212.4,
   },
 ];
 
@@ -79,32 +75,31 @@ export const useCalculation = ({
   width,
   length,
   thickness,
-  calculationName,
+  divisor,
   setValue,
   outputFieldName,
 }: useCalculationType) => {
   useEffect(() => {
     let valueToSet = 0;
     if (!!thickness) {
-      valueToSet =
-        (width * length * thickness) / defaultDivisors[calculationName];
+      valueToSet = (width * length * thickness) / divisor;
     } else {
-      valueToSet = width * (length / defaultDivisors[calculationName]);
+      valueToSet = width * (length / divisor);
     }
 
     setValue(outputFieldName, valueToSet);
-  }, [width, length, thickness, setValue, calculationName]);
+  }, [width, length, thickness, setValue, divisor]);
 };
 
 export const useSimpleCalculation = ({
   input,
-  calculationName,
+  divisor,
   setValue,
   outputFieldName,
 }: useSimpleCalculationType) => {
   useEffect(() => {
-    const valueToSet = input / defaultDivisors[calculationName];
+    const valueToSet = input / divisor;
 
     setValue(outputFieldName, valueToSet);
-  }, [input, setValue, calculationName]);
+  }, [input, setValue, divisor]);
 };

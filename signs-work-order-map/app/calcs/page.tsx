@@ -51,7 +51,7 @@ export default function Calcs() {
             inputLengthName={calculation.inputLengthName}
             outputName={calculation.outputName}
             outputLabel={calculation.outputLabel}
-            calculationName={calculation.calculationName}
+            divisor={calculation.divisor}
           />
         ))}
         <h1 className="calc-header">Paint</h1>
@@ -67,7 +67,7 @@ export default function Calcs() {
             inputThicknessName={calculation.inputThicknessName}
             outputName={calculation.outputName}
             outputLabel={calculation.outputLabel}
-            calculationName={calculation.calculationName}
+            divisor={calculation.divisor}
           />
         ))}
         <h1 className="calc-header">Bituminous adhesive</h1>
@@ -78,8 +78,8 @@ export default function Calcs() {
           setValue={setValue}
           inputName={"adhesiveInputRPMS"}
           outputName={"adhesiveOutput"}
-          calculationName={"adhesive"}
           outputLabel="Pounds of bituminous adhesive:"
+          divisor={3}
         />
       </form>
     </div>

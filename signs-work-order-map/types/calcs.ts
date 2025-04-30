@@ -32,20 +32,21 @@ export interface CalcComponentTypeDef {
   outputName: keyof CalculationInputsType;
   outputLabel: string;
   calculationName: string;
+  divisor: number;
 }
 
 export interface useCalculationType {
   width: number;
   length: number;
   thickness?: number;
-  calculationName: string;
+  divisor: number;
   setValue: UseFormSetValue<CalculationInputsType>;
   outputFieldName: keyof CalculationInputsType;
 }
 
 export interface useSimpleCalculationType {
   input: number;
-  calculationName: string;
+  divisor: number;
   setValue: UseFormSetValue<CalculationInputsType>;
   outputFieldName: keyof CalculationInputsType;
 }
@@ -60,7 +61,7 @@ export interface CalcWidthLengthComponentProps {
   inputThicknessName?: keyof CalculationInputsType;
   outputName: keyof CalculationInputsType;
   outputLabel: string;
-  calculationName: string;
+  divisor: number;
 }
 
 export interface CalcRPMSComponentProps {
@@ -71,5 +72,5 @@ export interface CalcRPMSComponentProps {
   inputName: keyof CalculationInputsType;
   outputName: keyof CalculationInputsType;
   outputLabel: string;
-  calculationName: string;
+  divisor: number;
 }

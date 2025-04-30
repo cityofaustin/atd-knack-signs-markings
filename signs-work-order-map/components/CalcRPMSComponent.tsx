@@ -14,18 +14,17 @@ export default function CalcRPMSComponent({
   inputName,
   outputName,
   outputLabel,
-  calculationName,
+  divisor,
 }: CalcRPMSComponentProps) {
   const [rpmsField] = watch([inputName]);
 
   useSimpleCalculation({
     input: rpmsField,
-    calculationName: calculationName,
+    divisor,
     setValue,
     outputFieldName: outputName,
   });
 
-  
   return (
     <Container className="m-3 p-3">
       <Row>
