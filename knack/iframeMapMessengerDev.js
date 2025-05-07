@@ -23,7 +23,7 @@
     function AutozoomSendMessageToApp(message) {
       var iframe = document.getElementById("mapIFrame").contentWindow;
       const stringifiedMessage = JSON.stringify(message);
-      console.log("inside API", stringifiedMessage);
+      console.log("autozoom message to app ", message.message)
       iframe.postMessage(stringifiedMessage, "*");
     }
   
@@ -42,7 +42,7 @@
   
       function sendMessageToApp(message, iframe) {
         var stringifiedMessage = JSON.stringify(message);
-        console.log("inside iFrameMessenger", stringifiedMessage);
+        console.log("iFrameMessage to app", message);
         iframe.postMessage(stringifiedMessage, "*");
       }
   
@@ -53,7 +53,6 @@
         if (event.data.source === "react-devtools-content-script") {
           return;
         }
-        console.log("message received:  ", event.data, event);
         var data = event.data;
         if (data.message === "LAT_LON_FIELDS") {
           var $latLonFields = $("#kn-input-field_3300");
@@ -98,7 +97,7 @@
       function workOrdersDetialsMapMessage(viewId) {
         var urlArray = window.location.href.split("/");
         var recordId = urlArray[urlArray.length - 2];
-        // var workOrderId = urlArray[urlArray.length - 4]; // not being used
+        // var workOrderId = urlArray[urlArray.length - 4]; // the id is the work order id, this is parsing something else
         var workOrderDetailsIFrame = $("#" + viewId + " #mapIFrame")[0]
           .contentWindow;
   

@@ -1,6 +1,4 @@
 export const getKnackHeaders = (userToken:string, appId:string) => {
-  console.log(userToken)
-  console.log(appId)
     return {
     headers: {
       "X-Knack-Application-Id": appId,

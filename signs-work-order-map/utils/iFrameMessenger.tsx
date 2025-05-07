@@ -7,14 +7,16 @@ function getSignsData(data) {
   }/records?view-work-orders-details-sign_id=${data.id}`;
 
   fetch(url, getKnackHeaders(data.token, data.app_id))
-  .then((res) => res.json())
-  .then((res)=> console.log(res.records))
+    .then((res) => res.json())
+    .then((res) => console.log(res.records));
 
-  return []
+  return [];
 }
 
 // should this be a component?
-export default function IFrameMessages() {
+export function iFrameMessenger() {
+  // without this line, I cant get the nextjs app to receive messages
+  window.top.postMessage("ready", "https://atd.knack.com/");
   useEffect(() => {
     const consoleMessage = (event) => {
       if (
@@ -26,8 +28,8 @@ export default function IFrameMessages() {
       }
       const data = JSON.parse(event.data);
       console.log(data.message);
-      console.log(data)
-      getSignsData(data)
+      console.log(data);
+      getSignsData(data);
     };
     window.addEventListener("message", consoleMessage);
 
@@ -35,8 +37,6 @@ export default function IFrameMessages() {
       window.removeEventListener("message", consoleMessage);
     };
   }, []);
-
-  window.top.postMessage("ready", "https://atd.knack.com/");
 
   // window.top.postMessage('reply', '*')
 }
