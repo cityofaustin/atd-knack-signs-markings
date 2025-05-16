@@ -14,11 +14,16 @@ interface LatLon {
   longitude: number;
 }
 
-export default function Map() {
+export default function Map({ data }) {
+  console.log(data);
   const onDrag = useCallback((event: ViewStateChangeEvent) => {
     // truncate values to our preferred precision
-    const latitude = +event.viewState.latitude.toFixed(MAP_COORDINATE_PRECISION);
-    const longitude = +event.viewState.longitude.toFixed(MAP_COORDINATE_PRECISION);
+    const latitude = +event.viewState.latitude.toFixed(
+      MAP_COORDINATE_PRECISION
+    );
+    const longitude = +event.viewState.longitude.toFixed(
+      MAP_COORDINATE_PRECISION
+    );
     console.log(latitude, longitude);
     setMapLatLon({
       latitude,
@@ -40,11 +45,26 @@ export default function Map() {
       {...DEFAULT_MAP_PARAMS}
       onDrag={onDrag}
     >
-      <Marker
+      {/* <Marker
         longitude={mapLatLon.longitude}
         latitude={mapLatLon.latitude}
         // draggable
-      />
+      /> */}
+
+      {data &&
+        data.map((sign) => (
+          <Marker
+            key={sign.id}
+            anchor="bottom"
+            longitude={sign.lng}
+            latitude={sign.lat}
+            // coordinates={[sign.lng, sign.lat]}
+            // onClick={() => this.signClick(sign.id)}
+          />
+        ))}
+      {/* <img src="/icons8-marker-40.png" alt="blue marker" />
+                        </Marker> */}
+
       <GeocoderControl position="top-left" marker={true} />
     </MapGL>
   );

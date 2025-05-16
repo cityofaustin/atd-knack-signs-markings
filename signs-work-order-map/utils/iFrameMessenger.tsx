@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+"use client"
+import { useEffect, useState } from "react";
 import { getKnackHeaders } from "@/utils/utils";
 
 function getSignsData(data) {
@@ -8,18 +9,22 @@ function getSignsData(data) {
 
   fetch(url, getKnackHeaders(data.token, data.app_id))
     .then((res) => res.json())
-    .then((res) => console.log(res.records));
+    .then((res) => console.log(res.records))
+    .catch((error)=>console.error(error))
 
   return [];
 }
 
 export function useIFrameMessenger() {
+  const [message, setMessage] = useState({})
+  if (!window) {
+    console.log("no window")
+    return
+  }
+  // without this line, I cant get the nextjs app to receive messages
+  window.top.postMessage("ready", "https://atd.knack.com/");
   useEffect(() => {
-    if (!window) {
-      return
-    }
-    // without this line, I cant get the nextjs app to receive messages
-    window.top.postMessage("ready", "https://atd.knack.com/");
+
     const consoleMessage = (event) => {
       if (
         event.data.source === "react-devtools-content-script" ||
@@ -31,8 +36,9 @@ export function useIFrameMessenger() {
       const data = JSON.parse(event.data);
       console.log(data.message);
       console.log(data);
+      setMessage(data)
       // this is only for the signs data
-      getSignsData(data);
+      // getSignsData(data);
     };
     window.addEventListener("message", consoleMessage);
 
@@ -40,4 +46,6 @@ export function useIFrameMessenger() {
       window.removeEventListener("message", consoleMessage);
     };
   }, []);
+
+  return message;
 }
