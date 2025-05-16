@@ -13,11 +13,13 @@ function getSignsData(data) {
   return [];
 }
 
-// should this be a component?
-export function iFrameMessenger() {
-  // without this line, I cant get the nextjs app to receive messages
-  window.top.postMessage("ready", "https://atd.knack.com/");
+export function useIFrameMessenger() {
   useEffect(() => {
+    if (!window) {
+      return
+    }
+    // without this line, I cant get the nextjs app to receive messages
+    window.top.postMessage("ready", "https://atd.knack.com/");
     const consoleMessage = (event) => {
       if (
         event.data.source === "react-devtools-content-script" ||
@@ -29,6 +31,7 @@ export function iFrameMessenger() {
       const data = JSON.parse(event.data);
       console.log(data.message);
       console.log(data);
+      // this is only for the signs data
       getSignsData(data);
     };
     window.addEventListener("message", consoleMessage);
@@ -37,6 +40,4 @@ export function iFrameMessenger() {
       window.removeEventListener("message", consoleMessage);
     };
   }, []);
-
-  // window.top.postMessage('reply', '*')
 }
