@@ -8,7 +8,7 @@ export default function Home() {
 
   console.log(knackPayload)
 
-  const location = knackPayload.location;
+  const location = knackPayload?.location;
 
   return (
     <div className={styles.page}>
