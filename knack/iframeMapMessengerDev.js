@@ -49,9 +49,13 @@
       ).appendTo($viewSelector);
     }
 
+    /**
+     * Posts message to specified iframe
+     * @param {Object} message - payload to send to iframe
+     * @param {*} iframe - iframe reference
+     */
     function sendMessageToApp(message, iframe) {
       var stringifiedMessage = JSON.stringify(message);
-      console.log("iFrameMessage to app", message);
       iframe.postMessage(stringifiedMessage, "*");
     }
 
@@ -78,20 +82,89 @@
       var recordId = urlArray[urlArray.length - 2];
       var workOrderId = urlArray[urlArray.length - 4];
 
-      var markerMessage = {
+      var headers = getHeaders(Knack.getUserToken(), Knack.application_id);
+      var signsMarkerMessage = {
         message: "KNACK_LOCATION_DETAILS",
-        view: "view_2733",
-        scene: "scene_1039",
-        token: Knack.getUserToken(),
-        app_id: Knack.application_id,
-        id: recordId,
-        workOrderScene: "scene_1028",
-        workOrderId: workOrderId,
-        workOrderView: "view_2573",
+        records: [],
+        location: [],
       };
 
-      sendMessageToApp(markerMessage, locationViewIFrame);
+      $.ajax({
+        url: `https://api.knack.com/v1/scenes/scene_1039/views/view_2733/records/${recordId}`,
+        headers: headers,
+      }).then(function (res) {
+        var locationField = res["field_3300_raw"];
+        signsMarkerMessage.location = [
+          locationField.latitude,
+          locationField.longitude,
+        ];
+
+        $.ajax({
+          url: `https://api.knack.com/v1/scenes/scene_1028/views/view_2573/records?view-work-orders-details-sign_id=${workOrderId}`,
+          headers: headers,
+        }).then(function (res) {
+          var records = res.records;
+          signsMarkerMessage.records = records;
+          sendMessageToApp(signsMarkerMessage, locationViewIFrame);
+        });
+      });
     }
+
+    /**
+     * uses work order record ID to request signs and sends to iframe
+     * @param {*} viewId
+     */
+    function workOrdersDetailsMapMessage(viewId) {
+      var urlArray = window.location.href.split("/");
+      var recordId = urlArray[urlArray.length - 2];
+      var workOrderDetailsIFrame = $("#" + viewId + " #mapIFrame")[0]
+        .contentWindow;
+      var headers = getHeaders(Knack.getUserToken(), Knack.application_id);
+      var view = myView.slice(1);
+
+      console.log("requesting records for work order id ", recordId);
+      $.ajax({
+        url: `https://api.knack.com/v1/scenes/scene_1028/views/${view}/records?view-work-orders-details-sign_id=${recordId}`,
+        headers: headers,
+      }).then(function (res) {
+        var records = res.records;
+        console.log("WORK ORDER SIGNS: ", records);
+        var signsMarkerMessage = {
+          message: "WORK_ORDER_SIGNS",
+          records: records,
+          location: [],
+        };
+        sendMessageToApp(signsMarkerMessage, workOrderDetailsIFrame);
+      });
+    }
+
+    function sendLocationMapMessage(viewId) {
+      // Use crumbtrail to get Location record ID
+      var crumbtrailArray = $(".kn-crumbtrail")
+        .children()
+        .last()
+        .attr("href")
+        .split("/");
+      var recordId = crumbtrailArray[crumbtrailArray.length - 1].split("?")[0];
+      var editLocationIframe = $("#view_2682 #mapIFrame")[0].contentWindow;
+
+      var headers = getHeaders(Knack.getUserToken(), Knack.application_id);
+
+      $.ajax({
+        url: `https://api.knack.com/v1/scenes/scene_1061/views/view_2682/records/${recordId}`,
+        headers: headers,
+      }).then(function (res) {
+        var locationField = res["field_3300_raw"];
+        console.log("EDIT_LOCATION: ", locationField);
+        var locationMessage = {
+          message: "EDIT_LOCATION",
+          records: [],
+          location: [locationField.latitude, locationField.longitude],
+        };
+        sendMessageToApp(locationMessage, editLocationIframe);
+      });
+    }
+
     // Location Details Page - Editable
     $("#view_2609 #mapIFrame").on("load", function () {
       locationDetailsMapMessage("view_2609");
@@ -102,68 +175,18 @@
       locationDetailsMapMessage("view_2733");
     });
 
-    // Work Orders Details Page Maps
-    function workOrdersDetialsMapMessage(viewId) {
-      var urlArray = window.location.href.split("/");
-      var recordId = urlArray[urlArray.length - 2];
-      var workOrderDetailsIFrame = $("#" + viewId + " #mapIFrame")[0]
-        .contentWindow;
-      var headers = getHeaders(Knack.getUserToken(), Knack.application_id);
-      var view = myView.slice(1);
-
-      var markerMessage = {
-        message: "SIGNS_API_REQUEST",
-        view: myView.slice(1),
-        scene: "scene_1028",
-        token: Knack.getUserToken(),
-        app_id: Knack.application_id,
-        id: recordId,
-      };
-
-      $.ajax({
-        url: `https://api.knack.com/v1/scenes/scene_1028/views/${view}/records?view-work-orders-details-sign_id=${recordId}`,
-        headers: headers,
-      }).then(function (res) {
-        var records = res.records;
-        console.log("internal ajax call ", records);
-        var signsmarkerMessage = {
-          message: "WORK_ORDER_SIGNS",
-          records: records,
-        };
-        sendMessageToApp(signsmarkerMessage, workOrderDetailsIFrame);
-      });
-
-      sendMessageToApp(markerMessage, workOrderDetailsIFrame);
-    }
     // Work Order Details Page - Editable
     $("#view_2573 #mapIFrame").on("load", function () {
-      workOrdersDetialsMapMessage("view_2573");
+      workOrdersDetailsMapMessage("view_2573");
     });
     // Work Order Details Page - Viewable
     $("#view_2619 #mapIFrame").on("load", function () {
-      workOrdersDetialsMapMessage("view_2619");
+      workOrdersDetailsMapMessage("view_2619");
     });
 
     // Edit Location Page
     $("#view_2682 #mapIFrame").on("load", function () {
-      // Use crumbtrail to get Location record ID
-      var crumbtrailArray = $(".kn-crumbtrail")
-        .children()
-        .last()
-        .attr("href")
-        .split("/");
-      var recordId = crumbtrailArray[crumbtrailArray.length - 1].split("?")[0];
-      var editLocationIframe = $("#view_2682 #mapIFrame")[0].contentWindow;
-
-      var markerMessage = {
-        message: "EDIT_SIGNS_API_REQUEST",
-        scene: "scene_1061",
-        view: "view_2682",
-        token: Knack.getUserToken(),
-        app_id: Knack.application_id,
-        id: recordId,
-      };
-      sendMessageToApp(markerMessage, editLocationIframe);
+      sendLocationMapMessage("view_2682");
     });
 
     // Get the current location from browser.
