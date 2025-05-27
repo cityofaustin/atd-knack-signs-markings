@@ -4,11 +4,11 @@ import Map from "@/components/Map";
 import { useIFrameMessenger } from "@/utils/iFrameMessenger";
 
 export default function Home() {
-  const knackMessage = useIFrameMessenger();
+  const knackPayload = useIFrameMessenger();
 
-  console.log(knackMessage)
+  console.log(knackPayload)
 
-  const location = knackMessage.location;
+  const location = knackPayload.location;
 
   return (
     <div className={styles.page}>
