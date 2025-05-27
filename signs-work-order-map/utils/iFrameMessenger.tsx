@@ -2,13 +2,13 @@
 import { useEffect, useState } from "react";
 
 type MessageToIframe = {
-  message?: string;
-  records?: [];
-  location?: [];
+  message: string;
+  records: [];
+  location: [number, number];
 };
 
 export function useIFrameMessenger() {
-  const [message, setMessage] = useState<MessageToIframe>({});
+  const [message, setMessage] = useState<MessageToIframe | null>(null);
 
   useEffect(() => {
     const consoleMessage = (event: MessageEvent) => {

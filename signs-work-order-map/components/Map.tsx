@@ -14,7 +14,11 @@ interface LatLon {
   longitude: number;
 }
 
-export default function Map({ location }) {
+interface MapProps {
+  location: [number, number] | undefined
+}
+
+export default function Map({ location }:MapProps) {
 
   const onDrag = useCallback((event: ViewStateChangeEvent) => {
     // truncate values to our preferred precision
