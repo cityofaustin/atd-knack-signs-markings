@@ -15,11 +15,10 @@ interface LatLon {
 }
 
 interface MapProps {
-  location: [number, number] | undefined
+  location: [number, number] | undefined;
 }
 
-export default function Map({ location }:MapProps) {
-
+export default function Map({ location }: MapProps) {
   const onDrag = useCallback((event: ViewStateChangeEvent) => {
     // truncate values to our preferred precision
     const latitude = +event.viewState.latitude.toFixed(
@@ -33,6 +32,11 @@ export default function Map({ location }:MapProps) {
       latitude,
       longitude,
     });
+    // send location to Knack
+    window.parent.postMessage(
+      { message: "LAT_LON_FIELDS", lat: latitude, lng: longitude },
+      "*"
+    );
   }, []);
 
   const [mapLatLon, setMapLatLon] = useState<LatLon>({

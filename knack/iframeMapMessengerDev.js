@@ -44,6 +44,7 @@
     if ($(myView + " #mapIFrame").length === 0) {
       https: $(
         // '<iframe src="https://atd-knack-signs-markings.netlify.app/" frameborder="0" scrolling="yes" id="mapIFrame" \
+        // '<iframe src="https://deploy-preview-326--nextjs-knack-signs-markings.netlify.app/" frameborder="0" scrolling="yes" id="mapIFrame" \
         '<iframe src="http://localhost:3000/" frameborder="0" scrolling="yes" id="mapIFrame" \
       style="width: 100%;height: 523px;"></iframe>'
       ).appendTo($viewSelector);
@@ -68,6 +69,7 @@
       }
       var data = event.data;
       if (data.message === "LAT_LON_FIELDS") {
+        console.log("received message ", data)
         var $latLonFields = $("#kn-input-field_3300");
 
         $latLonFields.find("#latitude").val(data.lat);
