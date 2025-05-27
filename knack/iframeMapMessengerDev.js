@@ -89,6 +89,8 @@
         location: [],
       };
 
+      // Request the location based on record ID
+      console.log("Requesting records for location id ", recordId);
       $.ajax({
         url: `https://api.knack.com/v1/scenes/scene_1039/views/view_2733/records/${recordId}`,
         headers: headers,
@@ -98,7 +100,8 @@
           locationField.latitude,
           locationField.longitude,
         ];
-
+        console.log("requesting records for work order id ", workOrderId);
+        // Request the associated signs records
         $.ajax({
           url: `https://api.knack.com/v1/scenes/scene_1028/views/view_2573/records?view-work-orders-details-sign_id=${workOrderId}`,
           headers: headers,
@@ -194,8 +197,8 @@
       // create message object for React App
       const geolocationMessage = {
         message: "KNACK_GEOLOCATION",
-        lat: position.coords.latitude,
-        lon: position.coords.longitude,
+        records: [],
+        location: [position.coords.latitude, position.coords.longitude],
       };
 
       // sends geolocation once the iframe is loaded

@@ -14,8 +14,8 @@ interface LatLon {
   longitude: number;
 }
 
-export default function Map({ data }) {
-  console.log(data);
+export default function Map({ location }) {
+
   const onDrag = useCallback((event: ViewStateChangeEvent) => {
     // truncate values to our preferred precision
     const latitude = +event.viewState.latitude.toFixed(
@@ -35,6 +35,7 @@ export default function Map({ data }) {
     latitude: DEFAULT_MAP_PAN_ZOOM.latitude,
     longitude: DEFAULT_MAP_PAN_ZOOM.longitude,
   });
+
   return (
     <MapGL
       initialViewState={{
@@ -45,25 +46,15 @@ export default function Map({ data }) {
       {...DEFAULT_MAP_PARAMS}
       onDrag={onDrag}
     >
-      {/* <Marker
+      <Marker
         longitude={mapLatLon.longitude}
         latitude={mapLatLon.latitude}
         // draggable
-      /> */}
+      />
 
-      {data &&
-        data.map((sign) => (
-          <Marker
-            key={sign.id}
-            anchor="bottom"
-            longitude={sign.lng}
-            latitude={sign.lat}
-            // coordinates={[sign.lng, sign.lat]}
-            // onClick={() => this.signClick(sign.id)}
-          />
-        ))}
-      {/* <img src="/icons8-marker-40.png" alt="blue marker" />
-                        </Marker> */}
+      {location && location[0] && (
+        <Marker latitude={location[0]} longitude={location[1]} />
+      )}
 
       <GeocoderControl position="top-left" marker={true} />
     </MapGL>
