@@ -1,6 +1,10 @@
 "use client";
-import { useCallback, useState } from "react";
-import MapGL, { Marker, ViewStateChangeEvent } from "react-map-gl/mapbox";
+import { useCallback, useState, useMemo } from "react";
+import MapGL, {
+  Marker,
+  ViewStateChangeEvent,
+  Popup,
+} from "react-map-gl/mapbox";
 import GeocoderControl from "@/components/MapGeocoderControl";
 
 import {
@@ -16,9 +20,13 @@ interface LatLon {
 
 interface MapProps {
   location: [number, number] | undefined;
+  signs: any;
+  messageType: string | undefined; // refine this more to only be one of the specific messages?
 }
 
-export default function Map({ location }: MapProps) {
+export default function Map({ location, signs, messageType }: MapProps) {
+  console.log(signs);
+  const [popupInfo, setPopupInfo] = useState(null);
   const onDrag = useCallback((event: ViewStateChangeEvent) => {
     // truncate values to our preferred precision
     const latitude = +event.viewState.latitude.toFixed(
@@ -44,6 +52,28 @@ export default function Map({ location }: MapProps) {
     longitude: DEFAULT_MAP_PAN_ZOOM.longitude,
   });
 
+  const pins = useMemo(
+    () =>
+      signs.map((sign, index) => (
+        <Marker
+          key={`marker-${index}`}
+          longitude={sign.lng}
+          latitude={sign.lat}
+          anchor="bottom"
+          onClick={(e) => {
+            // If we let the click event propagates to the map, it will immediately close the popup
+            // with `closeOnClick: true`
+            e.originalEvent.stopPropagation();
+            setPopupInfo(sign);
+          }}
+        >
+          {/*<Pin />
+           */}
+        </Marker>
+      )),
+    []
+  );
+
   return (
     <MapGL
       initialViewState={{
@@ -54,15 +84,17 @@ export default function Map({ location }: MapProps) {
       {...DEFAULT_MAP_PARAMS}
       onDrag={onDrag}
     >
-      <Marker
+      {/* <Marker
         longitude={mapLatLon.longitude}
         latitude={mapLatLon.latitude}
         // draggable
-      />
+      /> */}
 
-      {location && location[0] && (
+      {pins}
+
+      {/* {location && location[0] && (
         <Marker latitude={location[0]} longitude={location[1]} />
-      )}
+      )} */}
 
       <GeocoderControl position="top-left" marker={true} />
     </MapGL>
