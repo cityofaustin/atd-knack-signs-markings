@@ -1,11 +1,10 @@
 "use client";
 import { useCallback, useState, useMemo } from "react";
-import MapGL, {
-  Marker,
-  ViewStateChangeEvent,
-  Popup,
-} from "react-map-gl/mapbox";
+import MapGL, { Marker, ViewStateChangeEvent } from "react-map-gl/mapbox";
 import GeocoderControl from "@/components/MapGeocoderControl";
+import bbox from "@turf/bbox";
+import { lineString } from "@turf/helpers";
+import SignPopup from "./SignPopup";
 
 import {
   DEFAULT_MAP_PARAMS,
@@ -22,6 +21,14 @@ interface MapProps {
   location: [number, number] | undefined;
   signs: any;
   messageType: string | undefined; // refine this more to only be one of the specific messages?
+}
+
+export interface Sign {
+  id: string;
+  lng: number;
+  lat: number;
+  spatialId: number;
+  workOrderId: string;
 }
 
 export default function Map({ location, signs, messageType }: MapProps) {
@@ -52,11 +59,11 @@ export default function Map({ location, signs, messageType }: MapProps) {
     longitude: DEFAULT_MAP_PAN_ZOOM.longitude,
   });
 
-  const pins = useMemo(
+  const signPins = useMemo(
     () =>
-      signs.map((sign, index) => (
+      signs.map((sign) => (
         <Marker
-          key={`marker-${index}`}
+          key={`marker-${sign.id}`}
           longitude={sign.lng}
           latitude={sign.lat}
           anchor="bottom"
@@ -64,12 +71,10 @@ export default function Map({ location, signs, messageType }: MapProps) {
             // If we let the click event propagates to the map, it will immediately close the popup
             // with `closeOnClick: true`
             e.originalEvent.stopPropagation();
+            console.log(sign);
             setPopupInfo(sign);
           }}
-        >
-          {/*<Pin />
-           */}
-        </Marker>
+        />
       )),
     []
   );
@@ -90,72 +95,17 @@ export default function Map({ location, signs, messageType }: MapProps) {
         // draggable
       /> */}
 
-      {pins}
+      {signPins}
 
       {/* {location && location[0] && (
         <Marker latitude={location[0]} longitude={location[1]} />
       )} */}
 
       {popupInfo && (
-        <Popup
-          anchor="top"
-          longitude={Number(popupInfo.lng)}
-          latitude={Number(popupInfo.lat)}
-          onClose={() => setPopupInfo(null)}
-          offset={[0, -20]}
-        >
-          <div>
-            <span>
-              <a
-                href={`https://atd.knack.com/signs-markings#work-order-signs/view-work-orders-details-sign/${popupInfo?.workOrderId}/view-work-order-signs-location-details/${
-                  popupInfo.id
-                }`}
-                // ensure it doesn't open in the iframe
-                target="_top"
-              >
-                Location Detail Page
-              </a>
-            </span>
-            <br />
-            <span>Spatial ID: {popupInfo.spatialId}</span>
-            <br />
-            <span>Latitude: {popupInfo.lat}</span>
-            <br />
-            <span>Longitude: {popupInfo.lng}</span>
-          </div>
-        </Popup>
+        <SignPopup popupInfo={popupInfo} setPopupInfo={setPopupInfo} />
       )}
 
       <GeocoderControl position="top-left" marker={true} />
     </MapGL>
   );
 }
-
-/*
-                <Popup
-                  key={activeSign.id}
-                  coordinates={[activeSign.lng, activeSign.lat]}
-                  onClick={this.closePopup}
-                  offset={{ bottom: [0, -40] }}
-                >
-                  <div className="container popup">
-                    <span>
-                      <a
-                        href={`https://atd.knack.com/signs-markings#work-order-signs/view-work-orders-details-sign/${workOrderId}/view-work-order-signs-location-details/${
-                          activeSign.id
-                        }`}
-                        target="_top"
-                      >
-                        Location Detail Page
-                      </a>
-                    </span>
-                    <br />
-                    <span>Spatial ID: {activeSign.spatialId}</span>
-                    <br />
-                    <span>Latitude: {activeSign.lat}</span>
-                    <br />
-                    <span>Longitude: {activeSign.lng}</span>
-                  </div>
-                </Popup>
- *
- */

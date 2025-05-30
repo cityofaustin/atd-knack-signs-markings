@@ -1,6 +1,6 @@
 "use client";
 import styles from "./page.module.css";
-import Map from "@/components/Map";
+import Map, {Sign} from "@/components/Map";
 import { useIFrameMessenger } from "@/utils/iFrameMessenger";
 
 const testpayload = {

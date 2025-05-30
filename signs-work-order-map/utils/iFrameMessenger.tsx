@@ -1,14 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
 
-type MessageToIframe = {
+type MessageToIFrame = {
   message: string;
   records: [];
   location: [number, number];
 };
 
 export function useIFrameMessenger() {
-  const [message, setMessage] = useState<MessageToIframe | null>(null);
+  const [message, setMessage] = useState<MessageToIFrame | null>(null);
 
   useEffect(() => {
     const consoleMessage = (event: MessageEvent) => {
