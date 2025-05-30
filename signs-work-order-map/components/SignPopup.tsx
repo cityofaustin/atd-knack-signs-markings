@@ -3,7 +3,7 @@ import { Sign } from "@/components/Map";
 
 interface SignPopupProps {
   popupInfo: Sign;
-  setPopupInfo: React.Dispatch<React.SetStateAction<null>>;
+  setPopupInfo: React.Dispatch<React.SetStateAction<Sign | null>>;
 }
 
 export default function SignPopup({ popupInfo, setPopupInfo }: SignPopupProps) {

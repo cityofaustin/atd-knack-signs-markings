@@ -33,7 +33,7 @@ export interface Sign {
 
 export default function Map({ location, signs, messageType }: MapProps) {
   console.log(signs);
-  const [popupInfo, setPopupInfo] = useState(null);
+  const [popupInfo, setPopupInfo] = useState<Sign | null>(null);
   const onDrag = useCallback((event: ViewStateChangeEvent) => {
     // truncate values to our preferred precision
     const latitude = +event.viewState.latitude.toFixed(
@@ -61,7 +61,7 @@ export default function Map({ location, signs, messageType }: MapProps) {
 
   const signPins = useMemo(
     () =>
-      signs.map((sign) => (
+      signs.map((sign: Sign) => (
         <Marker
           key={`marker-${sign.id}`}
           longitude={sign.lng}
