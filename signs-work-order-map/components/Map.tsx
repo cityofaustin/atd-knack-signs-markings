@@ -96,7 +96,66 @@ export default function Map({ location, signs, messageType }: MapProps) {
         <Marker latitude={location[0]} longitude={location[1]} />
       )} */}
 
+      {popupInfo && (
+        <Popup
+          anchor="top"
+          longitude={Number(popupInfo.lng)}
+          latitude={Number(popupInfo.lat)}
+          onClose={() => setPopupInfo(null)}
+          offset={[0, -20]}
+        >
+          <div>
+            <span>
+              <a
+                href={`https://atd.knack.com/signs-markings#work-order-signs/view-work-orders-details-sign/${popupInfo?.workOrderId}/view-work-order-signs-location-details/${
+                  popupInfo.id
+                }`}
+                // ensure it doesn't open in the iframe
+                target="_top"
+              >
+                Location Detail Page
+              </a>
+            </span>
+            <br />
+            <span>Spatial ID: {popupInfo.spatialId}</span>
+            <br />
+            <span>Latitude: {popupInfo.lat}</span>
+            <br />
+            <span>Longitude: {popupInfo.lng}</span>
+          </div>
+        </Popup>
+      )}
+
       <GeocoderControl position="top-left" marker={true} />
     </MapGL>
   );
 }
+
+/*
+                <Popup
+                  key={activeSign.id}
+                  coordinates={[activeSign.lng, activeSign.lat]}
+                  onClick={this.closePopup}
+                  offset={{ bottom: [0, -40] }}
+                >
+                  <div className="container popup">
+                    <span>
+                      <a
+                        href={`https://atd.knack.com/signs-markings#work-order-signs/view-work-orders-details-sign/${workOrderId}/view-work-order-signs-location-details/${
+                          activeSign.id
+                        }`}
+                        target="_top"
+                      >
+                        Location Detail Page
+                      </a>
+                    </span>
+                    <br />
+                    <span>Spatial ID: {activeSign.spatialId}</span>
+                    <br />
+                    <span>Latitude: {activeSign.lat}</span>
+                    <br />
+                    <span>Longitude: {activeSign.lng}</span>
+                  </div>
+                </Popup>
+ *
+ */
