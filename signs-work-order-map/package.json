@@ -13,9 +13,11 @@
     "@netlify/plugin-nextjs": "^5.10.7",
     "@types/mapbox__mapbox-gl-geocoder": "^5.0.0",
     "@types/mapbox-gl": "^3.4.1",
+    "bootstrap": "^5.3.6",
     "mapbox-gl": "^3.10.0",
     "next": "15.2.4",
     "react": "^19.0.0",
+    "react-bootstrap": "^2.10.10",
     "react-dom": "^19.0.0",
     "react-map-gl": "^8.0.1"
   },
