@@ -19,6 +19,8 @@ export function useIFrameMessenger() {
       ) {
         return;
       }
+
+      console.log(event.data)
       const data = JSON.parse(event.data);
       setMessage(data);
     };

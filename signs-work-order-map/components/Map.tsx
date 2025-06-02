@@ -1,6 +1,10 @@
 "use client";
-import { useCallback, useState, useMemo } from "react";
-import MapGL, { Marker, ViewStateChangeEvent } from "react-map-gl/mapbox";
+import { useCallback, useState, useMemo, useEffect, useRef } from "react";
+import MapGL, {
+  Marker,
+  ViewStateChangeEvent,
+  MapRef,
+} from "react-map-gl/mapbox";
 import GeocoderControl from "@/components/MapGeocoderControl";
 import bbox from "@turf/bbox";
 import { lineString } from "@turf/helpers";
@@ -32,7 +36,8 @@ export interface Sign {
 }
 
 export default function Map({ location, signs, messageType }: MapProps) {
-  console.log(signs);
+  console.log("SIGNS ", signs);
+  const mapRef = useRef<MapRef>(null);
   const [popupInfo, setPopupInfo] = useState<Sign | null>(null);
   const onDrag = useCallback((event: ViewStateChangeEvent) => {
     // truncate values to our preferred precision
@@ -47,7 +52,7 @@ export default function Map({ location, signs, messageType }: MapProps) {
       latitude,
       longitude,
     });
-    // send location to Knack
+    // send location to Knack -- this shouldnt happen during certain views? or does it matter?
     window.parent.postMessage(
       { message: "LAT_LON_FIELDS", lat: latitude, lng: longitude },
       "*"
@@ -58,6 +63,34 @@ export default function Map({ location, signs, messageType }: MapProps) {
     latitude: DEFAULT_MAP_PAN_ZOOM.latitude,
     longitude: DEFAULT_MAP_PAN_ZOOM.longitude,
   });
+
+  const signArray = useMemo(() => {
+    return signs.map((sign: Sign) => [sign.lng, sign.lat]);
+  }, [signs]);
+
+  console.log(signArray, signArray.length, mapRef.current);
+
+  // const onClick = (event) => {
+  const lineStringFeature =
+    signArray.length < 2
+      ? lineString([signArray[0], [signArray[0][0], signArray[0][1]]])
+      : lineString(signArray);
+
+  console.log("feature", lineStringFeature);
+
+  useEffect(() => {
+    const [minLng, minLat, maxLng, maxLat] = bbox(lineStringFeature);
+    console.log(minLat, minLng, maxLat, maxLng);
+
+    mapRef.current?.fitBounds(
+      [
+        [minLng, minLat],
+        [maxLng, maxLat],
+      ],
+      { padding: 40, duration: 1000 }
+    );
+  }, [mapRef, lineStringFeature]);
+  // };
 
   const signPins = useMemo(
     () =>
@@ -76,11 +109,12 @@ export default function Map({ location, signs, messageType }: MapProps) {
           }}
         />
       )),
-    []
+    [signs]
   );
 
   return (
     <MapGL
+      ref={mapRef}
       initialViewState={{
         latitude: DEFAULT_MAP_PAN_ZOOM.latitude,
         longitude: DEFAULT_MAP_PAN_ZOOM.longitude,
@@ -88,6 +122,7 @@ export default function Map({ location, signs, messageType }: MapProps) {
       }}
       {...DEFAULT_MAP_PARAMS}
       onDrag={onDrag}
+      // onClick={onClick}
     >
       {/* <Marker
         longitude={mapLatLon.longitude}
