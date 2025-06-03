@@ -1,6 +1,6 @@
 "use client";
 import styles from "./page.module.css";
-import Map, {Sign} from "@/components/Map";
+import Map, { Sign } from "@/components/Map";
 import { useIFrameMessenger } from "@/utils/iFrameMessenger";
 
 const testpayload = {
@@ -50,16 +50,14 @@ const testpayload = {
   ],
 };
 
-const formatSignsRecords = (records) => {
+const formatSignsRecords = (records): Sign[] => {
   console.log(records);
-  return records.map((sign) => {
-    const signObj = {};
-    signObj["id"] = sign.id;
-    signObj["lat"] = sign.field_3300_raw.latitude;
-    signObj["lng"] = sign.field_3300_raw.longitude;
-    signObj["spatialId"] = sign.field_3297;
-    return signObj;
-  });
+  return records.map((sign) => ({
+    id: sign.id,
+    lat: sign.field_3300_raw.latitude,
+    lng: sign.field_3300_raw.longitude,
+    spatialId: sign.field_3300_raw.longitude,
+  }));
 };
 
 export default function Home() {

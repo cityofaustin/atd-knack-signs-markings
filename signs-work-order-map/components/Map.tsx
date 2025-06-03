@@ -1,10 +1,6 @@
 "use client";
-import { useCallback, useState, useMemo, useEffect, useRef } from "react";
-import MapGL, {
-  Marker,
-  ViewStateChangeEvent,
-  MapRef,
-} from "react-map-gl/mapbox";
+import { useCallback, useState, useMemo } from "react";
+import MapGL, { Marker, ViewStateChangeEvent } from "react-map-gl/mapbox";
 import GeocoderControl from "@/components/MapGeocoderControl";
 import bbox from "@turf/bbox";
 import { lineString } from "@turf/helpers";
@@ -36,8 +32,6 @@ export interface Sign {
 }
 
 export default function Map({ location, signs, messageType }: MapProps) {
-  console.log("SIGNS ", signs);
-  const mapRef = useRef<MapRef>(null);
   const [popupInfo, setPopupInfo] = useState<Sign | null>(null);
   const onDrag = useCallback((event: ViewStateChangeEvent) => {
     // truncate values to our preferred precision
@@ -68,29 +62,12 @@ export default function Map({ location, signs, messageType }: MapProps) {
     return signs.map((sign: Sign) => [sign.lng, sign.lat]);
   }, [signs]);
 
-  console.log(signArray, signArray.length, mapRef.current);
-
-  // const onClick = (event) => {
   const lineStringFeature =
     signArray.length < 2
       ? lineString([signArray[0], [signArray[0][0], signArray[0][1]]])
       : lineString(signArray);
 
-  console.log("feature", lineStringFeature);
-
-  useEffect(() => {
-    const [minLng, minLat, maxLng, maxLat] = bbox(lineStringFeature);
-    console.log(minLat, minLng, maxLat, maxLng);
-
-    mapRef.current?.fitBounds(
-      [
-        [minLng, minLat],
-        [maxLng, maxLat],
-      ],
-      { padding: 40, duration: 1000 }
-    );
-  }, [mapRef, lineStringFeature]);
-  // };
+  const [minLng, minLat, maxLng, maxLat] = bbox(lineStringFeature);
 
   const signPins = useMemo(
     () =>
@@ -114,15 +91,14 @@ export default function Map({ location, signs, messageType }: MapProps) {
 
   return (
     <MapGL
-      ref={mapRef}
       initialViewState={{
         latitude: DEFAULT_MAP_PAN_ZOOM.latitude,
         longitude: DEFAULT_MAP_PAN_ZOOM.longitude,
         zoom: DEFAULT_MAP_PAN_ZOOM.zoom,
+        bounds: [minLng, minLat, maxLng, maxLat],
       }}
       {...DEFAULT_MAP_PARAMS}
       onDrag={onDrag}
-      // onClick={onClick}
     >
       {/* <Marker
         longitude={mapLatLon.longitude}
