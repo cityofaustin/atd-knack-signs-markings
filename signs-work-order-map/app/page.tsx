@@ -1,10 +1,11 @@
 "use client";
 import styles from "./page.module.css";
-import Map, { Sign } from "@/components/Map";
+import Map from "@/components/Map";
+import { KnackRecord, Sign } from "@/types/map";
 import { useIFrameMessenger } from "@/utils/iFrameMessenger";
 
 const testpayload = {
-  location: [],
+  location: undefined,
   message: "WORK_ORDER_SIGNS",
   records: [
     {
@@ -50,7 +51,7 @@ const testpayload = {
   ],
 };
 
-const formatSignsRecords = (records): Sign[] => {
+const formatSignsRecords = (records: KnackRecord[]): Sign[] => {
   console.log(records);
   return records.map((sign) => ({
     id: sign.id,
@@ -65,7 +66,7 @@ export default function Home() {
   const knackPayload = testpayload;
   console.log(testpayload);
 
-  const location = knackPayload?.location;
+  const location = knackPayload.location;
   const signs = formatSignsRecords(knackPayload.records);
   const messageType = knackPayload?.message;
 

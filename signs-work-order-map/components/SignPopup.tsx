@@ -1,5 +1,5 @@
 import { Popup } from "react-map-gl/mapbox";
-import { Sign } from "@/components/Map";
+import { Sign } from "@/types/map"
 
 interface SignPopupProps {
   popupInfo: Sign;

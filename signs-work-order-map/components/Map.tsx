@@ -2,34 +2,14 @@
 import { useCallback, useState, useMemo } from "react";
 import MapGL, { Marker, ViewStateChangeEvent } from "react-map-gl/mapbox";
 import GeocoderControl from "@/components/MapGeocoderControl";
-import bbox from "@turf/bbox";
-import { lineString } from "@turf/helpers";
 import SignPopup from "./SignPopup";
-
+import { MapProps, LatLon, Sign } from "@/types/map";
+import { formatBounds } from "@/utils/mapUtils";
 import {
   DEFAULT_MAP_PARAMS,
   DEFAULT_MAP_PAN_ZOOM,
   MAP_COORDINATE_PRECISION,
 } from "@/config/map";
-
-interface LatLon {
-  latitude: number;
-  longitude: number;
-}
-
-interface MapProps {
-  location: [number, number] | undefined;
-  signs: any;
-  messageType: string | undefined; // refine this more to only be one of the specific messages?
-}
-
-export interface Sign {
-  id: string;
-  lng: number;
-  lat: number;
-  spatialId: number;
-  workOrderId: string;
-}
 
 export default function Map({ location, signs, messageType }: MapProps) {
   const [popupInfo, setPopupInfo] = useState<Sign | null>(null);
@@ -58,16 +38,7 @@ export default function Map({ location, signs, messageType }: MapProps) {
     longitude: DEFAULT_MAP_PAN_ZOOM.longitude,
   });
 
-  const signArray = useMemo(() => {
-    return signs.map((sign: Sign) => [sign.lng, sign.lat]);
-  }, [signs]);
-
-  const lineStringFeature =
-    signArray.length < 2
-      ? lineString([signArray[0], [signArray[0][0], signArray[0][1]]])
-      : lineString(signArray);
-
-  const [minLng, minLat, maxLng, maxLat] = bbox(lineStringFeature);
+  const bounds = formatBounds(signs);
 
   const signPins = useMemo(
     () =>
@@ -95,7 +66,7 @@ export default function Map({ location, signs, messageType }: MapProps) {
         latitude: DEFAULT_MAP_PAN_ZOOM.latitude,
         longitude: DEFAULT_MAP_PAN_ZOOM.longitude,
         zoom: DEFAULT_MAP_PAN_ZOOM.zoom,
-        bounds: [minLng, minLat, maxLng, maxLat],
+        bounds: bounds,
       }}
       {...DEFAULT_MAP_PARAMS}
       onDrag={onDrag}
@@ -108,9 +79,9 @@ export default function Map({ location, signs, messageType }: MapProps) {
 
       {signPins}
 
-      {/* {location && location[0] && (
+      {location && location[0] && (
         <Marker latitude={location[0]} longitude={location[1]} />
-      )} */}
+      )}
 
       {popupInfo && (
         <SignPopup popupInfo={popupInfo} setPopupInfo={setPopupInfo} />
