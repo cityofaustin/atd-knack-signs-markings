@@ -21,7 +21,7 @@ export function useIFrameMessenger() {
       }
 
       console.log(event.data)
-      const data = JSON.parse(event.data);
+      const data = JSON.parse(event?.data);
       setMessage(data);
     };
     window.addEventListener("message", consoleMessage);
