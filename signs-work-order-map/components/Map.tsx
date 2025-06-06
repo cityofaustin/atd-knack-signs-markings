@@ -73,7 +73,6 @@ export default function Map({ location, signs, messageType }: MapProps) {
   );
 
   useEffect(() => {
-    console.log(mapRef.current);
     if (!mapRef?.current || !bounds) {
       return;
     }

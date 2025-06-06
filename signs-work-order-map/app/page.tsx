@@ -5,7 +5,7 @@ import Map from "@/components/Map";
 import { KnackRecord, Sign } from "@/types/map";
 import { useIFrameMessenger } from "@/utils/iFrameMessenger";
 
-const formatSignsRecords = (records: KnackRecord[]): Sign[] =>
+const formatSignsRecords = (records: KnackRecord[] | undefined): Sign[] =>
   useMemo(() => {
     console.log(records);
     if (!records || records.length < 1) {
