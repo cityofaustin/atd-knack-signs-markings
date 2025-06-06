@@ -1,6 +1,17 @@
 "use client";
-import { useCallback, useState, useMemo } from "react";
-import MapGL, { Marker, ViewStateChangeEvent } from "react-map-gl/mapbox";
+import {
+  useCallback,
+  useState,
+  useMemo,
+  useEffect,
+  useRef,
+  RefObject,
+} from "react";
+import MapGL, {
+  MapRef,
+  Marker,
+  ViewStateChangeEvent,
+} from "react-map-gl/mapbox";
 import GeocoderControl from "@/components/MapGeocoderControl";
 import SignPopup from "./SignPopup";
 import { MapProps, LatLon, Sign } from "@/types/map";
@@ -12,6 +23,7 @@ import {
 } from "@/config/map";
 
 export default function Map({ location, signs, messageType }: MapProps) {
+  const mapRef = useRef<MapRef>(null);
   const [popupInfo, setPopupInfo] = useState<Sign | null>(null);
   const onDrag = useCallback((event: ViewStateChangeEvent) => {
     // truncate values to our preferred precision
@@ -60,8 +72,17 @@ export default function Map({ location, signs, messageType }: MapProps) {
     [signs]
   );
 
+  useEffect(() => {
+    console.log(mapRef.current);
+    if (!mapRef?.current || !bounds) {
+      return;
+    }
+    mapRef.current.fitBounds(bounds);
+  }, [bounds]);
+
   return (
     <MapGL
+      ref={mapRef}
       initialViewState={{
         latitude: DEFAULT_MAP_PAN_ZOOM.latitude,
         longitude: DEFAULT_MAP_PAN_ZOOM.longitude,
