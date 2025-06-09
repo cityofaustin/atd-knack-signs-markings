@@ -69,7 +69,7 @@
       }
       var data = event.data;
       if (data.message === "LAT_LON_FIELDS") {
-        console.log("received message ", data)
+        console.log("received message ", data);
         var $latLonFields = $("#kn-input-field_3300");
 
         $latLonFields.find("#latitude").val(data.lat);
@@ -87,8 +87,10 @@
       var headers = getHeaders(Knack.getUserToken(), Knack.application_id);
       var signsMarkerMessage = {
         message: "KNACK_LOCATION_DETAILS",
-        records: [],
-        location: [],
+        payload: {
+          records: [],
+          location: [],
+        },
       };
 
       // Request the location based on record ID
@@ -132,12 +134,13 @@
         url: `https://api.knack.com/v1/scenes/scene_1028/views/${view}/records?view-work-orders-details-sign_id=${recordId}`,
         headers: headers,
       }).then(function (res) {
-        var records = res.records;
-        console.log("WORK ORDER SIGNS: ", records);
+        console.log("WORK ORDER SIGNS: ", res.records);
         var signsMarkerMessage = {
           message: "WORK_ORDER_SIGNS",
-          records: records,
-          location: [],
+          payload: {
+            records: res.records,
+            location: [],
+          },
         };
         sendMessageToApp(signsMarkerMessage, workOrderDetailsIFrame);
       });
@@ -163,8 +166,10 @@
         console.log("EDIT_LOCATION: ", locationField);
         var locationMessage = {
           message: "EDIT_LOCATION",
-          records: [],
-          location: [locationField.latitude, locationField.longitude],
+          payload: {
+            records: [],
+            location: [locationField.latitude, locationField.longitude],
+          },
         };
         sendMessageToApp(locationMessage, editLocationIframe);
       });
@@ -199,8 +204,11 @@
       // create message object for React App
       const geolocationMessage = {
         message: "KNACK_GEOLOCATION",
-        records: [],
-        location: [position.coords.latitude, position.coords.longitude],
+        payload: {
+          records: [],
+          location: [],
+          geolocation: [position.coords.latitude, position.coords.longitude],
+        },
       };
 
       // sends geolocation once the iframe is loaded
