@@ -8,7 +8,7 @@
   var myView = window.viewIdsArray.shift(0);
 
   // const nextAppUrl = "https://deploy-preview-326--nextjs-knack-signs-markings.netlify.app/";
-  const nextAppUrl = "http://localhost:3000/";
+  const nextAppUrl = "http://localhost:3000";
 
   // Import jQuery into this file from CDN
   // https://stackoverflow.com/questions/34338411/how-to-import-jquery-using-es6-syntax
@@ -71,7 +71,7 @@
     // expects a message named "LAT_LON_FIELDS"
     // uses lat and lng from message to populate input fields in knack
     window.addEventListener("message", function (event) {
-      if (event.data.source === "react-devtools-content-script") {
+      if (event.origin !== nextAppUrl) {
         return;
       }
       var data = event.data;
@@ -105,23 +105,29 @@
       $.ajax({
         url: `https://api.knack.com/v1/scenes/scene_1039/views/view_2733/records/${recordId}`,
         headers: headers,
-      }).then(function (res) {
-        var locationField = res["field_3300_raw"];
-        signsMarkerMessage.location = [
-          locationField.latitude,
-          locationField.longitude,
-        ];
-        console.log("requesting records for work order id ", workOrderId);
-        // Request the associated signs records
-        $.ajax({
-          url: `https://api.knack.com/v1/scenes/scene_1028/views/view_2573/records?view-work-orders-details-sign_id=${workOrderId}`,
-          headers: headers,
-        }).then(function (res) {
-          var records = res.records;
-          signsMarkerMessage.records = records;
-          sendMessageToApp(signsMarkerMessage, locationViewIFrame);
+      })
+        .then(function (res) {
+          var locationField = res["field_3300_raw"]; // check if this is undefined
+          signsMarkerMessage.location = [
+            locationField.latitude,
+            locationField.longitude,
+          ];
+        })
+        .then(function () {
+          console.log("requesting records for work order id ", workOrderId);
+          // Request the associated signs records
+          $.ajax({
+            url: `https://api.knack.com/v1/scenes/scene_1028/views/view_2573/records?view-work-orders-details-sign_id=${workOrderId}`,
+            headers: headers,
+          }).then(function (res) {
+            var records = res.records;
+            signsMarkerMessage.records = records;
+            sendMessageToApp(signsMarkerMessage, locationViewIFrame);
+          });
+        })
+        .fail(function (res) {
+          console.error(res);
         });
-      });
     }
 
     /**
@@ -140,17 +146,22 @@
       $.ajax({
         url: `https://api.knack.com/v1/scenes/scene_1028/views/${view}/records?view-work-orders-details-sign_id=${recordId}`,
         headers: headers,
-      }).then(function (res) {
-        console.log("WORK ORDER SIGNS: ", res.records);
-        var signsMarkerMessage = {
-          message: "WORK_ORDER_SIGNS",
-          payload: {
-            records: res.records,
-            location: [],
-          },
-        };
-        sendMessageToApp(signsMarkerMessage, workOrderDetailsIFrame);
-      });
+      })
+        .then(function (res) {
+          console.log("WORK ORDER SIGNS: ", res.records);
+          var signsMarkerMessage = {
+            message: "WORK_ORDER_SIGNS",
+            payload: {
+              records: res.records,
+              location: [],
+              workOrderId: recordId,
+            },
+          };
+          sendMessageToApp(signsMarkerMessage, workOrderDetailsIFrame);
+        })
+        .fail(function (message) {
+          console.error(message);
+        });
     }
 
     function sendLocationMapMessage(viewId) {
@@ -168,18 +179,22 @@
       $.ajax({
         url: `https://api.knack.com/v1/scenes/scene_1061/views/view_2682/records/${recordId}`,
         headers: headers,
-      }).then(function (res) {
-        var locationField = res["field_3300_raw"];
-        console.log("EDIT_LOCATION: ", locationField);
-        var locationMessage = {
-          message: "EDIT_LOCATION",
-          payload: {
-            records: [],
-            location: [locationField.latitude, locationField.longitude],
-          },
-        };
-        sendMessageToApp(locationMessage, editLocationIframe);
-      });
+      })
+        .then(function (res) {
+          var locationField = res["field_3300_raw"];
+          console.log("EDIT_LOCATION: ", locationField);
+          var locationMessage = {
+            message: "EDIT_LOCATION",
+            payload: {
+              records: [],
+              location: [locationField.latitude, locationField.longitude],
+            },
+          };
+          sendMessageToApp(locationMessage, editLocationIframe);
+        })
+        .fail(function (message) {
+          console.error(message);
+        });
     }
 
     // Location Details Page - Editable
