@@ -1,5 +1,14 @@
+/**
+ * This code is imported into the Knack app and executed as custom vanilla JS that interacts with the NextJS app
+ * via iFrame messaging.
+ *
+ */
+
 (function () {
   var myView = window.viewIdsArray.shift(0);
+
+  // const nextAppUrl = "https://deploy-preview-326--nextjs-knack-signs-markings.netlify.app/";
+  const nextAppUrl = "http://localhost:3000/";
 
   // Import jQuery into this file from CDN
   // https://stackoverflow.com/questions/34338411/how-to-import-jquery-using-es6-syntax
@@ -43,10 +52,8 @@
     // Add React app as iframe if iframe doesn't already exist
     if ($(myView + " #mapIFrame").length === 0) {
       https: $(
-        // '<iframe src="https://atd-knack-signs-markings.netlify.app/" frameborder="0" scrolling="yes" id="mapIFrame" \
-        // '<iframe src="https://deploy-preview-326--nextjs-knack-signs-markings.netlify.app/" frameborder="0" scrolling="yes" id="mapIFrame" \
-        '<iframe src="http://localhost:3000/" frameborder="0" scrolling="yes" id="mapIFrame" \
-      style="width: 100%;height: 523px;"></iframe>'
+        `<iframe src=${nextAppUrl} frameborder="0" scrolling="yes" id="mapIFrame" \
+        style="width: 100%;height: 523px;"></iframe>`
       ).appendTo($viewSelector);
     }
 
