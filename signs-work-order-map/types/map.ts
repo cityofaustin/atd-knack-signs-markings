@@ -33,10 +33,9 @@ export interface KnackRecord {
         street2: string | null;
         zip: string;
       },
-    //   field_3301:
-    //     '<span class="5d13ae66d3186524eaea0b20">Librado Murrieta</span>',
+    //   field_3301: string
     //   field_3301_raw: [
-    //     { id: "5d13ae66d3186524eaea0b20", identifier: "Librado Murrieta" },
+    //     { id: string, identifier: string },
     //   ],
     //   field_3302: "08/01/2019",
     //   field_3302_raw: {

@@ -96,7 +96,10 @@
         message: "KNACK_LOCATION_DETAILS",
         payload: {
           records: [],
-          location: [],
+          location: {
+            longitude: undefined,
+            latitude: undefined,
+          },
         },
       };
 
@@ -107,11 +110,11 @@
         headers: headers,
       })
         .then(function (res) {
-          var locationField = res["field_3300_raw"]; // check if this is undefined
-          signsMarkerMessage.location = [
-            locationField.latitude,
-            locationField.longitude,
-          ];
+          var locationField = res["field_3300_raw"];
+          signsMarkerMessage.payload.location.longitude =
+            locationField.latitude;
+          signsMarkerMessage.payload.location.longitude =
+            locationField.longitude;
         })
         .then(function () {
           console.log("requesting records for work order id ", workOrderId);
@@ -121,7 +124,7 @@
             headers: headers,
           }).then(function (res) {
             var records = res.records;
-            signsMarkerMessage.records = records;
+            signsMarkerMessage.payload.records = records;
             sendMessageToApp(signsMarkerMessage, locationViewIFrame);
           });
         })
@@ -153,7 +156,6 @@
             message: "WORK_ORDER_SIGNS",
             payload: {
               records: res.records,
-              location: [],
               workOrderId: recordId,
             },
           };
@@ -186,8 +188,10 @@
           var locationMessage = {
             message: "EDIT_LOCATION",
             payload: {
-              records: [],
-              location: [locationField.latitude, locationField.longitude],
+              location: {
+                longitude: locationField.longitude,
+                latitude: locationField.latitude,
+              },
             },
           };
           sendMessageToApp(locationMessage, editLocationIframe);
@@ -227,9 +231,10 @@
       const geolocationMessage = {
         message: "KNACK_GEOLOCATION",
         payload: {
-          records: [],
-          location: [],
-          geolocation: [position.coords.latitude, position.coords.longitude],
+          geolocation: {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          },
         },
       };
 

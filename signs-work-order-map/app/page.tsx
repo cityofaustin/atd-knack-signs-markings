@@ -23,8 +23,10 @@ export default function Home() {
   const knackPayload = useIFrameMessenger();
   // const knackPayload = testpayload;
 
-  const location = knackPayload?.location;
-  const signs = formatSignsRecords(knackPayload?.records);
+  console.log(knackPayload)
+
+  const location = knackPayload?.payload?.location;
+  const signs = formatSignsRecords(knackPayload?.payload?.records);
   console.log(signs);
   const messageType = knackPayload?.message;
 

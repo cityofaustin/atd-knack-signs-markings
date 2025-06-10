@@ -3,8 +3,10 @@ import { useEffect, useState } from "react";
 
 type MessageToIFrame = {
   message: string;
-  records: [];
-  location: [number, number];
+  payload: {
+    records: [];
+    location: [number, number];
+  };
 };
 
 export function useIFrameMessenger() {
@@ -20,7 +22,7 @@ export function useIFrameMessenger() {
         return;
       }
 
-      console.log(event.data)
+      console.log(event.data);
       const data = JSON.parse(event?.data);
       setMessage(data);
     };
