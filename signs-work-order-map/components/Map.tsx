@@ -1,12 +1,5 @@
 "use client";
-import {
-  useCallback,
-  useState,
-  useMemo,
-  useEffect,
-  useRef,
-  RefObject,
-} from "react";
+import { useCallback, useState, useMemo, useEffect, useRef } from "react";
 import MapGL, {
   MapRef,
   Marker,
@@ -99,8 +92,8 @@ export default function Map({ location, signs, messageType }: MapProps) {
 
       {signPins}
 
-      {location && location[0] && (
-        <Marker latitude={location[0]} longitude={location[1]} />
+      {location?.latitude && location?.longitude && (
+        <Marker latitude={location.latitude} longitude={location.longitude} />
       )}
 
       {popupInfo && (

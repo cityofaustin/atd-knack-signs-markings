@@ -1,16 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
+import { KnackToIFrameMessage } from "@/types/map";
 
-type MessageToIFrame = {
-  message: string;
-  payload: {
-    records: [];
-    location: [number, number];
-  };
-};
 
 export function useIFrameMessenger() {
-  const [message, setMessage] = useState<MessageToIFrame | null>(null);
+  const [message, setMessage] = useState<KnackToIFrameMessage | null>(null);
 
   useEffect(() => {
     const consoleMessage = (event: MessageEvent) => {
