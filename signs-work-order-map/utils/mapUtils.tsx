@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import bbox from "@turf/bbox";
 import { lineString } from "@turf/helpers";
-import { Sign, KnackToIFrameMessage } from "@/types/map";
+import { Sign, KnackToIFrameMessage, LatLon } from "@/types/map";
 import { LngLatBoundsLike } from "mapbox-gl";
 
 /**
@@ -52,4 +52,30 @@ export const formatSignsRecords = (
       spatialId: sign.field_3297,
       workOrderId: knackPayload.payload.workOrderId,
     }));
+  }, [knackPayload]);
+
+/**
+ * Function that takes data from knack app and depending on message type, returns location
+ * @param knackPayload - message from Knack via IFrameMessage
+ * @returns
+ */
+export const formatLocation = (
+  knackPayload: KnackToIFrameMessage | null
+): LatLon =>
+  useMemo(() => {
+    if (!knackPayload || knackPayload?.message === "WORK_ORDER_SIGNS") {
+      return { longitude: undefined, latitude: undefined };
+    }
+
+    if (knackPayload.message === "KNACK_GEOLOCATION") {
+      return {
+        longitude: knackPayload.payload.geolocation.longitude,
+        latitude: knackPayload.payload.geolocation.latitude,
+      };
+    }
+
+    return {
+      longitude: knackPayload.payload.location.longitude,
+      latitude: knackPayload.payload.location.latitude,
+    };
   }, [knackPayload]);

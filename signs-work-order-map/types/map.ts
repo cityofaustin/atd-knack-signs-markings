@@ -1,6 +1,6 @@
 export interface LatLon {
-  latitude: number;
-  longitude: number;
+  latitude: number | undefined;
+  longitude: number | undefined;
 }
 
 export interface MapProps {
