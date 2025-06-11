@@ -111,8 +111,7 @@
       })
         .then(function (res) {
           var locationField = res["field_3300_raw"];
-          signsMarkerMessage.payload.location.longitude =
-            locationField.latitude;
+          signsMarkerMessage.payload.location.latitude = locationField.latitude;
           signsMarkerMessage.payload.location.longitude =
             locationField.longitude;
         })
@@ -125,6 +124,7 @@
           }).then(function (res) {
             var records = res.records;
             signsMarkerMessage.payload.records = records;
+            signsMarkerMessage.payload.workOrderId = workOrderId;
             sendMessageToApp(signsMarkerMessage, locationViewIFrame);
           });
         })
