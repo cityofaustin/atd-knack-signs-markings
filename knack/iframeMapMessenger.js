@@ -114,6 +114,7 @@
           signsMarkerMessage.payload.location.latitude = locationField.latitude;
           signsMarkerMessage.payload.location.longitude =
             locationField.longitude;
+          signsMarkerMessage.payload.locationRecordId = recordId;
         })
         .then(function () {
           console.log("requesting records for work order id ", workOrderId);

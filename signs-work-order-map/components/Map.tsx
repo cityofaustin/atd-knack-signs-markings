@@ -26,7 +26,6 @@ export default function Map({ location, signs, messageType }: MapProps) {
     const longitude = +event.viewState.longitude.toFixed(
       MAP_COORDINATE_PRECISION
     );
-    console.log(latitude, longitude);
     setMapLatLon({
       latitude,
       longitude,
@@ -53,6 +52,7 @@ export default function Map({ location, signs, messageType }: MapProps) {
           longitude={sign.lng}
           latitude={sign.lat}
           anchor="bottom"
+          color={sign.locationDetailPage ? "red" : undefined}
           onClick={(e) => {
             // If we let the click event propagates to the map, it will immediately close the popup
             // with `closeOnClick: true`
@@ -69,7 +69,9 @@ export default function Map({ location, signs, messageType }: MapProps) {
     if (!mapRef?.current || !bounds) {
       return;
     }
-    mapRef.current.fitBounds(bounds);
+    mapRef.current.fitBounds(bounds, {
+      padding: 100,
+    });
   }, [bounds]);
 
   return (
@@ -79,8 +81,9 @@ export default function Map({ location, signs, messageType }: MapProps) {
         latitude: DEFAULT_MAP_PAN_ZOOM.latitude,
         longitude: DEFAULT_MAP_PAN_ZOOM.longitude,
         zoom: DEFAULT_MAP_PAN_ZOOM.zoom,
-        bounds: bounds,
+        // bounds: bounds,
       }}
+      cooperativeGestures={true}
       {...DEFAULT_MAP_PARAMS}
       onDrag={onDrag}
     >

@@ -24,7 +24,6 @@ export const DEFAULT_MAP_PARAMS = {
   boxZoom: false,
   mapboxAccessToken: MAPBOX_TOKEN,
   maxBounds: MAP_MAX_BOUNDS,
-  maxZoom: 19,
   mapStyle: "mapbox://styles/mapbox/satellite-streets-v11",
 };
 

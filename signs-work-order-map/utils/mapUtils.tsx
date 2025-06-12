@@ -45,12 +45,19 @@ export const formatSignsRecords = (
     ) {
       return [];
     }
+
+    const locationId =
+      knackPayload.message === "KNACK_LOCATION_DETAILS"
+        ? knackPayload?.payload?.locationRecordId
+        : null;
+
     return knackPayload.payload.records.map((sign) => ({
       id: sign.id,
       lat: sign.field_3300_raw.latitude,
       lng: sign.field_3300_raw.longitude,
       spatialId: sign.field_3297,
       workOrderId: knackPayload.payload.workOrderId,
+      locationDetailPage: sign.id === locationId,
     }));
   }, [knackPayload]);
 

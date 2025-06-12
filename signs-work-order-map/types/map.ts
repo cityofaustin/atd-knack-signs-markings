@@ -19,6 +19,7 @@ export interface Sign {
   lat: number;
   spatialId: number;
   workOrderId: string;
+  locationDetailPage: boolean;
 }
 
 export interface KnackRecord {
@@ -72,6 +73,7 @@ export type KnackToIFrameMessage =
           latitude: number | undefined;
         };
         workOrderId: string;
+        locationRecordId: string;
       };
     }
   | {
