@@ -87,20 +87,22 @@ export default function Map({ location, signs, messageType }: MapProps) {
       {...DEFAULT_MAP_PARAMS}
       onDrag={onDrag}
     >
-      {/* {!location.latitude && location.longitude && 
-        <Marker
-        longitude={location.longitude}
-        latitude={location.latitude}
-        color="pink"
-        anchor="bottom"
-        // draggable
-      /> */}
+      {/* <Marker
+        longitude={mapLatLon.longitude}
+        latitude={mapLatLon.latitude}
+           // draggable
+      />
+        */
+        }
 
       {signPins}
 
-      {location?.latitude && location?.longitude && (
+      {
+        // when do we show location vs signs? based on message type?
+        /* {location?.latitude && location?.longitude && (
         <Marker latitude={location.latitude} longitude={location.longitude} />
-      )}
+      )} */
+      }
 
       {popupInfo && (
         <SignPopup popupInfo={popupInfo} setPopupInfo={setPopupInfo} />
