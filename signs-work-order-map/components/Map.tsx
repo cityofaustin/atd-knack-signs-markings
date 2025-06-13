@@ -81,7 +81,6 @@ export default function Map({ location, signs }: MapProps) {
         latitude: DEFAULT_MAP_PAN_ZOOM.latitude,
         longitude: DEFAULT_MAP_PAN_ZOOM.longitude,
         zoom: DEFAULT_MAP_PAN_ZOOM.zoom,
-        // bounds: bounds,
       }}
       cooperativeGestures={true}
       {...DEFAULT_MAP_PARAMS}
@@ -99,6 +98,8 @@ export default function Map({ location, signs }: MapProps) {
       {signPins}
 
       {
+        // showing the location / geolocation will happen in a subsequent issue
+        console.log("location from payload: ", location)
         // when do we show location vs signs? when there are no signs?
         /* {location?.latitude && location?.longitude && (
         <Marker latitude={location.latitude} longitude={location.longitude} />
