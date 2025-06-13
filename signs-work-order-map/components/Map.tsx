@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useState, useMemo, useEffect, useRef } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 import MapGL, {
   MapRef,
   Marker,
