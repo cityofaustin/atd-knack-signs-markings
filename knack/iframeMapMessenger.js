@@ -111,9 +111,9 @@
       })
         .then(function (res) {
           var locationField = res["field_3300_raw"];
-          signsMarkerMessage.payload.location.latitude = locationField.latitude;
+          signsMarkerMessage.payload.location.latitude = locationField?.latitude;
           signsMarkerMessage.payload.location.longitude =
-            locationField.longitude;
+            locationField?.longitude;
           signsMarkerMessage.payload.locationRecordId = recordId;
         })
         .then(function () {
@@ -190,8 +190,8 @@
             message: "EDIT_LOCATION",
             payload: {
               location: {
-                longitude: locationField.longitude,
-                latitude: locationField.latitude,
+                longitude: locationField?.longitude,
+                latitude: locationField?.latitude,
               },
             },
           };
