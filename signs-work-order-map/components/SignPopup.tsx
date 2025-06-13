@@ -20,7 +20,8 @@ export default function SignPopup({ popupInfo, setPopupInfo }: SignPopupProps) {
         {!popupInfo.locationDetailPage && (
           <li>
             <a
-              href={`https://atd.knack.com/signs-markings#work-order-signs/view-work-orders-details-sign/${popupInfo?.workOrderId}/view-work-order-signs-location-details/${
+            // TODO: update to prod url when testing is completed
+              href={`https://atd.knack.com/test-30-may-2024-signs-and-markings-operations#work-order-signs/view-work-orders-details-sign/${popupInfo?.workOrderId}/view-work-order-signs-location-details/${
                 popupInfo.id
               }`}
               // ensure it doesn't open in the iframe
