@@ -1,8 +1,9 @@
 import { useMemo } from "react";
 import bbox from "@turf/bbox";
 import { lineString } from "@turf/helpers";
-import { Sign, KnackToIFrameMessage, LatLon } from "@/types/map";
 import { LngLatBoundsLike } from "mapbox-gl";
+import { Marker } from "react-map-gl/mapbox";
+import { Sign, KnackToIFrameMessage, LatLon } from "@/types/map";
 
 /**
  * Takes array of Signs and if signs exist, returns bounding box for signs
@@ -86,3 +87,33 @@ export const formatLocation = (
       latitude: knackPayload.payload.location.latitude,
     };
   }, [knackPayload]);
+
+/**
+ * Takes array of Signs and if signs exist, returns bounding box for signs
+ * @param signs
+ * @returns
+ */
+export const createSignPins = (
+  signs: Sign[],
+  setPopupInfo: React.Dispatch<React.SetStateAction<Sign | null>>
+) =>
+  useMemo(
+    () =>
+      signs.map((sign: Sign) => (
+        <Marker
+          key={`marker-${sign.id}`}
+          longitude={sign.lng}
+          latitude={sign.lat}
+          anchor="bottom"
+          color={sign.locationDetailPage ? "red" : undefined}
+          onClick={(e) => {
+            // If we let the click event propagates to the map, it will immediately close the popup
+            // with `closeOnClick: true`
+            e.originalEvent.stopPropagation();
+            console.log(sign);
+            setPopupInfo(sign);
+          }}
+        />
+      )),
+    [signs, setPopupInfo]
+  );

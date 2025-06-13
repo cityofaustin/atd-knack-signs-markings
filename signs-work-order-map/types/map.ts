@@ -21,10 +21,13 @@ export interface Sign {
 }
 
 export interface KnackRecord {
+  /** spatial id */
   field_3297: number;
+  /** spatial id raw format */
   field_3297_raw: number;
-  /** address */
+  /** address in string form */
   field_3300: string;
+  /** address raw format  */
   field_3300_raw: {
     city: string;
     country: string;
@@ -36,28 +39,31 @@ export interface KnackRecord {
     street2: string | null;
     zip: string;
   };
-  //   field_3301: string
-  //   field_3301_raw: [
-  //     { id: string, identifier: string },
-  //   ],
-  //   field_3302: "08/01/2019",
-  //   field_3302_raw: {
-  //     am_pm: "AM",
-  //     date: "08/01/2019",
-  //     date_formatted: "08/01/2019",
-  //     hours: "12",
-  //     iso_timestamp: "2019-08-01T00:00:00.000Z",
-  //     minutes: "00",
-  //     proper_iso_timestamp: "2019-08-01T05:00:00.000Z",
-  //     proper_unix_timestamp: 1564635600000,
-  //     time: 0,
-  //     timestamp: "08/01/2019 12:00 am",
-  //     unix_timestamp: 1564617600000,
-  //   },
-  //   field_3378: "",
-  //   field_3378_raw: "",
-  //   field_3425: 1,
-  //   field_3425_raw: 1,
+  /** created date */
+  field_3302: string;
+  /** created date raw format */
+  field_3302_raw: {
+    am_pm: "AM" | "PM";
+    date: string;
+    date_formatted: string;
+    hours: string;
+    iso_timestamp: string;
+    minutes: string;
+    proper_iso_timestamp: string;
+    proper_unix_timestamp: number;
+    time: number;
+    timestamp: string;
+    unix_timestamp: number;
+  };
+  /** photo */
+  field_3378: string;
+  /** photo raw format */
+  field_3378_raw: string;
+  /** count of assets  */
+  field_3425: number;
+  /** count of assets raw format*/
+  field_3425_raw: number;
+  /** knack record id */
   id: string;
 }
 
@@ -94,7 +100,7 @@ export type KnackToIFrameMessage =
       message: "KNACK_GEOLOCATION";
       payload: {
         geolocation: {
-          latitude: number | undefined; // maybe not undefined?
+          latitude: number | undefined;
           longitude: number | undefined;
         };
       };
