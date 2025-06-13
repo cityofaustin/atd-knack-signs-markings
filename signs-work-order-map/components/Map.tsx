@@ -15,7 +15,7 @@ import {
   MAP_COORDINATE_PRECISION,
 } from "@/config/map";
 
-export default function Map({ location, signs, messageType }: MapProps) {
+export default function Map({ location, signs }: MapProps) {
   const mapRef = useRef<MapRef>(null);
   const [popupInfo, setPopupInfo] = useState<Sign | null>(null);
   const onDrag = useCallback((event: ViewStateChangeEvent) => {

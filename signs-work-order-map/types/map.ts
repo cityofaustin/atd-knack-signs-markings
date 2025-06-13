@@ -4,13 +4,11 @@ export interface LatLon {
 }
 
 export interface MapProps {
-  // update the location
   location: {
     longitude: number | undefined;
     latitude: number | undefined;
   };
-  signs: any;
-  messageType: string | undefined; // refine this more to only be one of the specific messages?
+  signs: Sign[];
 }
 
 export interface Sign {

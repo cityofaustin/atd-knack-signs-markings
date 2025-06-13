@@ -11,13 +11,12 @@ export default function Home() {
 
   const location = formatLocation(knackPayload);
   const signs = formatSignsRecords(knackPayload);
-  const messageType = knackPayload?.message;
 
   return (
     <div className={styles.page}>
       <main className={styles.main}>
         <div className={styles.map}>
-          <Map messageType={messageType} location={location} signs={signs} />
+          <Map location={location} signs={signs} />
         </div>
       </main>
     </div>
