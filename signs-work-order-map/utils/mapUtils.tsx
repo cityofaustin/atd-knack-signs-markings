@@ -8,7 +8,7 @@ import { Sign, KnackToIFrameMessage, LatLon } from "@/types/map";
 /**
  * Takes array of Signs and if signs exist, returns bounding box for signs
  * @param signs
- * @returns
+ * @returns bbox extent in [minX, minY, maxX, maxY] order or undefined
  */
 export const formatBounds = (signs: Sign[]): undefined | LngLatBoundsLike =>
   useMemo(() => {
@@ -65,7 +65,7 @@ export const formatSignsRecords = (
 /**
  * Function that takes data from knack app and depending on message type, returns location
  * @param knackPayload - message from Knack via IFrameMessage
- * @returns
+ * @returns LatLon object
  */
 export const formatLocation = (
   knackPayload: KnackToIFrameMessage | null
@@ -89,9 +89,11 @@ export const formatLocation = (
   }, [knackPayload]);
 
 /**
- * Takes array of Signs and if signs exist, returns bounding box for signs
+ * Takes array of Signs and returns array of map markers, one marker per sign
+ * If the sign id matches the location detail page id, render the marker as red
+ * otherwise, use default color
  * @param signs
- * @returns
+ * @returns Array of Map Markers
  */
 export const createSignPins = (
   signs: Sign[],
