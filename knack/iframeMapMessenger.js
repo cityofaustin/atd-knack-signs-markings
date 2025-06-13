@@ -7,8 +7,9 @@
 (function () {
   var myView = window.viewIdsArray.shift(0);
 
-  // const nextAppUrl = "https://deploy-preview-326--nextjs-knack-signs-markings.netlify.app/";
-  const nextAppUrl = "http://localhost:3000";
+  const nextAppUrl =
+    "https://deploy-preview-327--nextjs-knack-signs-markings.netlify.app/";
+  // const nextAppUrl = "http://localhost:3000";
 
   // Import jQuery into this file from CDN
   // https://stackoverflow.com/questions/34338411/how-to-import-jquery-using-es6-syntax
@@ -111,7 +112,8 @@
       })
         .then(function (res) {
           var locationField = res["field_3300_raw"];
-          signsMarkerMessage.payload.location.latitude = locationField?.latitude;
+          signsMarkerMessage.payload.location.latitude =
+            locationField?.latitude;
           signsMarkerMessage.payload.location.longitude =
             locationField?.longitude;
           signsMarkerMessage.payload.locationRecordId = recordId;
