@@ -17,7 +17,7 @@ export default function SignPopup({ popupInfo, setPopupInfo }: SignPopupProps) {
       offset={[0, -20]}
     >
       <ul className="list-unstyled m-0">
-        {!popupInfo.locationDetailPage && (
+        {!popupInfo.isLocationDetailPage && (
           <li>
             <a
             // TODO: update to prod url when testing is completed

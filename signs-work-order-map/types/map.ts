@@ -17,7 +17,7 @@ export interface Sign {
   lat: number;
   spatialId: number;
   workOrderId: string;
-  locationDetailPage: boolean;
+  isLocationDetailPage: boolean;
 }
 
 export interface KnackRecord {

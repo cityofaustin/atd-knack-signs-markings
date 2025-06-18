@@ -58,7 +58,7 @@ export const useFormatSignsRecords = (
       lng: sign.field_3300_raw.longitude,
       spatialId: sign.field_3297,
       workOrderId: knackPayload.payload.workOrderId,
-      locationDetailPage: sign.id === locationId,
+      isLocationDetailPage: sign.id === locationId,
     }));
   }, [knackPayload]);
 
@@ -107,7 +107,7 @@ export const useCreateSignPins = (
           longitude={sign.lng}
           latitude={sign.lat}
           anchor="bottom"
-          color={sign.locationDetailPage ? "red" : undefined}
+          color={sign.isLocationDetailPage ? "red" : undefined}
           onClick={(e) => {
             // If we let the click event propagates to the map, it will immediately close the popup
             // with `closeOnClick: true`
