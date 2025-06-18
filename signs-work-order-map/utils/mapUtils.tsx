@@ -10,7 +10,7 @@ import { Sign, KnackToIFrameMessage, LatLon } from "@/types/map";
  * @param signs
  * @returns bbox extent in [minX, minY, maxX, maxY] order or undefined
  */
-export const formatBounds = (signs: Sign[]): undefined | LngLatBoundsLike =>
+export const useFormatBounds = (signs: Sign[]): undefined | LngLatBoundsLike =>
   useMemo(() => {
     if (signs.length === 0) {
       return undefined;
@@ -35,7 +35,7 @@ export const formatBounds = (signs: Sign[]): undefined | LngLatBoundsLike =>
  * @param knackPayload - message from Knack via IFrameMessage
  * @returns Array of Signs or empty array if no sign data
  */
-export const formatSignsRecords = (
+export const useFormatSignsRecords = (
   knackPayload: KnackToIFrameMessage | null
 ): Sign[] =>
   useMemo(() => {
@@ -67,7 +67,7 @@ export const formatSignsRecords = (
  * @param knackPayload - message from Knack via IFrameMessage
  * @returns LatLon object
  */
-export const formatLocation = (
+export const useFormatLocation = (
   knackPayload: KnackToIFrameMessage | null
 ): LatLon =>
   useMemo(() => {
@@ -95,7 +95,7 @@ export const formatLocation = (
  * @param signs
  * @returns Array of Map Markers
  */
-export const createSignPins = (
+export const useCreateSignPins = (
   signs: Sign[],
   setPopupInfo: React.Dispatch<React.SetStateAction<Sign | null>>
 ) =>

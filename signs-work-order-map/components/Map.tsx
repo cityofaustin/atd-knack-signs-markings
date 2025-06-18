@@ -8,7 +8,7 @@ import MapGL, {
 import GeocoderControl from "@/components/MapGeocoderControl";
 import SignPopup from "./SignPopup";
 import { MapProps, LatLon, Sign } from "@/types/map";
-import { createSignPins, formatBounds } from "@/utils/mapUtils";
+import { useCreateSignPins, useFormatBounds } from "@/utils/mapUtils";
 import {
   DEFAULT_MAP_PARAMS,
   DEFAULT_MAP_PAN_ZOOM,
@@ -42,9 +42,9 @@ export default function Map({ location, signs }: MapProps) {
     longitude: DEFAULT_MAP_PAN_ZOOM.longitude,
   });
 
-  const bounds = formatBounds(signs);
+  const bounds = useFormatBounds(signs);
 
-  const signPins = createSignPins(signs, setPopupInfo);
+  const signPins = useCreateSignPins(signs, setPopupInfo);
 
   useEffect(() => {
     if (!mapRef?.current || !bounds) {
