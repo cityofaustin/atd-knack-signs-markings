@@ -50,8 +50,11 @@ export default function Map({ location, signs }: MapProps) {
     if (!mapRef?.current || !bounds) {
       return;
     }
+
     mapRef.current.fitBounds(bounds, {
       padding: 100,
+      maxZoom: 16,
+      duration: 0,
     });
   }, [bounds]);
 
