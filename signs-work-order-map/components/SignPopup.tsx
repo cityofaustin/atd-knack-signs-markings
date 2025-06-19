@@ -1,5 +1,6 @@
 import { Popup } from "react-map-gl/mapbox";
 import { Sign } from "@/types/map";
+import { KNACK_APP_URL } from "@/config/map";
 
 interface SignPopupProps {
   popupInfo: Sign;
@@ -20,8 +21,7 @@ export default function SignPopup({ popupInfo, setPopupInfo }: SignPopupProps) {
         {!popupInfo.isLocationDetailPage && (
           <li>
             <a
-            // TODO: update to prod url when testing is completed
-              href={`https://atd.knack.com/test-30-may-2024-signs-and-markings-operations#work-order-signs/view-work-orders-details-sign/${popupInfo?.workOrderId}/view-work-order-signs-location-details/${
+              href={`${KNACK_APP_URL}#work-order-signs/view-work-orders-details-sign/${popupInfo?.workOrderId}/view-work-order-signs-location-details/${
                 popupInfo.id
               }`}
               // ensure it doesn't open in the iframe
