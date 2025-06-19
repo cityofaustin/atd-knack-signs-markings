@@ -40,29 +40,29 @@ export interface KnackRecord {
     zip: string;
   };
   /** created date */
-  field_3302: string;
+  field_3302?: string;
   /** created date raw format */
-  field_3302_raw: {
-    am_pm: "AM" | "PM";
-    date: string;
-    date_formatted: string;
-    hours: string;
-    iso_timestamp: string;
-    minutes: string;
-    proper_iso_timestamp: string;
-    proper_unix_timestamp: number;
-    time: number;
-    timestamp: string;
-    unix_timestamp: number;
+  field_3302_raw?: {
+    am_pm?: "AM" | "PM";
+    date?: string;
+    date_formatted?: string;
+    hours?: string;
+    iso_timestamp?: string;
+    minutes?: string;
+    proper_iso_timestamp?: string;
+    proper_unix_timestamp?: number;
+    time?: number;
+    timestamp?: string;
+    unix_timestamp?: number;
   };
   /** photo */
-  field_3378: string;
+  field_3378?: string;
   /** photo raw format */
-  field_3378_raw: string;
+  field_3378_raw?: string;
   /** count of assets  */
-  field_3425: number;
+  field_3425?: number;
   /** count of assets raw format*/
-  field_3425_raw: number;
+  field_3425_raw?: number;
   /** knack record id */
   id: string;
 }
