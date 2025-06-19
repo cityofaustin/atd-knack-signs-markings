@@ -6,6 +6,7 @@ import MapGL, {
   ViewStateChangeEvent,
 } from "react-map-gl/mapbox";
 import GeocoderControl from "@/components/MapGeocoderControl";
+import { NavigationControl } from "react-map-gl/mapbox";
 import SignPopup from "./SignPopup";
 import { MapProps, LatLon, Sign } from "@/types/map";
 import { useCreateSignPins, useFormatBounds } from "@/utils/mapUtils";
@@ -95,6 +96,7 @@ export default function Map({ location, signs }: MapProps) {
       )}
 
       <GeocoderControl position="top-left" marker={true} />
+      <NavigationControl position="bottom-right" showCompass={false} />
     </MapGL>
   );
 }
