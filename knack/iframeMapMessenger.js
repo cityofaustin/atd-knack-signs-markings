@@ -39,13 +39,6 @@
     };
   }
 
-  function AutozoomSendMessageToApp(message) {
-    var iframe = document.getElementById("mapIFrame").contentWindow;
-    const stringifiedMessage = JSON.stringify(message);
-    console.log("autozoom message to app ", message.message);
-    iframe.postMessage(stringifiedMessage, "*");
-  }
-
   // Start polling...
   checkReady(function ($) {
     var $viewSelector = $(myView);
@@ -65,7 +58,7 @@
      */
     function sendMessageToApp(message, iframe) {
       var stringifiedMessage = JSON.stringify(message);
-      iframe.postMessage(stringifiedMessage, "*");
+      iframe.postMessage(stringifiedMessage, nextAppUrl);
     }
 
     // Listen for lat/lon changes
@@ -231,23 +224,5 @@
       sendLocationMapMessage("view_2682");
     });
 
-    // Get the current location from browser.
-    navigator.geolocation.getCurrentPosition(function (position) {
-      // create message object for React App
-      const geolocationMessage = {
-        message: "KNACK_GEOLOCATION",
-        payload: {
-          geolocation: {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          },
-        },
-      };
-
-      // sends geolocation once the iframe is loaded
-      $("#mapIFrame").on("load", function () {
-        AutozoomSendMessageToApp(geolocationMessage);
-      });
-    });
   });
 })();
