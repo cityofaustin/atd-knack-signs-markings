@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import bbox from "@turf/bbox";
 import { lineString } from "@turf/helpers";
 import { LngLatBoundsLike } from "mapbox-gl";
@@ -123,3 +123,21 @@ export const useCreateSignPins = (
       ),
     [signs, setPopupInfo]
   );
+
+export const useGeoLocation = () => {
+  const [geoLocation, setGeoLocation] = useState<LatLon | undefined>(undefined);
+
+  useEffect(() => {
+    console.log("getting location");
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(({ coords }) => {
+        setGeoLocation({
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+        });
+      });
+    }
+  }, []);
+
+  return geoLocation;
+};

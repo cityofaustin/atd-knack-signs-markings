@@ -9,7 +9,11 @@ import GeocoderControl from "@/components/MapGeocoderControl";
 import { NavigationControl, GeolocateControl } from "react-map-gl/mapbox";
 import SignPopup from "./SignPopup";
 import { MapProps, LatLon, Sign } from "@/types/map";
-import { useCreateSignPins, useFormatBounds } from "@/utils/mapUtils";
+import {
+  useCreateSignPins,
+  useFormatBounds,
+  useGeoLocation,
+} from "@/utils/mapUtils";
 import {
   DEFAULT_MAP_PARAMS,
   DEFAULT_MAP_PAN_ZOOM,
@@ -44,8 +48,10 @@ export default function Map({ location, signs }: MapProps) {
   });
 
   const bounds = useFormatBounds(signs);
-
   const signPins = useCreateSignPins(signs, setPopupInfo);
+  const geoLocation = useGeoLocation();
+
+  console.log(geoLocation);
 
   useEffect(() => {
     if (!mapRef?.current || !bounds) {
