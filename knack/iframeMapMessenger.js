@@ -7,9 +7,9 @@
 (function () {
   var myView = window.viewIdsArray.shift(0);
 
-  const nextAppUrl =
-    "https://deploy-preview-327--nextjs-knack-signs-markings.netlify.app/";
-  // const nextAppUrl = "http://localhost:3000";
+  // const nextAppUrl =
+  // "https://deploy-preview-327--nextjs-knack-signs-markings.netlify.app/";
+  const nextAppUrl = "http://localhost:3000";
 
   // Import jQuery into this file from CDN
   // https://stackoverflow.com/questions/34338411/how-to-import-jquery-using-es6-syntax
@@ -53,8 +53,8 @@
     // Add React app as iframe if iframe doesn't already exist
     if ($(myView + " #mapIFrame").length === 0) {
       https: $(
-        `<iframe src=${nextAppUrl} frameborder="0" scrolling="yes" id="mapIFrame" \
-        style="width: 100%;height: 523px;"></iframe>`
+        `<iframe src=${nextAppUrl} frameborder="0" allow="geolocation" scrolling="yes" \
+        id="mapIFrame" style="width: 100%;height: 523px;"></iframe>`
       ).appendTo($viewSelector);
     }
 
@@ -79,9 +79,12 @@
       if (data.message === "LAT_LON_FIELDS") {
         console.log("received message ", data);
         var $latLonFields = $("#kn-input-field_3300");
-
-        $latLonFields.find("#latitude").val(data.lat);
-        $latLonFields.find("[name='longitude']").val(data.lng);
+        if (!!data.lat && !!data.lng) {
+          $latLonFields.find("#latitude").val(data.lat);
+          $latLonFields.find("[name='longitude']").val(data.lng);
+        } else {
+          console.error("Payload missing complete location data ", data);
+        }
       }
     });
 
