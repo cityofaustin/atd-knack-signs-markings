@@ -12,10 +12,17 @@ import { Sign, KnackToIFrameMessage, LatLon } from "@/types/map";
  */
 export const useFormatBounds = (signs: Sign[]): undefined | LngLatBoundsLike =>
   useMemo(() => {
-    if (signs.length === 0) {
+    // Knack does not check if locations have legitimate latitude and longitude
+    const checkedSigns = signs.filter((sign: Sign) => sign.lat && sign.lng);
+
+    if (checkedSigns.length === 0) {
       return undefined;
     }
-    const signLatLonArray = signs.map((sign: Sign) => [sign.lng, sign.lat]);
+
+    const signLatLonArray = checkedSigns.map((sign: Sign) => [
+      sign.lng,
+      sign.lat,
+    ]);
 
     const lineStringFeature =
       // if there is only one sign in the array, create the linestring for the bounding box using the one sign
