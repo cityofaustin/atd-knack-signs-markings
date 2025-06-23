@@ -115,7 +115,6 @@ export const useCreateSignPins = (
                 // If we let the click event propagates to the map, it will immediately close the popup
                 // with `closeOnClick: true`
                 e.originalEvent.stopPropagation();
-                console.log(sign);
                 setPopupInfo(sign);
               }}
             />
@@ -124,11 +123,13 @@ export const useCreateSignPins = (
     [signs, setPopupInfo]
   );
 
+/**
+ * @returns If geolocation permissions are on, return LatLon
+ */
 export const useGeoLocation = () => {
   const [geoLocation, setGeoLocation] = useState<LatLon | undefined>(undefined);
 
   useEffect(() => {
-    console.log("getting location");
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(({ coords }) => {
         setGeoLocation({

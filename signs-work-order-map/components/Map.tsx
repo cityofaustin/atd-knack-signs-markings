@@ -51,6 +51,10 @@ export default function Map({ location, signs }: MapProps) {
   const signPins = useCreateSignPins(signs, setPopupInfo);
   const geoLocation = useGeoLocation();
 
+  /**
+   * If there are no location pins and we have a geolocation point
+   * center map at geolocation
+   */
   useEffect(() => {
     if (!mapRef?.current || signs.length > 0) {
       return;
@@ -101,9 +105,7 @@ export default function Map({ location, signs }: MapProps) {
       {signPins}
 
       {
-        // showing the location / geolocation will happen in a subsequent issue
-        //  console.log("location from payload: ", location)
-        // when do we show location vs signs? when there are no signs?
+        // the add location marker, work will be completed in a following PR
         location?.latitude && location?.longitude && (
           <Marker latitude={location.latitude} longitude={location.longitude} />
         )
@@ -114,7 +116,11 @@ export default function Map({ location, signs }: MapProps) {
       )}
 
       <GeocoderControl position="top-left" marker={true} />
-      <GeolocateControl position="top-left" showUserLocation={false} />
+      <GeolocateControl
+        position="top-left"
+        showUserLocation={false}
+        fitBoundsOptions={{ maxZoom: 16, duration: 0 }}
+      />
       <NavigationControl position="bottom-right" showCompass={false} />
     </MapGL>
   );
