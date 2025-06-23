@@ -5,6 +5,11 @@ import "mapbox-gl/dist/mapbox-gl.css";
 // const NEARMAP_KEY = process.env.NEXT_PUBLIC_NEARMAP_KEY;
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
+
+// TODO: update to prod url when testing is completed
+// export const KNACK_APP_URL = 'http://atd.knack.com/signs-markings'
+export const KNACK_APP_URL = 'https://atd.knack.com/test-30-may-2024-signs-and-markings-operations';
+
 export const MAP_COORDINATE_PRECISION = 8;
 
 export const DEFAULT_MAP_PAN_ZOOM = {

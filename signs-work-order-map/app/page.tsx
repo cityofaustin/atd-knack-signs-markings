@@ -2,19 +2,21 @@
 import styles from "./page.module.css";
 import Map from "@/components/Map";
 import { useIFrameMessenger } from "@/utils/iFrameMessenger";
+import { useFormatSignsRecords, useFormatLocation } from "@/utils/mapUtils";
 
 export default function Home() {
   const knackPayload = useIFrameMessenger();
 
-  console.log(knackPayload)
+  console.log(knackPayload);
 
-  const location = knackPayload?.location;
+  const location = useFormatLocation(knackPayload);
+  const signs = useFormatSignsRecords(knackPayload);
 
   return (
     <div className={styles.page}>
       <main className={styles.main}>
         <div className={styles.map}>
-          <Map location={location} />
+          <Map location={location} signs={signs} />
         </div>
       </main>
     </div>
