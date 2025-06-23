@@ -51,8 +51,20 @@ export default function Map({ location, signs }: MapProps) {
   const signPins = useCreateSignPins(signs, setPopupInfo);
   const geoLocation = useGeoLocation();
 
-  console.log(geoLocation);
+  useEffect(() => {
+    if (!mapRef?.current || signs.length > 0) {
+      return;
+    }
+    if (geoLocation?.latitude && geoLocation.longitude) {
+      mapRef.current.jumpTo({
+        center: [geoLocation?.longitude, geoLocation?.latitude],
+      });
+    }
+  }, [geoLocation, signs]);
 
+  /**
+   * Zoom to bounding box containing location pins
+   */
   useEffect(() => {
     if (!mapRef?.current || !bounds) {
       return;
@@ -90,11 +102,11 @@ export default function Map({ location, signs }: MapProps) {
 
       {
         // showing the location / geolocation will happen in a subsequent issue
-        console.log("location from payload: ", location)
+        //  console.log("location from payload: ", location)
         // when do we show location vs signs? when there are no signs?
-        /* {location?.latitude && location?.longitude && (
-        <Marker latitude={location.latitude} longitude={location.longitude} />
-      )} */
+        location?.latitude && location?.longitude && (
+          <Marker latitude={location.latitude} longitude={location.longitude} />
+        )
       }
 
       {popupInfo && (
@@ -102,7 +114,7 @@ export default function Map({ location, signs }: MapProps) {
       )}
 
       <GeocoderControl position="top-left" marker={true} />
-      <GeolocateControl position="top-left" />
+      <GeolocateControl position="top-left" showUserLocation={false} />
       <NavigationControl position="bottom-right" showCompass={false} />
     </MapGL>
   );
