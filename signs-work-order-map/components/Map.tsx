@@ -106,9 +106,10 @@ export default function Map({ location, signs }: MapProps) {
 
       {
         // the add location marker, work will be completed in a following PR
-        location?.latitude && location?.longitude && (
-          <Marker latitude={location.latitude} longitude={location.longitude} />
-        )
+        // location?.latitude && location?.longitude && (
+        //   <Marker latitude={location.latitude} longitude={location.longitude} />
+        // )
+        console.log(location)
       }
 
       {popupInfo && (

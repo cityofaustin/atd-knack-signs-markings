@@ -12,7 +12,7 @@ import { Sign, KnackToIFrameMessage, LatLon } from "@/types/map";
  */
 export const useFormatBounds = (signs: Sign[]): undefined | LngLatBoundsLike =>
   useMemo(() => {
-    // Knack does not check if locations have legitimate latitude and longitude
+    // Knack will save undefined latitudes and longitudes, this filters those out.
     const checkedSigns = signs.filter((sign: Sign) => sign.lat && sign.lng);
 
     if (checkedSigns.length === 0) {
