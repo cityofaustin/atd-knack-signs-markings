@@ -95,13 +95,4 @@ export type KnackToIFrameMessage =
           latitude: number | undefined;
         };
       };
-    }
-  | {
-      message: "KNACK_GEOLOCATION";
-      payload: {
-        geolocation: {
-          latitude: number | undefined;
-          longitude: number | undefined;
-        };
-      };
     };

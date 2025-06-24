@@ -47,10 +47,7 @@ export const useFormatSignsRecords = (
 ): Sign[] =>
   useMemo(() => {
     if (!knackPayload) return [];
-    if (
-      knackPayload?.message === "EDIT_LOCATION" ||
-      knackPayload?.message === "KNACK_GEOLOCATION"
-    ) {
+    if (knackPayload?.message === "EDIT_LOCATION") {
       return [];
     }
 
@@ -80,13 +77,6 @@ export const useFormatLocation = (
   useMemo(() => {
     if (!knackPayload || knackPayload?.message === "WORK_ORDER_SIGNS") {
       return { longitude: undefined, latitude: undefined };
-    }
-
-    if (knackPayload.message === "KNACK_GEOLOCATION") {
-      return {
-        longitude: knackPayload.payload.geolocation.longitude,
-        latitude: knackPayload.payload.geolocation.latitude,
-      };
     }
 
     return {
