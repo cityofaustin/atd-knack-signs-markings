@@ -16,7 +16,7 @@ export default function Home() {
     <div className={styles.page}>
       <main className={styles.main}>
         <div className={styles.map}>
-          <Map signs={signs} messageType={knackPayload?.message}/>
+          <Map signs={signs} messageType={knackPayload?.message} />
         </div>
       </main>
     </div>
