@@ -8,6 +8,7 @@ import MapGL, {
 import GeocoderControl from "@/components/MapGeocoderControl";
 import { NavigationControl, GeolocateControl } from "react-map-gl/mapbox";
 import SignPopup from "./SignPopup";
+import { sendLatLonToParent } from "@/utils/iFrameMessenger";
 import { MapProps, LatLon, Sign } from "@/types/map";
 import {
   useCreateSignPins,
@@ -36,13 +37,7 @@ export default function Map({ signs, messageType }: MapProps) {
       longitude,
     });
 
-    // todo: pull this out of here, so it can be a callable function
-    // and should send a message before dragging too
-    // send location to Knack
-    window.parent.postMessage(
-      { message: "LAT_LON_FIELDS", lat: latitude, lng: longitude },
-      "https://atd.knack.com"
-    );
+    sendLatLonToParent({ latitude, longitude });
   }, []);
 
   const [mapLatLon, setMapLatLon] = useState<LatLon>({
@@ -91,8 +86,8 @@ export default function Map({ signs, messageType }: MapProps) {
 
     const { lng, lat } = mapRef.current.getCenter();
     setMapLatLon({
-      latitude: lat,
-      longitude: lng,
+      latitude: +lat.toFixed(MAP_COORDINATE_PRECISION),
+      longitude: +lng.toFixed(MAP_COORDINATE_PRECISION),
     });
   }, [bounds]);
 
@@ -107,7 +102,9 @@ export default function Map({ signs, messageType }: MapProps) {
       cooperativeGestures={true}
       {...DEFAULT_MAP_PARAMS}
       onDrag={onDrag}
-      onLoad={() => console.log(mapRef.current)}
+      onLoad={() => {
+        sendLatLonToParent(mapLatLon);
+      }}
     >
       {mapLatLon?.latitude &&
         mapLatLon?.longitude &&

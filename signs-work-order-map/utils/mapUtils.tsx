@@ -4,6 +4,7 @@ import { lineString } from "@turf/helpers";
 import { LngLatBoundsLike } from "mapbox-gl";
 import { Marker } from "react-map-gl/mapbox";
 import { Sign, KnackToIFrameMessage, LatLon } from "@/types/map";
+import { MAP_COORDINATE_PRECISION } from "@/config/map";
 
 /**
  * Takes array of Signs and if signs exist, returns bounding box for signs
@@ -69,14 +70,14 @@ export const useFormatSignsRecords = (
 /**
  * Function that takes data from knack app and depending on message type, returns location
  * @param knackPayload - message from Knack via IFrameMessage
- * @returns LatLon object
+ * @returns LatLon object or null
  */
 export const useFormatLocation = (
   knackPayload: KnackToIFrameMessage | null
-): LatLon =>
+): LatLon | null =>
   useMemo(() => {
     if (!knackPayload || knackPayload?.message === "WORK_ORDER_SIGNS") {
-      return { longitude: undefined, latitude: undefined };
+      return null;
     }
 
     return {
@@ -130,8 +131,8 @@ export const useGeoLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(({ coords }) => {
         setGeoLocation({
-          latitude: coords.latitude,
-          longitude: coords.longitude,
+          latitude: +coords.latitude.toFixed(MAP_COORDINATE_PRECISION),
+          longitude: +coords.longitude.toFixed(MAP_COORDINATE_PRECISION),
         });
       });
     }
