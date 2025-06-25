@@ -35,6 +35,9 @@ export default function Map({ signs, messageType }: MapProps) {
       latitude,
       longitude,
     });
+
+    // todo: pull this out of here, so it can be a callable function
+    // and should send a message before dragging too
     // send location to Knack
     window.parent.postMessage(
       { message: "LAT_LON_FIELDS", lat: latitude, lng: longitude },
@@ -53,7 +56,7 @@ export default function Map({ signs, messageType }: MapProps) {
 
   /**
    * If there are no location pins and we have a geolocation point
-   * center map at geolocation
+   * center map at geolocation. Set add location marker to same coords as geolocation
    */
   useEffect(() => {
     if (!mapRef?.current || signs.length > 0) {
@@ -63,11 +66,17 @@ export default function Map({ signs, messageType }: MapProps) {
       mapRef.current.jumpTo({
         center: [geoLocation?.longitude, geoLocation?.latitude],
       });
+
+      setMapLatLon({
+        latitude: geoLocation.latitude,
+        longitude: geoLocation.longitude,
+      });
     }
   }, [geoLocation, signs]);
 
   /**
    * Zoom to bounding box containing location pins
+   * and set add location marker to center
    */
   useEffect(() => {
     if (!mapRef?.current || !bounds) {
@@ -78,6 +87,12 @@ export default function Map({ signs, messageType }: MapProps) {
       padding: 100,
       maxZoom: 16,
       duration: 0,
+    });
+
+    const { lng, lat } = mapRef.current.getCenter();
+    setMapLatLon({
+      latitude: lat,
+      longitude: lng,
     });
   }, [bounds]);
 
@@ -92,6 +107,7 @@ export default function Map({ signs, messageType }: MapProps) {
       cooperativeGestures={true}
       {...DEFAULT_MAP_PARAMS}
       onDrag={onDrag}
+      onLoad={() => console.log(mapRef.current)}
     >
       {mapLatLon?.latitude &&
         mapLatLon?.longitude &&
