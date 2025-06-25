@@ -20,7 +20,7 @@ import {
   MAP_COORDINATE_PRECISION,
 } from "@/config/map";
 
-export default function Map({ location, signs }: MapProps) {
+export default function Map({ signs, messageType }: MapProps) {
   const mapRef = useRef<MapRef>(null);
   const [popupInfo, setPopupInfo] = useState<Sign | null>(null);
   const onDrag = useCallback((event: ViewStateChangeEvent) => {
@@ -93,24 +93,19 @@ export default function Map({ location, signs }: MapProps) {
       {...DEFAULT_MAP_PARAMS}
       onDrag={onDrag}
     >
-      {signs.length < 1 && mapLatLon?.latitude && mapLatLon?.longitude && (
-        <Marker
-          longitude={mapLatLon.longitude}
-          latitude={mapLatLon.latitude}
-          // draggable
-          //red?
-        />
-      )}
+      {mapLatLon?.latitude &&
+        mapLatLon?.longitude &&
+        messageType !== "KNACK_LOCATION_DETAILS" && (
+          <Marker
+            longitude={mapLatLon.longitude}
+            latitude={mapLatLon.latitude}
+            anchor="bottom"
+            color={"red"}
+            rotation={45} // trying this now to differentiate instead of pulse
+          />
+        )}
 
       {signPins}
-
-      {
-        // the add location marker, work will be completed in a following PR
-        // location?.latitude && location?.longitude && (
-        //   <Marker latitude={location.latitude} longitude={location.longitude} />
-        // )
-        console.log(location)
-      }
 
       {popupInfo && (
         <SignPopup popupInfo={popupInfo} setPopupInfo={setPopupInfo} />

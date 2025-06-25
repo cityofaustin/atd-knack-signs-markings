@@ -9,14 +9,14 @@ export default function Home() {
 
   console.log(knackPayload);
 
-  const location = useFormatLocation(knackPayload);
+  // const location = useFormatLocation(knackPayload);
   const signs = useFormatSignsRecords(knackPayload);
 
   return (
     <div className={styles.page}>
       <main className={styles.main}>
         <div className={styles.map}>
-          <Map location={location} signs={signs} />
+          <Map signs={signs} messageType={knackPayload?.message}/>
         </div>
       </main>
     </div>

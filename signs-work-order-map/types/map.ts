@@ -4,10 +4,11 @@ export interface LatLon {
 }
 
 export interface MapProps {
-  location: {
+  location?: {
     longitude: number | undefined;
     latitude: number | undefined;
   };
+  messageType?: "KNACK_LOCATION_DETAILS" | "EDIT_LOCATION" | "WORK_ORDER_SIGNS";
   signs: Sign[];
 }
 
