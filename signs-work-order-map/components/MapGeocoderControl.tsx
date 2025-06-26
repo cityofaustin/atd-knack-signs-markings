@@ -17,6 +17,7 @@ type GeocoderControlProps = Omit<
 > & {
   marker?: boolean | Omit<MarkerProps, "longitude" | "latitude">;
 
+  /** Where in the map should the geocoder appear */
   position: ControlPosition;
 
   onLoading?: (e: object) => void;
@@ -48,15 +49,15 @@ export default function GeocoderControl(props: GeocoderControlProps) {
           result &&
           (result.center ||
             (result.geometry?.type === "Point" && result.geometry.coordinates));
-        if (result.center[0] && result.center[1]) {
+        if (location) {
           props.setMapLatLon({
-            longitude: result.center[0],
-            latitude: result.center[1],
+            longitude: location[0],
+            latitude: location[1],
           });
           sendLatLonToParent({
-            longitude: result.center[0],
-            latitude: result.center[1],
-          })
+            longitude: location[0],
+            latitude: location[1],
+          });
         }
         if (location && props.marker) {
           const markerProps =

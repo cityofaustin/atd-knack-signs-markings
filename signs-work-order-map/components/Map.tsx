@@ -133,11 +133,7 @@ export default function Map({ signs, messageType }: MapProps) {
         <SignPopup popupInfo={popupInfo} setPopupInfo={setPopupInfo} />
       )}
 
-      <GeocoderControl
-        position="top-left"
-        marker={false}
-        setMapLatLon={setMapLatLon}
-      />
+      <GeocoderControl position="top-left" setMapLatLon={setMapLatLon} />
       <GeolocateControl
         position="top-left"
         showUserLocation={false}
