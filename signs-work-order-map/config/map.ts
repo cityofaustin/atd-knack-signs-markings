@@ -3,7 +3,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 
 // // The Nearmap API key is managed by CTM. Contact help desk for maintenance and troubleshooting.
 // const NEARMAP_KEY = process.env.NEXT_PUBLIC_NEARMAP_KEY;
-const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+export const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
 
 // TODO: update to prod url when testing is completed
