@@ -23,7 +23,7 @@ import {
 
 /**
  *
- * @param signs Array of Signs from knack paylod, or empty array
+ * @param signs Array of Signs from knack payload, or empty array
  * @param messageType String from knack payload
  * @returns
  */
@@ -56,7 +56,7 @@ export default function Map({ signs, messageType }: MapProps) {
   const geoLocation = useGeoLocation();
 
   /**
-   * If there are no location pins and we have a geolocation point center
+   * If there are no sign location pins and we have a geolocation point center
    * map at geolocation. Set add location marker to same coordindates as geolocation
    */
   useEffect(() => {
