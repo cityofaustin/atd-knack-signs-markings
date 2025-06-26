@@ -21,6 +21,12 @@ import {
   MAP_COORDINATE_PRECISION,
 } from "@/config/map";
 
+/**
+ *
+ * @param signs Array of Signs from knack paylod, or empty array
+ * @param messageType String from knack payload
+ * @returns
+ */
 export default function Map({ signs, messageType }: MapProps) {
   const mapRef = useRef<MapRef>(null);
   const [popupInfo, setPopupInfo] = useState<Sign | null>(null);
@@ -50,8 +56,8 @@ export default function Map({ signs, messageType }: MapProps) {
   const geoLocation = useGeoLocation();
 
   /**
-   * If there are no location pins and we have a geolocation point
-   * center map at geolocation. Set add location marker to same coords as geolocation
+   * If there are no location pins and we have a geolocation point center
+   * map at geolocation. Set add location marker to same coordindates as geolocation
    */
   useEffect(() => {
     if (!mapRef?.current || signs.length > 0) {
@@ -71,7 +77,7 @@ export default function Map({ signs, messageType }: MapProps) {
 
   /**
    * Zoom to bounding box containing location pins
-   * and set add location marker to center
+   * and set "add location marker" coordinates to center
    */
   useEffect(() => {
     if (!mapRef?.current || !bounds) {
@@ -119,7 +125,6 @@ export default function Map({ signs, messageType }: MapProps) {
         )}
 
       {signPins}
-
       {popupInfo && (
         <SignPopup popupInfo={popupInfo} setPopupInfo={setPopupInfo} />
       )}

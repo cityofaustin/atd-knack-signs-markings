@@ -7,8 +7,8 @@ import { Sign, KnackToIFrameMessage, LatLon } from "@/types/map";
 import { MAP_COORDINATE_PRECISION } from "@/config/map";
 
 /**
- * Takes array of Signs and if signs exist, returns bounding box for signs
- * @param signs
+ * Takes array of Signs from knack payload and if signs exist, returns bounding box for signs
+ * @param signs Array of Signs
  * @returns bbox extent in [minX, minY, maxX, maxY] order or undefined
  */
 export const useFormatBounds = (signs: Sign[]): undefined | LngLatBoundsLike =>
@@ -90,7 +90,7 @@ export const useFormatLocation = (
  * Takes array of Signs and returns array of map markers, one marker per sign
  * If the sign id matches the location detail page id, render the marker as red
  * otherwise, use default color
- * @param signs
+ * @param signs Array of Signs
  * @returns Array of Map Markers
  */
 export const useCreateSignPins = (

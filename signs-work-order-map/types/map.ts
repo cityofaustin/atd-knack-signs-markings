@@ -18,6 +18,7 @@ export interface Sign {
   lat: number;
   spatialId: number;
   workOrderId: string;
+  /** if the sign id matches the location record id, the payload came from the location details page */
   isLocationDetailPage: boolean;
 }
 
