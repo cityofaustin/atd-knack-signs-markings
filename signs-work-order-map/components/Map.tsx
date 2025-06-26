@@ -112,17 +112,21 @@ export default function Map({ signs, messageType }: MapProps) {
         sendLatLonToParent(mapLatLon);
       }}
     >
-      {mapLatLon?.latitude &&
-        mapLatLon?.longitude &&
-        messageType !== "KNACK_LOCATION_DETAILS" && (
-          <Marker
-            longitude={mapLatLon.longitude}
-            latitude={mapLatLon.latitude}
-            anchor="bottom"
-            color={"red"}
-            rotation={45} // trying this now to differentiate instead of pulse
-          />
-        )}
+      {
+        // red "add location" marker that is situated at center of map. This marker's location is
+        // what is sent to knack in the LAT_LON_PAYLOAD message
+        mapLatLon?.latitude &&
+          mapLatLon?.longitude &&
+          messageType !== "KNACK_LOCATION_DETAILS" && (
+            <Marker
+              longitude={mapLatLon.longitude}
+              latitude={mapLatLon.latitude}
+              anchor="bottom"
+              color={"red"}
+              rotation={45} // trying this now to differentiate instead of pulse
+            />
+          )
+      }
 
       {signPins}
       {popupInfo && (
