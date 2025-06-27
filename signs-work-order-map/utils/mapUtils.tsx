@@ -12,17 +12,12 @@ import { Sign, KnackToIFrameMessage, LatLon } from "@/types/map";
  */
 export const useFormatBounds = (signs: Sign[]): undefined | LngLatBoundsLike =>
   useMemo(() => {
-    // Knack will save undefined latitudes and longitudes, this filters those out.
-    const checkedSigns = signs.filter((sign: Sign) => sign.lat && sign.lng);
-
-    if (checkedSigns.length === 0) {
+      console.log(signs)
+    if (signs.length === 0) {
       return undefined;
     }
 
-    const signLatLonArray = checkedSigns.map((sign: Sign) => [
-      sign.lng,
-      sign.lat,
-    ]);
+    const signLatLonArray = signs.map((sign: Sign) => [sign.lng, sign.lat]);
 
     const lineStringFeature =
       // if there is only one sign in the array, create the linestring for the bounding box using the one sign
@@ -56,7 +51,7 @@ export const useFormatSignsRecords = (
         ? knackPayload?.payload?.locationRecordId
         : null;
 
-    return knackPayload.payload.records.map((sign) => ({
+    const signsArray = knackPayload.payload.records.map((sign) => ({
       id: sign.id,
       lat: sign.field_3300_raw.latitude,
       lng: sign.field_3300_raw.longitude,
@@ -64,6 +59,9 @@ export const useFormatSignsRecords = (
       workOrderId: knackPayload.payload.workOrderId,
       isLocationDetailPage: sign.id === locationId,
     }));
+
+    // Knack will save undefined latitudes and longitudes, this filters those out.
+    return signsArray.filter((sign: Sign) => sign.lat && sign.lng);
   }, [knackPayload]);
 
 /**

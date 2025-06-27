@@ -59,7 +59,7 @@ export default function Map({ location, signs }: MapProps) {
     if (!mapRef?.current || signs.length > 0) {
       return;
     }
-    if (geoLocation?.latitude && geoLocation.longitude) {
+    if (geoLocation?.latitude && geoLocation?.longitude) {
       mapRef.current.jumpTo({
         center: [geoLocation?.longitude, geoLocation?.latitude],
       });
@@ -109,7 +109,7 @@ export default function Map({ location, signs }: MapProps) {
         // location?.latitude && location?.longitude && (
         //   <Marker latitude={location.latitude} longitude={location.longitude} />
         // )
-        console.log(location)
+        console.log("location from iframeMessenger payload", location)
       }
 
       {popupInfo && (
