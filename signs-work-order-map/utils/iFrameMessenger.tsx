@@ -27,7 +27,7 @@ export function useIFrameMessenger() {
 export function sendLatLonToParent(coords: LatLon) {
   // send location to Knack
   window.parent.postMessage(
-    { message: "LAT_LON_FIELDS", lat: coords.latitude, lng: coords.longitude },
+    { message: "LAT_LON_UPDATE", lat: coords.latitude, lng: coords.longitude },
     "https://atd.knack.com"
   );
 }
