@@ -37,7 +37,7 @@ export default function Map({ location, signs }: MapProps) {
     });
     // send location to Knack
     window.parent.postMessage(
-      { message: "LAT_LON_FIELDS", lat: latitude, lng: longitude },
+      { message: "LAT_LON_UPDATE", lat: latitude, lng: longitude },
       "https://atd.knack.com"
     );
   }, []);
