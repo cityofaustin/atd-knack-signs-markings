@@ -28,18 +28,18 @@ export interface KnackRecord {
   /** spatial id raw format */
   field_3297_raw: number;
   /** address in string form */
-  field_3300: string;
+  field_3300: string | undefined;
   /** address raw format  */
   field_3300_raw: {
-    city: string;
-    country: string;
-    full: string;
-    latitude: number;
-    longitude: number;
-    state: string;
-    street: string;
+    city: string | undefined;
+    country: string | undefined;
+    full: string | undefined;
+    latitude: number | undefined;
+    longitude: number | undefined;
+    state: string | undefined;
+    street: string | undefined;
     street2: string | null;
-    zip: string;
+    zip: string | undefined;
   };
   /** created date */
   field_3302?: string;
