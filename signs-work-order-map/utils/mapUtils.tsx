@@ -49,17 +49,26 @@ export const useFormatSignsRecords = (
         ? knackPayload?.payload?.locationRecordId
         : null;
 
-    const signsArray = knackPayload.payload.records.map((sign) => ({
-      id: sign.id,
-      lat: sign.field_3300_raw.latitude,
-      lng: sign.field_3300_raw.longitude,
-      spatialId: sign.field_3297,
-      workOrderId: knackPayload.payload.workOrderId,
-      isLocationDetailPage: sign.id === locationId,
-    }));
-
     // Knack will save undefined latitudes and longitudes, this filters those out.
-    return signsArray.filter((sign: Sign) => sign.lat && sign.lng);
+    const signsArray: Sign[] = knackPayload.payload.records.reduce(
+      (acc: Sign[], sign) => {
+        if (sign.field_3300_raw.latitude && sign.field_3300_raw.longitude) {
+          const newSign = {
+            id: sign.id,
+            lat: sign.field_3300_raw.latitude,
+            lng: sign.field_3300_raw.longitude,
+            spatialId: sign.field_3297,
+            workOrderId: knackPayload.payload.workOrderId,
+            isLocationDetailPage: sign.id === locationId,
+          };
+          acc.push(newSign);
+        }
+        return acc;
+      },
+      []
+    );
+
+    return signsArray;
   }, [knackPayload]);
 
 /**
