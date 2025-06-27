@@ -4,9 +4,10 @@ import MapGL, {
   MapRef,
   Marker,
   ViewStateChangeEvent,
+  NavigationControl,
+  GeolocateControl,
 } from "react-map-gl/mapbox";
 import GeocoderControl from "@/components/MapGeocoderControl";
-import { NavigationControl, GeolocateControl } from "react-map-gl/mapbox";
 import SignPopup from "./SignPopup";
 import { sendLatLonToParent } from "@/utils/iFrameMessenger";
 import { MapProps, LatLon, Sign } from "@/types/map";
@@ -38,6 +39,18 @@ export default function Map({ signs, messageType }: MapProps) {
     const longitude = +event.viewState.longitude.toFixed(
       MAP_COORDINATE_PRECISION
     );
+    setMapLatLon({
+      latitude,
+      longitude,
+    });
+
+    sendLatLonToParent({ latitude, longitude });
+  }, []);
+
+  const onGeolocate = useCallback((data: GeolocationPosition) => {
+    // truncate values to our preferred precision
+    const latitude = +data.coords.latitude.toFixed(MAP_COORDINATE_PRECISION);
+    const longitude = +data.coords.longitude.toFixed(MAP_COORDINATE_PRECISION);
     setMapLatLon({
       latitude,
       longitude,
@@ -138,6 +151,7 @@ export default function Map({ signs, messageType }: MapProps) {
         position="top-left"
         showUserLocation={false}
         fitBoundsOptions={{ maxZoom: 16, duration: 0 }}
+        onGeolocate={onGeolocate}
       />
       <NavigationControl position="bottom-right" showCompass={false} />
     </MapGL>
