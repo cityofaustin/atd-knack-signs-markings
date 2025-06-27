@@ -63,7 +63,7 @@ export default function Map({ signs, messageType }: MapProps) {
     if (!mapRef?.current || signs.length > 0) {
       return;
     }
-    if (geoLocation?.latitude && geoLocation.longitude) {
+    if (geoLocation?.latitude && geoLocation?.longitude) {
       mapRef.current.jumpTo({
         center: [geoLocation?.longitude, geoLocation?.latitude],
       });
