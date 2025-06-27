@@ -7,9 +7,9 @@
 (function () {
   var myView = window.viewIdsArray.shift(0);
 
-  const nextAppUrl =
-    "https://deploy-preview-328--nextjs-knack-signs-markings.netlify.app/";
-  // const nextAppUrl = "http://localhost:3000";
+  // const nextAppUrl =
+  //   "https://deploy-preview-328--nextjs-knack-signs-markings.netlify.app/";
+  const nextAppUrl = "http://localhost:3000";
 
   // Import jQuery into this file from CDN
   // https://stackoverflow.com/questions/34338411/how-to-import-jquery-using-es6-syntax
@@ -62,22 +62,18 @@
     }
 
     // Listen for lat/lon changes
-    // expects a message named "LAT_LON_FIELDS"
+    // expects a message named "LAT_LON_UPDATE"
     // uses lat and lng from message to populate input fields in knack
     window.addEventListener("message", function (event) {
       if (event.origin !== nextAppUrl) {
         return;
       }
       var data = event.data;
-      if (data.message === "LAT_LON_FIELDS") {
-        console.log("received message ", data);
+      if (data.message === "LAT_LON_UPDATE") {
+        console.log("knack received message ", data);
         var $latLonFields = $("#kn-input-field_3300");
-        if (!!data.lat && !!data.lng) {
-          $latLonFields.find("#latitude").val(data.lat);
-          $latLonFields.find("[name='longitude']").val(data.lng);
-        } else {
-          console.error("Payload missing complete location data ", data);
-        }
+        $latLonFields.find("#latitude").val(data.lat);
+        $latLonFields.find("[name='longitude']").val(data.lng);
       }
     });
 
