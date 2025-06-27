@@ -12,11 +12,9 @@ import { Sign, KnackToIFrameMessage, LatLon } from "@/types/map";
  */
 export const useFormatBounds = (signs: Sign[]): undefined | LngLatBoundsLike =>
   useMemo(() => {
-      console.log(signs)
     if (signs.length === 0) {
       return undefined;
     }
-
     const signLatLonArray = signs.map((sign: Sign) => [sign.lng, sign.lat]);
 
     const lineStringFeature =
