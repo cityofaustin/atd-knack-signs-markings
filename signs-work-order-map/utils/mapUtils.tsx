@@ -81,7 +81,7 @@ export const useFormatLocation = (
   knackPayload: KnackToIFrameMessage | null
 ): LatLon | null =>
   useMemo(() => {
-    if (!knackPayload || knackPayload?.message === "WORK_ORDER_SIGNS") {
+    if (!knackPayload || knackPayload?.message !== "EDIT_LOCATION") {
       return null;
     }
 

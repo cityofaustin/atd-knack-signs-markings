@@ -28,7 +28,7 @@ import {
  * @param messageType String from knack payload
  * @returns
  */
-export default function Map({ signs, messageType }: MapProps) {
+export default function Map({ signs, messageType, editLocation }: MapProps) {
   const mapRef = useRef<MapRef>(null);
   const [popupInfo, setPopupInfo] = useState<Sign | null>(null);
   const onDrag = useCallback((event: ViewStateChangeEvent) => {
