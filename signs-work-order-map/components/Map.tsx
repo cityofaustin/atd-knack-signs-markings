@@ -31,6 +31,11 @@ import {
 export default function Map({ signs, messageType, editLocation }: MapProps) {
   const mapRef = useRef<MapRef>(null);
   const [popupInfo, setPopupInfo] = useState<Sign | null>(null);
+  const [mapLatLon, setMapLatLon] = useState<LatLon>({
+    latitude: DEFAULT_MAP_PAN_ZOOM.latitude,
+    longitude: DEFAULT_MAP_PAN_ZOOM.longitude,
+  });
+  // when map is dragged, set lat/lon state and send location to knack
   const onDrag = useCallback((event: ViewStateChangeEvent) => {
     // truncate values to our preferred precision
     const latitude = +event.viewState.latitude.toFixed(
@@ -47,6 +52,7 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
     sendLatLonToParent({ latitude, longitude });
   }, []);
 
+  // when geolocation icon is tapped, set lat/lon state and send location to knack
   const onGeolocate = useCallback((data: GeolocationPosition) => {
     // truncate values to our preferred precision
     const latitude = +data.coords.latitude.toFixed(MAP_COORDINATE_PRECISION);
@@ -58,11 +64,6 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
 
     sendLatLonToParent({ latitude, longitude });
   }, []);
-
-  const [mapLatLon, setMapLatLon] = useState<LatLon>({
-    latitude: DEFAULT_MAP_PAN_ZOOM.latitude,
-    longitude: DEFAULT_MAP_PAN_ZOOM.longitude,
-  });
 
   const bounds = useFormatBounds(signs);
   const signPins = useCreateSignPins(signs, setPopupInfo);
@@ -115,7 +116,7 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
     });
   }, [bounds]);
 
-  /***
+  /**
    * editLocation is sent from knack when a GIS Tech is on the Edit Location view
    * center map on location, and send coordinates back to Knack to populate the
    * location form
