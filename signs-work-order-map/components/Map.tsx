@@ -73,7 +73,11 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
    * map at geolocation. Set add location marker to same coordindates as geolocation
    */
   useEffect(() => {
-    if (!mapRef?.current || signs.length > 0) {
+    if (
+      !mapRef?.current ||
+      signs.length > 0 ||
+      messageType === "EDIT_LOCATION"
+    ) {
       return;
     }
     if (geoLocation?.latitude && geoLocation?.longitude) {
@@ -86,7 +90,7 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
         longitude: geoLocation.longitude,
       });
     }
-  }, [geoLocation, signs]);
+  }, [geoLocation, signs, messageType]);
 
   /**
    * Zoom to bounding box containing location pins
@@ -109,6 +113,26 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
       longitude: +lng.toFixed(MAP_COORDINATE_PRECISION),
     });
   }, [bounds]);
+
+  /***
+   *
+   */
+  useEffect(() => {
+    if (!mapRef?.current || !editLocation) {
+      return;
+    }
+
+    if (editLocation.latitude && editLocation.longitude) {
+      mapRef.current.jumpTo({
+        center: [editLocation?.longitude, editLocation?.latitude],
+      });
+
+      setMapLatLon({
+        latitude: editLocation.latitude,
+        longitude: editLocation.longitude,
+      });
+    }
+  }, [editLocation]);
 
   return (
     <MapGL
