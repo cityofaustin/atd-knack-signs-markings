@@ -6,9 +6,14 @@ import MapGL, {
   ViewStateChangeEvent,
 } from "react-map-gl/mapbox";
 import GeocoderControl from "@/components/MapGeocoderControl";
+import { NavigationControl, GeolocateControl } from "react-map-gl/mapbox";
 import SignPopup from "./SignPopup";
 import { MapProps, LatLon, Sign } from "@/types/map";
-import { useCreateSignPins, useFormatBounds } from "@/utils/mapUtils";
+import {
+  useCreateSignPins,
+  useFormatBounds,
+  useGeoLocation,
+} from "@/utils/mapUtils";
 import {
   DEFAULT_MAP_PARAMS,
   DEFAULT_MAP_PAN_ZOOM,
@@ -32,7 +37,7 @@ export default function Map({ location, signs }: MapProps) {
     });
     // send location to Knack
     window.parent.postMessage(
-      { message: "LAT_LON_FIELDS", lat: latitude, lng: longitude },
+      { message: "LAT_LON_UPDATE", lat: latitude, lng: longitude },
       "https://atd.knack.com"
     );
   }, []);
@@ -43,9 +48,27 @@ export default function Map({ location, signs }: MapProps) {
   });
 
   const bounds = useFormatBounds(signs);
-
   const signPins = useCreateSignPins(signs, setPopupInfo);
+  const geoLocation = useGeoLocation();
 
+  /**
+   * If there are no sign locations and we have a geolocation point
+   * center map at geolocation
+   */
+  useEffect(() => {
+    if (!mapRef?.current || signs.length > 0) {
+      return;
+    }
+    if (geoLocation?.latitude && geoLocation?.longitude) {
+      mapRef.current.jumpTo({
+        center: [geoLocation?.longitude, geoLocation?.latitude],
+      });
+    }
+  }, [geoLocation, signs]);
+
+  /**
+   * Zoom to bounding box containing location pins
+   */
   useEffect(() => {
     if (!mapRef?.current || !bounds) {
       return;
@@ -82,12 +105,11 @@ export default function Map({ location, signs }: MapProps) {
       {signPins}
 
       {
-        // showing the location / geolocation will happen in a subsequent issue
-        console.log("location from payload: ", location)
-        // when do we show location vs signs? when there are no signs?
-        /* {location?.latitude && location?.longitude && (
-        <Marker latitude={location.latitude} longitude={location.longitude} />
-      )} */
+        // the add location marker, work will be completed in a following PR
+        // location?.latitude && location?.longitude && (
+        //   <Marker latitude={location.latitude} longitude={location.longitude} />
+        // )
+        console.log("location from iframeMessenger payload", location)
       }
 
       {popupInfo && (
@@ -95,6 +117,12 @@ export default function Map({ location, signs }: MapProps) {
       )}
 
       <GeocoderControl position="top-left" marker={true} />
+      <GeolocateControl
+        position="top-left"
+        showUserLocation={false}
+        fitBoundsOptions={{ maxZoom: 17, duration: 0 }}
+      />
+      <NavigationControl position="bottom-right" showCompass={false} />
     </MapGL>
   );
 }

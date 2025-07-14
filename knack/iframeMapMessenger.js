@@ -7,9 +7,9 @@
 (function () {
   var myView = window.viewIdsArray.shift(0);
 
-  const nextAppUrl =
-    "https://deploy-preview-327--nextjs-knack-signs-markings.netlify.app/";
-  // const nextAppUrl = "http://localhost:3000";
+  // const nextAppUrl =
+  //   "https://deploy-preview-328--nextjs-knack-signs-markings.netlify.app/";
+  const nextAppUrl = "http://localhost:3000";
 
   // Import jQuery into this file from CDN
   // https://stackoverflow.com/questions/34338411/how-to-import-jquery-using-es6-syntax
@@ -39,13 +39,6 @@
     };
   }
 
-  function AutozoomSendMessageToApp(message) {
-    var iframe = document.getElementById("mapIFrame").contentWindow;
-    const stringifiedMessage = JSON.stringify(message);
-    console.log("autozoom message to app ", message.message);
-    iframe.postMessage(stringifiedMessage, "*");
-  }
-
   // Start polling...
   checkReady(function ($) {
     var $viewSelector = $(myView);
@@ -53,8 +46,8 @@
     // Add React app as iframe if iframe doesn't already exist
     if ($(myView + " #mapIFrame").length === 0) {
       https: $(
-        `<iframe src=${nextAppUrl} frameborder="0" scrolling="yes" id="mapIFrame" \
-        style="width: 100%;height: 523px;"></iframe>`
+        `<iframe src=${nextAppUrl} frameborder="0" allow="geolocation" scrolling="yes" \
+        id="mapIFrame" style="width: 100%;height: 523px;"></iframe>`
       ).appendTo($viewSelector);
     }
 
@@ -65,21 +58,20 @@
      */
     function sendMessageToApp(message, iframe) {
       var stringifiedMessage = JSON.stringify(message);
-      iframe.postMessage(stringifiedMessage, "*");
+      iframe.postMessage(stringifiedMessage, nextAppUrl);
     }
 
     // Listen for lat/lon changes
-    // expects a message named "LAT_LON_FIELDS"
+    // expects a message named "LAT_LON_UPDATE"
     // uses lat and lng from message to populate input fields in knack
     window.addEventListener("message", function (event) {
       if (event.origin !== nextAppUrl) {
         return;
       }
       var data = event.data;
-      if (data.message === "LAT_LON_FIELDS") {
-        console.log("received message ", data);
+      if (data.message === "LAT_LON_UPDATE") {
+        console.log("knack received message ", data);
         var $latLonFields = $("#kn-input-field_3300");
-
         $latLonFields.find("#latitude").val(data.lat);
         $latLonFields.find("[name='longitude']").val(data.lng);
       }
@@ -226,25 +218,6 @@
     // Edit Location Page
     $("#view_2682 #mapIFrame").on("load", function () {
       sendLocationMapMessage("view_2682");
-    });
-
-    // Get the current location from browser.
-    navigator.geolocation.getCurrentPosition(function (position) {
-      // create message object for React App
-      const geolocationMessage = {
-        message: "KNACK_GEOLOCATION",
-        payload: {
-          geolocation: {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          },
-        },
-      };
-
-      // sends geolocation once the iframe is loaded
-      $("#mapIFrame").on("load", function () {
-        AutozoomSendMessageToApp(geolocationMessage);
-      });
     });
   });
 })();

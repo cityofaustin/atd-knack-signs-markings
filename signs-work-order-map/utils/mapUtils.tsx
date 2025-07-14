@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import bbox from "@turf/bbox";
 import { lineString } from "@turf/helpers";
 import { LngLatBoundsLike } from "mapbox-gl";
@@ -40,10 +40,7 @@ export const useFormatSignsRecords = (
 ): Sign[] =>
   useMemo(() => {
     if (!knackPayload) return [];
-    if (
-      knackPayload?.message === "EDIT_LOCATION" ||
-      knackPayload?.message === "KNACK_GEOLOCATION"
-    ) {
+    if (knackPayload?.message === "EDIT_LOCATION") {
       return [];
     }
 
@@ -52,14 +49,26 @@ export const useFormatSignsRecords = (
         ? knackPayload?.payload?.locationRecordId
         : null;
 
-    return knackPayload.payload.records.map((sign) => ({
-      id: sign.id,
-      lat: sign.field_3300_raw.latitude,
-      lng: sign.field_3300_raw.longitude,
-      spatialId: sign.field_3297,
-      workOrderId: knackPayload.payload.workOrderId,
-      isLocationDetailPage: sign.id === locationId,
-    }));
+    // Knack will save undefined latitudes and longitudes, this filters those out.
+    const signsArray: Sign[] = knackPayload.payload.records.reduce(
+      (acc: Sign[], sign) => {
+        if (sign.field_3300_raw.latitude && sign.field_3300_raw.longitude) {
+          const newSign = {
+            id: sign.id,
+            lat: sign.field_3300_raw.latitude,
+            lng: sign.field_3300_raw.longitude,
+            spatialId: sign.field_3297,
+            workOrderId: knackPayload.payload.workOrderId,
+            isLocationDetailPage: sign.id === locationId,
+          };
+          acc.push(newSign);
+        }
+        return acc;
+      },
+      []
+    );
+
+    return signsArray;
   }, [knackPayload]);
 
 /**
@@ -73,13 +82,6 @@ export const useFormatLocation = (
   useMemo(() => {
     if (!knackPayload || knackPayload?.message === "WORK_ORDER_SIGNS") {
       return { longitude: undefined, latitude: undefined };
-    }
-
-    if (knackPayload.message === "KNACK_GEOLOCATION") {
-      return {
-        longitude: knackPayload.payload.geolocation.longitude,
-        latitude: knackPayload.payload.geolocation.latitude,
-      };
     }
 
     return {
@@ -115,7 +117,6 @@ export const useCreateSignPins = (
                 // If we let the click event propagates to the map, it will immediately close the popup
                 // with `closeOnClick: true`
                 e.originalEvent.stopPropagation();
-                console.log(sign);
                 setPopupInfo(sign);
               }}
             />
@@ -123,3 +124,23 @@ export const useCreateSignPins = (
       ),
     [signs, setPopupInfo]
   );
+
+/**
+ * @returns If geolocation permissions are on, return LatLon
+ */
+export const useGeoLocation = () => {
+  const [geoLocation, setGeoLocation] = useState<LatLon | undefined>(undefined);
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(({ coords }) => {
+        setGeoLocation({
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+        });
+      });
+    }
+  }, []);
+
+  return geoLocation;
+};
