@@ -52,7 +52,7 @@ export default function Map({ location, signs }: MapProps) {
   const geoLocation = useGeoLocation();
 
   /**
-   * If there are no location pins and we have a geolocation point
+   * If there are no sign locations and we have a geolocation point
    * center map at geolocation
    */
   useEffect(() => {
@@ -120,7 +120,7 @@ export default function Map({ location, signs }: MapProps) {
       <GeolocateControl
         position="top-left"
         showUserLocation={false}
-        fitBoundsOptions={{ maxZoom: 16, duration: 0 }}
+        fitBoundsOptions={{ maxZoom: 17, duration: 0 }}
       />
       <NavigationControl position="bottom-right" showCompass={false} />
     </MapGL>
