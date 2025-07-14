@@ -70,7 +70,8 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
 
   /**
    * If there are no sign location pins and we have a geolocation point center
-   * map at geolocation. Set add location marker to same coordindates as geolocation
+   * map at geolocation *unless we are editing an existing saved location*.
+   * Set add location marker to same coordindates as geolocation
    */
   useEffect(() => {
     if (
@@ -115,7 +116,9 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
   }, [bounds]);
 
   /***
-   *
+   * editLocation is sent from knack when a GIS Tech is on the Edit Location view
+   * center map on location, and send coordinates back to Knack to populate the
+   * location form
    */
   useEffect(() => {
     if (!mapRef?.current || !editLocation) {
