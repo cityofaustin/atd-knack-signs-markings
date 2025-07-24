@@ -31,7 +31,6 @@ import {
 export default function Map({ signs, messageType }: MapProps) {
   const mapRef = useRef<MapRef>(null);
   const [popupInfo, setPopupInfo] = useState<Sign | null>(null);
-  const [zoomLevel, setZoomLevel] = useState<number>(DEFAULT_MAP_PAN_ZOOM.zoom)
   const updateCenterMarker = useCallback((event: ViewStateChangeEvent) => {
     // truncate values to our preferred precision
     const latitude = +event.viewState.latitude.toFixed(
@@ -67,7 +66,7 @@ export default function Map({ signs, messageType }: MapProps) {
   });
 
   const bounds = useFormatBounds(signs);
-  const signPins = useCreateSignPins(signs, setPopupInfo, zoomLevel);
+  const signPins = useCreateSignPins(signs, setPopupInfo);
   const geoLocation = useGeoLocation();
 
   /**
@@ -127,7 +126,6 @@ export default function Map({ signs, messageType }: MapProps) {
       onLoad={() => {
         sendLatLonToParent(mapLatLon);
       }}
-
     >
       {
         // red "add location" marker that is situated at center of map. This marker's location is
@@ -138,7 +136,6 @@ export default function Map({ signs, messageType }: MapProps) {
             <Marker
               longitude={mapLatLon.longitude}
               latitude={mapLatLon.latitude}
-              anchor="bottom"
               color={"red"}
               rotation={45} // trying this now to differentiate instead of pulse
             />

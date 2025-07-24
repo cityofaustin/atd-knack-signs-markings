@@ -112,7 +112,6 @@ export const useCreateSignPins = (
               key={`marker-${sign.id}`}
               longitude={sign.lng}
               latitude={sign.lat}
-              anchor="bottom"
               color={sign.isLocationDetailPage ? "red" : undefined}
               onClick={(e) => {
                 // If we let the click event propagates to the map, it will immediately close the popup
