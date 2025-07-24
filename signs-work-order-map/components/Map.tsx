@@ -123,6 +123,7 @@ export default function Map({ signs, messageType }: MapProps) {
       {...DEFAULT_MAP_PARAMS}
       onDrag={updateCenterMarker}
       onZoom={updateCenterMarker}
+      onMoveEnd={updateCenterMarker}
       onLoad={() => {
         sendLatLonToParent(mapLatLon);
       }}
