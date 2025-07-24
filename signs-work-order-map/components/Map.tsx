@@ -31,7 +31,8 @@ import {
 export default function Map({ signs, messageType }: MapProps) {
   const mapRef = useRef<MapRef>(null);
   const [popupInfo, setPopupInfo] = useState<Sign | null>(null);
-  const onDrag = useCallback((event: ViewStateChangeEvent) => {
+  const [zoomLevel, setZoomLevel] = useState<number>(DEFAULT_MAP_PAN_ZOOM.zoom)
+  const updateCenterMarker = useCallback((event: ViewStateChangeEvent) => {
     // truncate values to our preferred precision
     const latitude = +event.viewState.latitude.toFixed(
       MAP_COORDINATE_PRECISION
@@ -46,6 +47,7 @@ export default function Map({ signs, messageType }: MapProps) {
 
     sendLatLonToParent({ latitude, longitude });
   }, []);
+
 
   const onGeolocate = useCallback((data: GeolocationPosition) => {
     // truncate values to our preferred precision
@@ -65,7 +67,7 @@ export default function Map({ signs, messageType }: MapProps) {
   });
 
   const bounds = useFormatBounds(signs);
-  const signPins = useCreateSignPins(signs, setPopupInfo);
+  const signPins = useCreateSignPins(signs, setPopupInfo, zoomLevel);
   const geoLocation = useGeoLocation();
 
   /**
@@ -120,10 +122,12 @@ export default function Map({ signs, messageType }: MapProps) {
       }}
       cooperativeGestures={true}
       {...DEFAULT_MAP_PARAMS}
-      onDrag={onDrag}
+      onDrag={updateCenterMarker}
+      onZoom={updateCenterMarker}
       onLoad={() => {
         sendLatLonToParent(mapLatLon);
       }}
+
     >
       {
         // red "add location" marker that is situated at center of map. This marker's location is
