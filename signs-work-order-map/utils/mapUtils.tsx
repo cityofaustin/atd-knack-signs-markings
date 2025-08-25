@@ -4,10 +4,11 @@ import { lineString } from "@turf/helpers";
 import { LngLatBoundsLike } from "mapbox-gl";
 import { Marker } from "react-map-gl/mapbox";
 import { Sign, KnackToIFrameMessage, LatLon } from "@/types/map";
+import { MAP_COORDINATE_PRECISION } from "@/config/map";
 
 /**
- * Takes array of Signs and if signs exist, returns bounding box for signs
- * @param signs
+ * Takes array of Signs from knack payload and if signs exist, returns bounding box for signs
+ * @param signs Array of Signs
  * @returns bbox extent in [minX, minY, maxX, maxY] order or undefined
  */
 export const useFormatBounds = (signs: Sign[]): undefined | LngLatBoundsLike =>
@@ -74,14 +75,14 @@ export const useFormatSignsRecords = (
 /**
  * Function that takes data from knack app and depending on message type, returns location
  * @param knackPayload - message from Knack via IFrameMessage
- * @returns LatLon object
+ * @returns LatLon object or null
  */
 export const useFormatLocation = (
   knackPayload: KnackToIFrameMessage | null
-): LatLon =>
+): LatLon | null =>
   useMemo(() => {
     if (!knackPayload || knackPayload?.message === "WORK_ORDER_SIGNS") {
-      return { longitude: undefined, latitude: undefined };
+      return null;
     }
 
     return {
@@ -94,7 +95,7 @@ export const useFormatLocation = (
  * Takes array of Signs and returns array of map markers, one marker per sign
  * If the sign id matches the location detail page id, render the marker as red
  * otherwise, use default color
- * @param signs
+ * @param signs Array of Signs
  * @returns Array of Map Markers
  */
 export const useCreateSignPins = (
@@ -111,7 +112,6 @@ export const useCreateSignPins = (
               key={`marker-${sign.id}`}
               longitude={sign.lng}
               latitude={sign.lat}
-              anchor="bottom"
               color={sign.isLocationDetailPage ? "red" : undefined}
               onClick={(e) => {
                 // If we let the click event propagates to the map, it will immediately close the popup
@@ -135,8 +135,8 @@ export const useGeoLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(({ coords }) => {
         setGeoLocation({
-          latitude: coords.latitude,
-          longitude: coords.longitude,
+          latitude: +coords.latitude.toFixed(MAP_COORDINATE_PRECISION),
+          longitude: +coords.longitude.toFixed(MAP_COORDINATE_PRECISION),
         });
       });
     }

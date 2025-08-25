@@ -4,10 +4,12 @@ import MapGL, {
   MapRef,
   Marker,
   ViewStateChangeEvent,
+  NavigationControl,
+  GeolocateControl,
 } from "react-map-gl/mapbox";
 import GeocoderControl from "@/components/MapGeocoderControl";
-import { NavigationControl, GeolocateControl } from "react-map-gl/mapbox";
 import SignPopup from "./SignPopup";
+import { sendLatLonToParent } from "@/utils/iFrameMessenger";
 import { MapProps, LatLon, Sign } from "@/types/map";
 import {
   useCreateSignPins,
@@ -20,10 +22,16 @@ import {
   MAP_COORDINATE_PRECISION,
 } from "@/config/map";
 
-export default function Map({ location, signs }: MapProps) {
+/**
+ *
+ * @param signs Array of Signs from knack payload, or empty array
+ * @param messageType String from knack payload
+ * @returns
+ */
+export default function Map({ signs, messageType }: MapProps) {
   const mapRef = useRef<MapRef>(null);
   const [popupInfo, setPopupInfo] = useState<Sign | null>(null);
-  const onDrag = useCallback((event: ViewStateChangeEvent) => {
+  const updateCenterMarker = useCallback((event: ViewStateChangeEvent) => {
     // truncate values to our preferred precision
     const latitude = +event.viewState.latitude.toFixed(
       MAP_COORDINATE_PRECISION
@@ -35,11 +43,21 @@ export default function Map({ location, signs }: MapProps) {
       latitude,
       longitude,
     });
-    // send location to Knack
-    window.parent.postMessage(
-      { message: "LAT_LON_UPDATE", lat: latitude, lng: longitude },
-      "https://atd.knack.com"
-    );
+
+    sendLatLonToParent({ latitude, longitude });
+  }, []);
+
+
+  const onGeolocate = useCallback((data: GeolocationPosition) => {
+    // truncate values to our preferred precision
+    const latitude = +data.coords.latitude.toFixed(MAP_COORDINATE_PRECISION);
+    const longitude = +data.coords.longitude.toFixed(MAP_COORDINATE_PRECISION);
+    setMapLatLon({
+      latitude,
+      longitude,
+    });
+
+    sendLatLonToParent({ latitude, longitude });
   }, []);
 
   const [mapLatLon, setMapLatLon] = useState<LatLon>({
@@ -52,8 +70,8 @@ export default function Map({ location, signs }: MapProps) {
   const geoLocation = useGeoLocation();
 
   /**
-   * If there are no sign locations and we have a geolocation point
-   * center map at geolocation
+   * If there are no sign location pins and we have a geolocation point center
+   * map at geolocation. Set add location marker to same coordindates as geolocation
    */
   useEffect(() => {
     if (!mapRef?.current || signs.length > 0) {
@@ -63,11 +81,17 @@ export default function Map({ location, signs }: MapProps) {
       mapRef.current.jumpTo({
         center: [geoLocation?.longitude, geoLocation?.latitude],
       });
+
+      setMapLatLon({
+        latitude: geoLocation.latitude,
+        longitude: geoLocation.longitude,
+      });
     }
   }, [geoLocation, signs]);
 
   /**
    * Zoom to bounding box containing location pins
+   * and set "add location marker" coordinates to center
    */
   useEffect(() => {
     if (!mapRef?.current || !bounds) {
@@ -78,6 +102,12 @@ export default function Map({ location, signs }: MapProps) {
       padding: 100,
       maxZoom: 16,
       duration: 0,
+    });
+
+    const { lng, lat } = mapRef.current.getCenter();
+    setMapLatLon({
+      latitude: +lat.toFixed(MAP_COORDINATE_PRECISION),
+      longitude: +lng.toFixed(MAP_COORDINATE_PRECISION),
     });
   }, [bounds]);
 
@@ -91,36 +121,39 @@ export default function Map({ location, signs }: MapProps) {
       }}
       cooperativeGestures={true}
       {...DEFAULT_MAP_PARAMS}
-      onDrag={onDrag}
+      onDrag={updateCenterMarker}
+      onZoom={updateCenterMarker}
+      onMoveEnd={updateCenterMarker}
+      onLoad={() => {
+        sendLatLonToParent(mapLatLon);
+      }}
     >
-      {signs.length < 1 && mapLatLon?.latitude && mapLatLon?.longitude && (
-        <Marker
-          longitude={mapLatLon.longitude}
-          latitude={mapLatLon.latitude}
-          // draggable
-          //red?
-        />
-      )}
-
-      {signPins}
-
       {
-        // the add location marker, work will be completed in a following PR
-        // location?.latitude && location?.longitude && (
-        //   <Marker latitude={location.latitude} longitude={location.longitude} />
-        // )
-        console.log("location from iframeMessenger payload", location)
+        // red "add location" marker that is situated at center of map. This marker's location is
+        // what is sent to knack in the LAT_LON_UPDATE payload message
+        mapLatLon?.latitude &&
+          mapLatLon?.longitude &&
+          messageType !== "KNACK_LOCATION_DETAILS" && (
+            <Marker
+              longitude={mapLatLon.longitude}
+              latitude={mapLatLon.latitude}
+              color={"red"}
+              rotation={45} // trying this now to differentiate instead of pulse
+            />
+          )
       }
 
+      {signPins}
       {popupInfo && (
         <SignPopup popupInfo={popupInfo} setPopupInfo={setPopupInfo} />
       )}
 
-      <GeocoderControl position="top-left" marker={true} />
+      <GeocoderControl position="top-left" setMapLatLon={setMapLatLon} />
       <GeolocateControl
         position="top-left"
         showUserLocation={false}
-        fitBoundsOptions={{ maxZoom: 17, duration: 0 }}
+        fitBoundsOptions={{ maxZoom: 16, duration: 0 }}
+        onGeolocate={onGeolocate}
       />
       <NavigationControl position="bottom-right" showCompass={false} />
     </MapGL>

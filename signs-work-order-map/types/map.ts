@@ -4,10 +4,11 @@ export interface LatLon {
 }
 
 export interface MapProps {
-  location: {
+  location?: {
     longitude: number | undefined;
     latitude: number | undefined;
   };
+  messageType?: "KNACK_LOCATION_DETAILS" | "EDIT_LOCATION" | "WORK_ORDER_SIGNS";
   signs: Sign[];
 }
 
@@ -17,6 +18,7 @@ export interface Sign {
   lat: number;
   spatialId: number;
   workOrderId: string;
+  /** if the sign id matches the location record id, the payload came from the location details page */
   isLocationDetailPage: boolean;
 }
 

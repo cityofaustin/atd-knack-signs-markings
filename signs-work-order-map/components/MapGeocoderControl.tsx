@@ -7,6 +7,9 @@ import {
 } from "react-map-gl/mapbox";
 import MapboxGeocoder, { GeocoderOptions } from "@mapbox/mapbox-gl-geocoder";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
+import { MAPBOX_TOKEN } from "@/config/map";
+import { LatLon } from "@/types/map";
+import { sendLatLonToParent } from "@/utils/iFrameMessenger";
 
 type GeocoderControlProps = Omit<
   GeocoderOptions,
@@ -14,15 +17,16 @@ type GeocoderControlProps = Omit<
 > & {
   marker?: boolean | Omit<MarkerProps, "longitude" | "latitude">;
 
+  /** Where in the map should the geocoder appear */
   position: ControlPosition;
 
   onLoading?: (e: object) => void;
   onResults?: (e: object) => void;
   onResult?: (e: object) => void;
   onError?: (e: object) => void;
+  setMapLatLon: (value: LatLon) => void;
 };
 
-const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 const ATX_BOUNDING_BOX: [number, number, number, number] = [
   -98.182, 29.987, -97.304, 30.663,
 ];
@@ -45,6 +49,16 @@ export default function GeocoderControl(props: GeocoderControlProps) {
           result &&
           (result.center ||
             (result.geometry?.type === "Point" && result.geometry.coordinates));
+        if (location) {
+          props.setMapLatLon({
+            longitude: location[0],
+            latitude: location[1],
+          });
+          sendLatLonToParent({
+            longitude: location[0],
+            latitude: location[1],
+          });
+        }
         if (location && props.marker) {
           const markerProps =
             typeof props.marker === "object" ? props.marker : {};
@@ -123,19 +137,6 @@ export default function GeocoderControl(props: GeocoderControlProps) {
     if (geocoder.getOrigin() !== props.origin && props.origin !== undefined) {
       geocoder.setOrigin(props.origin);
     }
-    // Types missing from @types/mapbox__mapbox-gl-geocoder
-    // if (geocoder.getAutocomplete() !== props.autocomplete && props.autocomplete !== undefined) {
-    //   geocoder.setAutocomplete(props.autocomplete);
-    // }
-    // if (geocoder.getFuzzyMatch() !== props.fuzzyMatch && props.fuzzyMatch !== undefined) {
-    //   geocoder.setFuzzyMatch(props.fuzzyMatch);
-    // }
-    // if (geocoder.getRouting() !== props.routing && props.routing !== undefined) {
-    //   geocoder.setRouting(props.routing);
-    // }
-    // if (geocoder.getWorldview() !== props.worldview && props.worldview !== undefined) {
-    //   geocoder.setWorldview(props.worldview);
-    // }
   }
   return marker;
 }
