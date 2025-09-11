@@ -35,8 +35,7 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
     latitude: DEFAULT_MAP_PAN_ZOOM.latitude,
     longitude: DEFAULT_MAP_PAN_ZOOM.longitude,
   });
-  // when map is dragged, set lat/lon state and send location to knack
-  const onDrag = useCallback((event: ViewStateChangeEvent) => {
+  const updateCenterMarker = useCallback((event: ViewStateChangeEvent) => {
     // truncate values to our preferred precision
     const latitude = +event.viewState.latitude.toFixed(
       MAP_COORDINATE_PRECISION
@@ -148,7 +147,9 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
       }}
       cooperativeGestures={true}
       {...DEFAULT_MAP_PARAMS}
-      onDrag={onDrag}
+      onDrag={updateCenterMarker}
+      onZoom={updateCenterMarker}
+      onMoveEnd={updateCenterMarker}
       onLoad={() => {
         sendLatLonToParent(mapLatLon);
       }}
@@ -162,7 +163,6 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
             <Marker
               longitude={mapLatLon.longitude}
               latitude={mapLatLon.latitude}
-              anchor="bottom"
               color={"red"}
               rotation={45} // trying this now to differentiate instead of pulse
             />
