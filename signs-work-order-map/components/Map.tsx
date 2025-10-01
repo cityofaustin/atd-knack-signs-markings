@@ -69,19 +69,27 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
   const geoLocation = useGeoLocation();
 
   /**
-   * If there are no sign location pins and we have a geolocation point center
-   * map at geolocation *unless we are editing an existing saved location*.
-   * Set add location marker to same coordindates as geolocation
+   * Map jumpTo center useEffect
+   * If there are no sign location pins and not editing an existing location,
+   * center at geolocation.
+   * If editing an existing location, center at that location.
+   * Set add location marker to same coordinates as center
    */
   useEffect(() => {
-    if (
-      !mapRef?.current ||
-      signs.length > 0 ||
-      messageType === "EDIT_LOCATION"
-    ) {
+    if (!mapRef?.current || signs.length > 0) {
       return;
     }
-    if (geoLocation?.latitude && geoLocation?.longitude) {
+
+    if (editLocation?.latitude && editLocation?.longitude) {
+      mapRef.current.jumpTo({
+        center: [editLocation?.longitude, editLocation?.latitude],
+      });
+
+      setMapLatLon({
+        latitude: editLocation.latitude,
+        longitude: editLocation.longitude,
+      });
+    } else if (geoLocation?.latitude && geoLocation?.longitude) {
       mapRef.current.jumpTo({
         center: [geoLocation?.longitude, geoLocation?.latitude],
       });
@@ -91,7 +99,7 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
         longitude: geoLocation.longitude,
       });
     }
-  }, [geoLocation, signs, messageType]);
+  }, [geoLocation, signs, messageType, editLocation]);
 
   /**
    * Zoom to bounding box containing location pins
@@ -114,28 +122,6 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
       longitude: +lng.toFixed(MAP_COORDINATE_PRECISION),
     });
   }, [bounds]);
-
-  /**
-   * editLocation is sent from knack when a GIS Tech is on the Edit Location view
-   * center map on location, and send coordinates back to Knack to populate the
-   * location form
-   */
-  useEffect(() => {
-    if (!mapRef?.current || !editLocation) {
-      return;
-    }
-
-    if (editLocation.latitude && editLocation.longitude) {
-      mapRef.current.jumpTo({
-        center: [editLocation?.longitude, editLocation?.latitude],
-      });
-
-      setMapLatLon({
-        latitude: editLocation.latitude,
-        longitude: editLocation.longitude,
-      });
-    }
-  }, [editLocation]);
 
   return (
     <MapGL
@@ -164,7 +150,6 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
               longitude={mapLatLon.longitude}
               latitude={mapLatLon.latitude}
               color={"red"}
-              rotation={45} // trying this now to differentiate instead of pulse
             />
           )
       }
