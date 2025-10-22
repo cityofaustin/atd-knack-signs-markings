@@ -4,10 +4,7 @@ export interface LatLon {
 }
 
 export interface MapProps {
-  location?: {
-    longitude: number | undefined;
-    latitude: number | undefined;
-  };
+  editLocation?: LatLon | null;
   messageType?: "KNACK_LOCATION_DETAILS" | "EDIT_LOCATION" | "WORK_ORDER_SIGNS";
   signs: Sign[];
 }

@@ -28,9 +28,13 @@ import {
  * @param messageType String from knack payload
  * @returns
  */
-export default function Map({ signs, messageType }: MapProps) {
+export default function Map({ signs, messageType, editLocation }: MapProps) {
   const mapRef = useRef<MapRef>(null);
   const [popupInfo, setPopupInfo] = useState<Sign | null>(null);
+  const [mapLatLon, setMapLatLon] = useState<LatLon>({
+    latitude: DEFAULT_MAP_PAN_ZOOM.latitude,
+    longitude: DEFAULT_MAP_PAN_ZOOM.longitude,
+  });
   const updateCenterMarker = useCallback((event: ViewStateChangeEvent) => {
     // truncate values to our preferred precision
     const latitude = +event.viewState.latitude.toFixed(
@@ -47,7 +51,7 @@ export default function Map({ signs, messageType }: MapProps) {
     sendLatLonToParent({ latitude, longitude });
   }, []);
 
-
+  // when geolocation icon is tapped, set lat/lon state and send location to knack
   const onGeolocate = useCallback((data: GeolocationPosition) => {
     // truncate values to our preferred precision
     const latitude = +data.coords.latitude.toFixed(MAP_COORDINATE_PRECISION);
@@ -60,24 +64,32 @@ export default function Map({ signs, messageType }: MapProps) {
     sendLatLonToParent({ latitude, longitude });
   }, []);
 
-  const [mapLatLon, setMapLatLon] = useState<LatLon>({
-    latitude: DEFAULT_MAP_PAN_ZOOM.latitude,
-    longitude: DEFAULT_MAP_PAN_ZOOM.longitude,
-  });
-
   const bounds = useFormatBounds(signs);
   const signPins = useCreateSignPins(signs, setPopupInfo);
   const geoLocation = useGeoLocation();
 
   /**
-   * If there are no sign location pins and we have a geolocation point center
-   * map at geolocation. Set add location marker to same coordindates as geolocation
+   * Map jumpTo center useEffect
+   * If there are no sign location pins and not editing an existing location,
+   * center at geolocation.
+   * If editing an existing location, center at that location.
+   * Set add location marker to same coordinates as center
    */
   useEffect(() => {
     if (!mapRef?.current || signs.length > 0) {
       return;
     }
-    if (geoLocation?.latitude && geoLocation?.longitude) {
+
+    if (editLocation?.latitude && editLocation?.longitude) {
+      mapRef.current.jumpTo({
+        center: [editLocation?.longitude, editLocation?.latitude],
+      });
+
+      setMapLatLon({
+        latitude: editLocation.latitude,
+        longitude: editLocation.longitude,
+      });
+    } else if (geoLocation?.latitude && geoLocation?.longitude) {
       mapRef.current.jumpTo({
         center: [geoLocation?.longitude, geoLocation?.latitude],
       });
@@ -87,7 +99,7 @@ export default function Map({ signs, messageType }: MapProps) {
         longitude: geoLocation.longitude,
       });
     }
-  }, [geoLocation, signs]);
+  }, [geoLocation, signs, messageType, editLocation]);
 
   /**
    * Zoom to bounding box containing location pins
@@ -138,7 +150,6 @@ export default function Map({ signs, messageType }: MapProps) {
               longitude={mapLatLon.longitude}
               latitude={mapLatLon.latitude}
               color={"red"}
-              rotation={45} // trying this now to differentiate instead of pulse
             />
           )
       }
