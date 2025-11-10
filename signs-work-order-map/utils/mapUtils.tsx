@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import bbox from "@turf/bbox";
 import { lineString } from "@turf/helpers";
 import { LngLatBoundsLike } from "mapbox-gl";
 import { Marker } from "react-map-gl/mapbox";
 import { Sign, KnackToIFrameMessage, LatLon } from "@/types/map";
 import { MAP_COORDINATE_PRECISION } from "@/config/map";
+import { fetchSignAssetsForMap } from "@/services/agolService";
 
 /**
  * Takes array of Signs from knack payload and if signs exist, returns bounding box for signs
@@ -92,9 +93,28 @@ export const useFormatLocation = (
   }, [knackPayload]);
 
 /**
+ * Custom marker component for AGOL signs (yellow dots with black stroke)
+ */
+const AGOLMarker = ({ onClick }: { onClick: (e: any) => void }) => (
+  <div
+    onClick={onClick}
+    style={{
+      width: "8px",
+      height: "8px",
+      borderRadius: "50%",
+      backgroundColor: "#FFD700", // Gold/Yellow color
+      border: "1px solid #000000", // Black stroke
+      cursor: "pointer",
+      boxShadow: "0 1px 2px rgba(0,0,0,0.3)", // Subtle shadow for visibility
+      transform: "translate(-50%, -50%)", // Center the dot on the coordinate
+    }}
+  />
+);
+
+/**
  * Takes array of Signs and returns array of map markers, one marker per sign
  * If the sign id matches the location detail page id, render the marker as red
- * otherwise, use default color
+ * AGOL signs are rendered as small yellow dots with black stroke, Knack signs in default color
  * @param signs Array of Signs
  * @returns Array of Map Markers
  */
@@ -112,14 +132,30 @@ export const useCreateSignPins = (
               key={`marker-${sign.id}`}
               longitude={sign.lng}
               latitude={sign.lat}
-              color={sign.isLocationDetailPage ? "red" : undefined}
+              color={
+                sign.isLocationDetailPage
+                  ? "red"
+                  : sign.source === "agol"
+                    ? undefined // Don't use default color for AGOL signs
+                    : undefined
+              }
               onClick={(e) => {
                 // If we let the click event propagates to the map, it will immediately close the popup
                 // with `closeOnClick: true`
                 e.originalEvent.stopPropagation();
                 setPopupInfo(sign);
               }}
-            />
+            >
+              {/* Custom marker for AGOL signs */}
+              {sign.source === "agol" && (
+                <AGOLMarker
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setPopupInfo(sign);
+                  }}
+                />
+              )}
+            </Marker>
           )
       ),
     [signs, setPopupInfo]
@@ -143,4 +179,69 @@ export const useGeoLocation = () => {
   }, []);
 
   return geoLocation;
+};
+
+/**
+ * Custom hook to fetch AGOL sign assets based on map bounds
+ * @param bounds Current map bounds
+ * @param enabled Whether to fetch data (useful for disabling during initial load)
+ * @returns Object containing AGOL signs, loading state, and error state
+ */
+export const useAGOLSignAssets = (
+  bounds: { north: number; south: number; east: number; west: number } | null,
+  enabled: boolean = true
+) => {
+  const [agolSigns, setAgolSigns] = useState<Sign[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    if (!bounds || !enabled) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const assets = await fetchSignAssetsForMap(bounds);
+      setAgolSigns(assets);
+    } catch (err) {
+      console.error("Error fetching AGOL sign assets:", err);
+      setError(err instanceof Error ? err.message : "Unknown error occurred");
+    } finally {
+      setLoading(false);
+    }
+  }, [bounds, enabled]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  return {
+    agolSigns,
+    loading,
+    error,
+    refetch: fetchData,
+  };
+};
+
+/**
+ * Helper function to get current map bounds from MapRef
+ * @param mapRef Reference to the map instance
+ * @returns Map bounds in lat/lon format or null if map not ready
+ */
+export const getMapBounds = (mapRef: React.RefObject<any>) => {
+  if (!mapRef.current) return null;
+
+  try {
+    const bounds = mapRef.current.getBounds();
+    return {
+      north: bounds.getNorth(),
+      south: bounds.getSouth(),
+      east: bounds.getEast(),
+      west: bounds.getWest(),
+    };
+  } catch (error) {
+    console.error("Error getting map bounds:", error);
+    return null;
+  }
 };

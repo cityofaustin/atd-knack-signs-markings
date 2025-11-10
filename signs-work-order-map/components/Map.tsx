@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useState, useEffect, useRef } from "react";
+import { useCallback, useState, useEffect, useRef, useMemo } from "react";
 import MapGL, {
   MapRef,
   Marker,
@@ -15,6 +15,8 @@ import {
   useCreateSignPins,
   useFormatBounds,
   useGeoLocation,
+  useAGOLSignAssets,
+  getMapBounds,
 } from "@/utils/mapUtils";
 import {
   DEFAULT_MAP_PARAMS,
@@ -35,6 +37,13 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
     latitude: DEFAULT_MAP_PAN_ZOOM.latitude,
     longitude: DEFAULT_MAP_PAN_ZOOM.longitude,
   });
+  const [mapBounds, setMapBounds] = useState<{
+    north: number;
+    south: number;
+    east: number;
+    west: number;
+  } | null>(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
   const updateCenterMarker = useCallback((event: ViewStateChangeEvent) => {
     // truncate values to our preferred precision
     const latitude = +event.viewState.latitude.toFixed(
@@ -51,6 +60,14 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
     sendLatLonToParent({ latitude, longitude });
   }, []);
 
+  // Update map bounds when the map moves
+  const updateMapBounds = useCallback(() => {
+    const bounds = getMapBounds(mapRef);
+    if (bounds) {
+      setMapBounds(bounds);
+    }
+  }, []);
+
   // when geolocation icon is tapped, set lat/lon state and send location to knack
   const onGeolocate = useCallback((data: GeolocationPosition) => {
     // truncate values to our preferred precision
@@ -65,8 +82,29 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
   }, []);
 
   const bounds = useFormatBounds(signs);
-  const signPins = useCreateSignPins(signs, setPopupInfo);
   const geoLocation = useGeoLocation();
+
+  // Fetch AGOL sign assets based on current map bounds
+  const {
+    agolSigns,
+    loading: agolLoading,
+    error: agolError,
+  } = useAGOLSignAssets(
+    mapBounds,
+    mapLoaded // Only fetch when map is loaded
+  );
+
+  // Combine Knack signs with AGOL signs
+  const allSigns = useMemo(() => {
+    // Mark Knack signs with source
+    const knackSigns = signs.map((sign) => ({
+      ...sign,
+      source: "knack" as const,
+    }));
+    return [...knackSigns, ...agolSigns];
+  }, [signs, agolSigns]);
+
+  const signPins = useCreateSignPins(allSigns, setPopupInfo);
 
   /**
    * Map jumpTo center useEffect
@@ -135,8 +173,13 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
       {...DEFAULT_MAP_PARAMS}
       onDrag={updateCenterMarker}
       onZoom={updateCenterMarker}
-      onMoveEnd={updateCenterMarker}
+      onMoveEnd={(e) => {
+        updateCenterMarker(e);
+        updateMapBounds();
+      }}
       onLoad={() => {
+        setMapLoaded(true);
+        updateMapBounds();
         sendLatLonToParent(mapLatLon);
       }}
     >
@@ -157,6 +200,45 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
       {signPins}
       {popupInfo && (
         <SignPopup popupInfo={popupInfo} setPopupInfo={setPopupInfo} />
+      )}
+
+      {/* Loading indicator for AGOL data */}
+      {agolLoading && (
+        <div
+          style={{
+            position: "absolute",
+            top: "10px",
+            right: "10px",
+            background: "rgba(255, 255, 255, 0.9)",
+            padding: "8px 12px",
+            borderRadius: "4px",
+            fontSize: "14px",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            zIndex: 1000,
+          }}
+        >
+          Loading sign assets...
+        </div>
+      )}
+
+      {/* Error indicator for AGOL data */}
+      {agolError && (
+        <div
+          style={{
+            position: "absolute",
+            top: "10px",
+            right: "10px",
+            background: "rgba(255, 0, 0, 0.9)",
+            color: "white",
+            padding: "8px 12px",
+            borderRadius: "4px",
+            fontSize: "14px",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            zIndex: 1000,
+          }}
+        >
+          Error loading signs: {agolError}
+        </div>
       )}
 
       <GeocoderControl position="top-left" setMapLatLon={setMapLatLon} />
