@@ -112,9 +112,19 @@ const AGOLMarker = ({ onClick }: { onClick: (e: any) => void }) => (
 );
 
 /**
+ * Helper function to log AGOL sign data to console
+ */
+const logAGOLSignData = (sign: Sign) => {
+  console.group(`🟡 AGOL Sign Asset - ID: ${sign.spatialId}`);
+  console.log("📍 Location:", `${sign.lat.toFixed(6)}, ${sign.lng.toFixed(6)}`);
+  console.groupEnd();
+};
+
+/**
  * Takes array of Signs and returns array of map markers, one marker per sign
  * If the sign id matches the location detail page id, render the marker as red
- * AGOL signs are rendered as small yellow dots with black stroke, Knack signs in default color
+ * AGOL signs are rendered as small yellow dots with black stroke and log to console when clicked
+ * Knack signs use default color and show popups when clicked
  * @param signs Array of Signs
  * @returns Array of Map Markers
  */
@@ -140,10 +150,14 @@ export const useCreateSignPins = (
                     : undefined
               }
               onClick={(e) => {
-                // If we let the click event propagates to the map, it will immediately close the popup
-                // with `closeOnClick: true`
-                e.originalEvent.stopPropagation();
-                setPopupInfo(sign);
+                // Only handle clicks for non-AGOL signs here
+                // AGOL signs are handled by their custom AGOLMarker component
+                if (sign.source !== "agol") {
+                  // If we let the click event propagates to the map, it will immediately close the popup
+                  // with `closeOnClick: true`
+                  e.originalEvent.stopPropagation();
+                  setPopupInfo(sign);
+                }
               }}
             >
               {/* Custom marker for AGOL signs */}
@@ -151,7 +165,7 @@ export const useCreateSignPins = (
                 <AGOLMarker
                   onClick={(e) => {
                     e.stopPropagation();
-                    setPopupInfo(sign);
+                    logAGOLSignData(sign);
                   }}
                 />
               )}
