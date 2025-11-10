@@ -35,14 +35,11 @@ export interface MapBounds {
  * Configuration for AGOL service
  */
 const AGOL_CONFIG = {
-  // Base URL for the Sign Assets Maintenance feature layer
+  // Base URL for the Sign Assets Maintenance Public View feature layer
   BASE_URL:
-    "https://services.arcgis.com/0L95CJ0VTaxqcmED/ArcGIS/rest/services/Sign_Assets_Maint/FeatureServer/1",
+    "https://services.arcgis.com/0L95CJ0VTaxqcmED/arcgis/rest/services/Sign_Assets_Maint_Public_View/FeatureServer/1",
 
-  // Token for authentication (optional - leave empty for public layers)
-  TOKEN: process.env.NEXT_PUBLIC_AGOL_TOKEN || "",
-
-  // Default spatial reference system (Texas State Plane Central)
+  // Default spatial reference system (WGS84)
   DEFAULT_SR: 4326, // Use WGS84 for input coordinates, let AGOL handle the conversion
 
   // Maximum number of records to fetch
@@ -50,9 +47,6 @@ const AGOL_CONFIG = {
 
   // Default output fields (you can expand this based on your needs)
   DEFAULT_OUT_FIELDS: "*", // Get all fields, or specify specific ones like 'OBJECTID_1,SIGN_TYPE,INSTALL_DATE'
-
-  // Whether to require authentication (set to false for public layers)
-  REQUIRE_AUTH: true,
 };
 
 /**
@@ -113,11 +107,6 @@ function buildQueryParams(
   params.set("inSR", AGOL_CONFIG.DEFAULT_SR.toString()); // Input spatial reference
   params.set("outSR", "4326"); // Output in WGS84 for easy use in web maps
 
-  // Add token if available and authentication is required
-  if (AGOL_CONFIG.REQUIRE_AUTH && AGOL_CONFIG.TOKEN) {
-    params.set("token", AGOL_CONFIG.TOKEN);
-  }
-
   return params;
 }
 
@@ -161,19 +150,6 @@ export async function fetchSignAssets(
     // Check for errors in the response
     if ("error" in data) {
       const errorData = data as any;
-
-      // Handle token required error specifically
-      if (
-        errorData.error.code === 499 ||
-        errorData.error.message === "Token Required"
-      ) {
-        throw new Error(
-          "This AGOL feature layer requires authentication. " +
-            "Either set NEXT_PUBLIC_AGOL_TOKEN in your environment or " +
-            "contact your ArcGIS administrator to make the layer publicly accessible."
-        );
-      }
-
       throw new Error(`AGOL API error: ${errorData.error.message}`);
     }
 

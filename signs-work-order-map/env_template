@@ -1,6 +1,2 @@
 NEXT_PUBLIC_MAPBOX_TOKEN=<token>
 NEXT_PUBLIC_NEARMAP_KEY=<nearmap-key>
-
-# AGOL Token (optional - only needed if feature layer requires authentication)
-# Leave empty or remove this line if using public access
-# NEXT_PUBLIC_AGOL_TOKEN=<agol-token>
