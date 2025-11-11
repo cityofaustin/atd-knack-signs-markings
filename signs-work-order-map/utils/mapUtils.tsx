@@ -5,7 +5,10 @@ import { LngLatBoundsLike } from "mapbox-gl";
 import { Marker } from "react-map-gl/mapbox";
 import { Sign, KnackToIFrameMessage, LatLon } from "@/types/map";
 import { MAP_COORDINATE_PRECISION } from "@/config/map";
-import { fetchSignAssetsForMap } from "@/services/agolService";
+import {
+  useSignAssetsFeatureService,
+  convertGeoJSONToSigns,
+} from "@/utils/agol";
 
 /**
  * Takes array of Signs from knack payload and if signs exist, returns bounding box for signs
@@ -205,36 +208,32 @@ export const useAGOLSignAssets = (
   bounds: { north: number; south: number; east: number; west: number } | null,
   enabled: boolean = true
 ) => {
-  const [agolSigns, setAgolSigns] = useState<Sign[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = useCallback(async () => {
-    if (!bounds || !enabled) return;
+  // Use the new feature service hook with GeoJSON accumulation
+  const geojson = useSignAssetsFeatureService(bounds, enabled, setLoading);
 
-    setLoading(true);
-    setError(null);
-
+  // Convert GeoJSON to Sign array format for compatibility
+  const agolSigns = useMemo(() => {
     try {
-      const assets = await fetchSignAssetsForMap(bounds);
-      setAgolSigns(assets);
+      setError(null);
+      return convertGeoJSONToSigns(geojson);
     } catch (err) {
-      console.error("Error fetching AGOL sign assets:", err);
+      console.error("Error converting AGOL GeoJSON to signs:", err);
       setError(err instanceof Error ? err.message : "Unknown error occurred");
-    } finally {
-      setLoading(false);
+      return [];
     }
-  }, [bounds, enabled]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  }, [geojson]);
 
   return {
     agolSigns,
     loading,
     error,
-    refetch: fetchData,
+    refetch: () => {
+      // The new pattern doesn't need manual refetch - it accumulates automatically
+      console.log("Refetch not needed with accumulating pattern");
+    },
   };
 };
 
