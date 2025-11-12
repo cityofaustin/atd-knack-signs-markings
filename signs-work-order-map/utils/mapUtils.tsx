@@ -211,7 +211,7 @@ export const useAGOLSignAssets = (
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Use the new feature service hook with GeoJSON accumulation
+  // Use the feature service hook with GeoJSON accumulation
   const geojson = useSignAssetsFeatureService(bounds, enabled, setLoading);
 
   // Convert GeoJSON to Sign array format for compatibility
@@ -230,10 +230,6 @@ export const useAGOLSignAssets = (
     agolSigns,
     loading,
     error,
-    refetch: () => {
-      // The new pattern doesn't need manual refetch - it accumulates automatically
-      console.log("Refetch not needed with accumulating pattern");
-    },
   };
 };
 

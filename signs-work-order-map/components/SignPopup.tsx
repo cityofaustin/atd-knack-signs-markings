@@ -18,10 +18,6 @@ export default function SignPopup({ popupInfo, setPopupInfo }: SignPopupProps) {
       offset={[0, -20]}
     >
       <ul className="list-unstyled m-0">
-        <li>
-          <strong>Source:</strong> Knack Work Order
-        </li>
-
         {!popupInfo.isLocationDetailPage && (
           <li>
             <a
@@ -35,10 +31,9 @@ export default function SignPopup({ popupInfo, setPopupInfo }: SignPopupProps) {
             </a>
           </li>
         )}
-
         <li>Spatial ID: {popupInfo.spatialId}</li>
-        <li>Latitude: {popupInfo.lat.toFixed(6)}</li>
-        <li>Longitude: {popupInfo.lng.toFixed(6)}</li>
+        <li>Latitude: {popupInfo.lat}</li>
+        <li>Longitude: {popupInfo.lng}</li>
       </ul>
     </Popup>
   );
