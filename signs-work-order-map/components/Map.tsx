@@ -9,6 +9,7 @@ import MapGL, {
 } from "react-map-gl/mapbox";
 import GeocoderControl from "@/components/MapGeocoderControl";
 import SignPopup from "./SignPopup";
+import { MapStatusIndicator } from "./MapStatusIndicator";
 import { sendLatLonToParent } from "@/utils/iFrameMessenger";
 import { MapProps, LatLon, Sign } from "@/types/map";
 import {
@@ -202,43 +203,15 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
         <SignPopup popupInfo={popupInfo} setPopupInfo={setPopupInfo} />
       )}
 
-      {/* Loading indicator for AGOL data */}
+      {/* Status indicators for AGOL data */}
       {agolLoading && (
-        <div
-          style={{
-            position: "absolute",
-            top: "10px",
-            right: "10px",
-            background: "rgba(255, 255, 255, 0.9)",
-            padding: "8px 12px",
-            borderRadius: "4px",
-            fontSize: "14px",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-            zIndex: 1000,
-          }}
-        >
-          Loading sign assets...
-        </div>
+        <MapStatusIndicator type="loading" message="Loading sign assets..." />
       )}
-
-      {/* Error indicator for AGOL data */}
       {agolError && (
-        <div
-          style={{
-            position: "absolute",
-            top: "10px",
-            right: "10px",
-            background: "rgba(255, 0, 0, 0.9)",
-            color: "white",
-            padding: "8px 12px",
-            borderRadius: "4px",
-            fontSize: "14px",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-            zIndex: 1000,
-          }}
-        >
-          Error loading signs: {agolError}
-        </div>
+        <MapStatusIndicator
+          type="error"
+          message={`Error loading signs: ${agolError}`}
+        />
       )}
 
       <GeocoderControl position="top-left" setMapLatLon={setMapLatLon} />
