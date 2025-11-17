@@ -128,10 +128,18 @@ const logAGOLSignData = (sign: Sign) => {
 
 /**
  * Takes array of Signs and returns array of map markers, one marker per sign
- * If the sign id matches the location detail page id, render the marker as red
- * AGOL signs are rendered as small yellow dots with black stroke and log to console when clicked
- * Knack signs use default color and show popups when clicked
- * @param signs Array of Signs
+ *
+ * Marker color logic:
+ * - Red: Location detail page sign (isLocationDetailPage = true)
+ * - Default blue: Knack work order signs (source = "knack" or undefined)
+ * - Yellow dot: AGOL signs (source = "agol", uses custom AGOLMarker component)
+ *
+ * Interaction logic:
+ * - Knack signs: Show popup with work order info when clicked
+ * - AGOL signs: Log data to console when clicked (handled by AGOLMarker)
+ *
+ * @param signs Array of Signs (can include both Knack and AGOL signs)
+ * @param setPopupInfo State setter for popup display
  * @returns Array of Map Markers
  */
 export const useCreateSignPins = (
@@ -148,13 +156,9 @@ export const useCreateSignPins = (
               key={`marker-${sign.id}`}
               longitude={sign.lng}
               latitude={sign.lat}
-              color={
-                sign.isLocationDetailPage
-                  ? "red"
-                  : sign.source === "agol"
-                    ? undefined // Don't use default color for AGOL signs
-                    : undefined
-              }
+              // Only override color for location detail page (red)
+              // All other signs use default color (AGOL uses custom marker component anyway)
+              color={sign.isLocationDetailPage ? "red" : undefined}
               onClick={(e) => {
                 // Only handle clicks for non-AGOL signs here
                 // AGOL signs are handled by their custom AGOLMarker component
