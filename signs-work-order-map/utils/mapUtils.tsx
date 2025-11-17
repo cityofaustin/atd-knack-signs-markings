@@ -119,7 +119,10 @@ const AGOLMarker = ({ onClick }: { onClick: (e: any) => void }) => (
  */
 const logAGOLSignData = (sign: Sign) => {
   console.group(`🟡 AGOL Sign Asset - ID: ${sign.spatialId}`);
-  console.log("📍 Location:", `${sign.lat.toFixed(6)}, ${sign.lng.toFixed(6)}`);
+  console.info(
+    "📍 Location:",
+    `${sign.lat.toFixed(MAP_COORDINATE_PRECISION)}, ${sign.lng.toFixed(MAP_COORDINATE_PRECISION)}`
+  );
   console.groupEnd();
 };
 
