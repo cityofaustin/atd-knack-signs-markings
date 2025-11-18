@@ -23,6 +23,7 @@ import {
   DEFAULT_MAP_PARAMS,
   DEFAULT_MAP_PAN_ZOOM,
   MAP_COORDINATE_PRECISION,
+  AGOL_SIGNS_MIN_ZOOM,
 } from "@/config/map";
 
 /**
@@ -45,6 +46,7 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
     west: number;
   } | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [zoom, setZoom] = useState<number>(DEFAULT_MAP_PAN_ZOOM.zoom);
   const updateCenterMarker = useCallback((event: ViewStateChangeEvent) => {
     // truncate values to our preferred precision
     const latitude = +event.viewState.latitude.toFixed(
@@ -53,10 +55,13 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
     const longitude = +event.viewState.longitude.toFixed(
       MAP_COORDINATE_PRECISION
     );
+    const currentZoom = event.viewState.zoom;
+
     setMapLatLon({
       latitude,
       longitude,
     });
+    setZoom(currentZoom);
 
     sendLatLonToParent({ latitude, longitude });
   }, []);
@@ -85,6 +90,9 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
   const bounds = useFormatBounds(signs);
   const geoLocation = useGeoLocation();
 
+  // Only fetch AGOL signs when zoomed in enough for performance
+  const isZoomedInEnough = zoom >= AGOL_SIGNS_MIN_ZOOM;
+
   // Fetch AGOL sign assets based on current map bounds
   const {
     agolSigns,
@@ -92,18 +100,21 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
     error: agolError,
   } = useAGOLSignAssets(
     mapBounds,
-    mapLoaded // Only fetch when map is loaded
+    mapLoaded && isZoomedInEnough // Only fetch when map is loaded and zoomed in enough
   );
 
-  // Combine Knack signs with AGOL signs
+  // Combine Knack signs with AGOL signs (only include AGOL signs if zoomed in enough)
   const allSigns = useMemo(() => {
     // Mark Knack signs with source
     const knackSigns = signs.map((sign) => ({
       ...sign,
       source: "knack" as const,
     }));
-    return [...knackSigns, ...agolSigns];
-  }, [signs, agolSigns]);
+    // Only include AGOL signs when zoomed in enough for performance
+    const visibleAgolSigns = isZoomedInEnough ? agolSigns : [];
+
+    return [...knackSigns, ...visibleAgolSigns];
+  }, [signs, agolSigns, isZoomedInEnough]);
 
   const signPins = useCreateSignPins(allSigns, setPopupInfo);
 
@@ -176,10 +187,14 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
       onZoom={updateCenterMarker}
       onMoveEnd={(e) => {
         updateCenterMarker(e);
+        const moveEndZoom = e.viewState.zoom;
+        setZoom(moveEndZoom);
         updateMapBounds();
       }}
-      onLoad={() => {
+      onLoad={(e) => {
+        const initialZoom = e.target.getZoom();
         setMapLoaded(true);
+        setZoom(initialZoom);
         updateMapBounds();
         sendLatLonToParent(mapLatLon);
       }}
@@ -204,10 +219,17 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
       )}
 
       {/* Status indicators for AGOL data */}
-      {agolLoading && (
+      {!isZoomedInEnough && (
+        <MapStatusIndicator
+          type="loading"
+          message="Zoom in to view sign features"
+          position={{ top: "10px", right: "10px" }}
+        />
+      )}
+      {isZoomedInEnough && agolLoading && (
         <MapStatusIndicator type="loading" message="Loading sign assets..." />
       )}
-      {agolError && (
+      {isZoomedInEnough && agolError && (
         <MapStatusIndicator
           type="error"
           message={`Error loading signs: ${agolError}`}
