@@ -58,6 +58,7 @@ interface UseFeatureServiceParams {
   isVisible: boolean;
   featureIdProp: string;
   setIsFetchingFeatures?: (loading: boolean) => void;
+  setFetchError?: (error: string | null) => void;
 }
 
 /**
@@ -133,6 +134,7 @@ export const useFeatureService = ({
   isVisible,
   featureIdProp,
   setIsFetchingFeatures,
+  setFetchError,
 }: UseFeatureServiceParams): FeatureCollection => {
   const [geojson, dispatchFeatureUpdate] = useReducer(featureReducer, {
     type: "FeatureCollection",
@@ -147,6 +149,7 @@ export const useFeatureService = ({
     }
 
     setIsFetchingFeatures?.(true);
+    setFetchError?.(null);
 
     // Cancel any in-flight request
     if (controllerRef.current) {
@@ -182,15 +185,30 @@ export const useFeatureService = ({
           featureIdProp,
         });
         setIsFetchingFeatures?.(false);
+        setFetchError?.(null);
         controllerRef.current = undefined;
       })
       .catch((error) => {
         if (error instanceof DOMException && error.name === "AbortError") {
           console.warn("🚫 AGOL fetch aborted by newer request");
+          setIsFetchingFeatures?.(false);
+          setFetchError?.(null);
         } else {
           console.error("❌ AGOL fetch error:", error);
+          // Handle network errors and other fetch failures
+          let errorMessage = "Failed to load sign assets";
+          if (
+            error instanceof TypeError &&
+            error.message === "Failed to fetch"
+          ) {
+            errorMessage =
+              "Network error: Unable to connect to sign data service";
+          } else if (error instanceof Error) {
+            errorMessage = error.message || errorMessage;
+          }
+          setFetchError?.(errorMessage);
+          setIsFetchingFeatures?.(false);
         }
-        setIsFetchingFeatures?.(false);
       });
 
     // Cleanup function
@@ -199,7 +217,15 @@ export const useFeatureService = ({
         controllerRef.current.abort();
       }
     };
-  }, [bounds, name, layerId, isVisible, featureIdProp, setIsFetchingFeatures]);
+  }, [
+    bounds,
+    name,
+    layerId,
+    isVisible,
+    featureIdProp,
+    setIsFetchingFeatures,
+    setFetchError,
+  ]);
 
   return geojson;
 };
@@ -211,7 +237,8 @@ export const useFeatureService = ({
 export const useSignAssetsFeatureService = (
   bounds: MapBounds | null,
   isVisible: boolean = true,
-  setIsFetchingFeatures?: (loading: boolean) => void
+  setIsFetchingFeatures?: (loading: boolean) => void,
+  setFetchError?: (error: string | null) => void
 ): FeatureCollection => {
   return useFeatureService({
     name: "Sign_Assets_Maint_Public_View",
@@ -220,6 +247,7 @@ export const useSignAssetsFeatureService = (
     isVisible,
     featureIdProp: "OBJECTID_1",
     setIsFetchingFeatures,
+    setFetchError,
   });
 };
 

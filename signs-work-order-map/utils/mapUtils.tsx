@@ -219,16 +219,24 @@ export const useAGOLSignAssets = (
   const [error, setError] = useState<string | null>(null);
 
   // Use the feature service hook with GeoJSON accumulation
-  const geojson = useSignAssetsFeatureService(bounds, enabled, setLoading);
+  const geojson = useSignAssetsFeatureService(
+    bounds,
+    enabled,
+    setLoading,
+    setError
+  );
 
   // Convert GeoJSON to Sign array format for compatibility
   const agolSigns = useMemo(() => {
     try {
-      setError(null);
+      // Only set error if conversion fails
       return convertGeoJSONToSigns(geojson);
     } catch (err) {
       console.error("Error converting AGOL GeoJSON to signs:", err);
-      setError(err instanceof Error ? err.message : "Unknown error occurred");
+      const conversionError =
+        err instanceof Error ? err.message : "Unknown error occurred";
+      // Only set conversion error if there's no existing fetch error
+      setError((prevError) => prevError || conversionError);
       return [];
     }
   }, [geojson]);
