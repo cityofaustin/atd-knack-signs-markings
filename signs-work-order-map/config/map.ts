@@ -22,7 +22,7 @@ export const DEFAULT_MAP_PAN_ZOOM = {
  * Minimum zoom level required to display AGOL sign assets
  * Zoom levels below this threshold will hide signs to improve performance
  */
-export const AGOL_SIGNS_MIN_ZOOM = 15;
+export const AGOL_SIGNS_MIN_ZOOM = 16.5;
 
 export const MAP_MAX_BOUNDS: [[number, number], [number, number]] = [
   [-99, 29],
