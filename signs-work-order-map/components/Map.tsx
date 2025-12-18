@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useState, useEffect, useRef } from "react";
+import { useCallback, useState, useEffect, useRef, useMemo } from "react";
 import MapGL, {
   MapRef,
   Marker,
@@ -9,17 +9,21 @@ import MapGL, {
 } from "react-map-gl/mapbox";
 import GeocoderControl from "@/components/MapGeocoderControl";
 import SignPopup from "./SignPopup";
+import { MapStatusIndicator } from "./MapStatusIndicator";
 import { sendLatLonToParent } from "@/utils/iFrameMessenger";
 import { MapProps, LatLon, Sign } from "@/types/map";
 import {
   useCreateSignPins,
   useFormatBounds,
   useGeoLocation,
+  useAGOLSignAssets,
+  getMapBounds,
 } from "@/utils/mapUtils";
 import {
   DEFAULT_MAP_PARAMS,
   DEFAULT_MAP_PAN_ZOOM,
   MAP_COORDINATE_PRECISION,
+  AGOL_SIGNS_MIN_ZOOM,
 } from "@/config/map";
 
 /**
@@ -35,6 +39,14 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
     latitude: DEFAULT_MAP_PAN_ZOOM.latitude,
     longitude: DEFAULT_MAP_PAN_ZOOM.longitude,
   });
+  const [mapBounds, setMapBounds] = useState<{
+    north: number;
+    south: number;
+    east: number;
+    west: number;
+  } | null>(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
+  const [zoom, setZoom] = useState<number>(DEFAULT_MAP_PAN_ZOOM.zoom);
   const updateCenterMarker = useCallback((event: ViewStateChangeEvent) => {
     // truncate values to our preferred precision
     const latitude = +event.viewState.latitude.toFixed(
@@ -43,12 +55,23 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
     const longitude = +event.viewState.longitude.toFixed(
       MAP_COORDINATE_PRECISION
     );
+    const currentZoom = event.viewState.zoom;
+
     setMapLatLon({
       latitude,
       longitude,
     });
+    setZoom(currentZoom);
 
     sendLatLonToParent({ latitude, longitude });
+  }, []);
+
+  // Update map bounds when the map moves
+  const updateMapBounds = useCallback(() => {
+    const bounds = getMapBounds(mapRef);
+    if (bounds) {
+      setMapBounds(bounds);
+    }
   }, []);
 
   // when geolocation icon is tapped, set lat/lon state and send location to knack
@@ -65,8 +88,35 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
   }, []);
 
   const bounds = useFormatBounds(signs);
-  const signPins = useCreateSignPins(signs, setPopupInfo);
   const geoLocation = useGeoLocation();
+
+  // Only fetch AGOL signs when zoomed in enough for performance
+  const isZoomedInEnough = zoom >= AGOL_SIGNS_MIN_ZOOM;
+
+  // Fetch AGOL sign assets based on current map bounds
+  const {
+    agolSigns,
+    loading: agolLoading,
+    error: agolError,
+  } = useAGOLSignAssets(
+    mapBounds,
+    mapLoaded && isZoomedInEnough // Only fetch when map is loaded and zoomed in enough
+  );
+
+  // Combine Knack signs with AGOL signs (only include AGOL signs if zoomed in enough)
+  const allSigns = useMemo(() => {
+    // Mark Knack signs with source
+    const knackSigns = signs.map((sign) => ({
+      ...sign,
+      source: "knack" as const,
+    }));
+    // Only include AGOL signs when zoomed in enough for performance
+    const visibleAgolSigns = isZoomedInEnough ? agolSigns : [];
+
+    return [...knackSigns, ...visibleAgolSigns];
+  }, [signs, agolSigns, isZoomedInEnough]);
+
+  const signPins = useCreateSignPins(allSigns, setPopupInfo);
 
   /**
    * Map jumpTo center useEffect
@@ -135,8 +185,17 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
       {...DEFAULT_MAP_PARAMS}
       onDrag={updateCenterMarker}
       onZoom={updateCenterMarker}
-      onMoveEnd={updateCenterMarker}
-      onLoad={() => {
+      onMoveEnd={(e) => {
+        updateCenterMarker(e);
+        const moveEndZoom = e.viewState.zoom;
+        setZoom(moveEndZoom);
+        updateMapBounds();
+      }}
+      onLoad={(e) => {
+        const initialZoom = e.target.getZoom();
+        setMapLoaded(true);
+        setZoom(initialZoom);
+        updateMapBounds();
         sendLatLonToParent(mapLatLon);
       }}
     >
@@ -157,6 +216,24 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
       {signPins}
       {popupInfo && (
         <SignPopup popupInfo={popupInfo} setPopupInfo={setPopupInfo} />
+      )}
+
+      {/* Status indicators for AGOL data */}
+      {!isZoomedInEnough && (
+        <MapStatusIndicator
+          type="loading"
+          message="Zoom in to view sign features"
+          position={{ top: "10px", right: "10px" }}
+        />
+      )}
+      {isZoomedInEnough && agolLoading && (
+        <MapStatusIndicator type="loading" message="Loading sign assets..." />
+      )}
+      {isZoomedInEnough && agolError && (
+        <MapStatusIndicator
+          type="error"
+          message={`Error loading signs: ${agolError}`}
+        />
       )}
 
       <GeocoderControl position="top-left" setMapLatLon={setMapLatLon} />
