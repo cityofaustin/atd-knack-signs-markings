@@ -1,10 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import bbox from "@turf/bbox";
 import { lineString } from "@turf/helpers";
 import { LngLatBoundsLike } from "mapbox-gl";
 import { Marker } from "react-map-gl/mapbox";
 import { Sign, KnackToIFrameMessage, LatLon } from "@/types/map";
 import { MAP_COORDINATE_PRECISION } from "@/config/map";
+import {
+  useSignAssetsFeatureService,
+  convertGeoJSONToSigns,
+} from "@/utils/agol";
 
 /**
  * Takes array of Signs from knack payload and if signs exist, returns bounding box for signs
@@ -92,10 +96,50 @@ export const useFormatLocation = (
   }, [knackPayload]);
 
 /**
+ * Custom marker component for AGOL signs (yellow dots with black stroke)
+ */
+const AGOLMarker = ({ onClick }: { onClick: (e: any) => void }) => (
+  <div
+    onClick={onClick}
+    style={{
+      width: "8px",
+      height: "8px",
+      borderRadius: "50%",
+      backgroundColor: "#FFD700", // Gold/Yellow color
+      border: "1px solid #000000", // Black stroke
+      cursor: "pointer",
+      boxShadow: "0 1px 2px rgba(0,0,0,0.3)", // Subtle shadow for visibility
+      transform: "translate(-50%, -50%)", // Center the dot on the coordinate
+    }}
+  />
+);
+
+/**
+ * Helper function to log AGOL sign data to console
+ */
+const logAGOLSignData = (sign: Sign) => {
+  console.group(`🟡 AGOL Sign Asset - ID: ${sign.spatialId}`);
+  console.info(
+    "📍 Location:",
+    `${sign.lat.toFixed(MAP_COORDINATE_PRECISION)}, ${sign.lng.toFixed(MAP_COORDINATE_PRECISION)}`
+  );
+  console.groupEnd();
+};
+
+/**
  * Takes array of Signs and returns array of map markers, one marker per sign
- * If the sign id matches the location detail page id, render the marker as red
- * otherwise, use default color
- * @param signs Array of Signs
+ *
+ * Marker color logic:
+ * - Red: Location detail page sign (isLocationDetailPage = true)
+ * - Default blue: Knack work order signs (source = "knack" or undefined)
+ * - Yellow dot: AGOL signs (source = "agol", uses custom AGOLMarker component)
+ *
+ * Interaction logic:
+ * - Knack signs: Show popup with work order info when clicked
+ * - AGOL signs: Log data to console when clicked (handled by AGOLMarker)
+ *
+ * @param signs Array of Signs (can include both Knack and AGOL signs)
+ * @param setPopupInfo State setter for popup display
  * @returns Array of Map Markers
  */
 export const useCreateSignPins = (
@@ -112,14 +156,30 @@ export const useCreateSignPins = (
               key={`marker-${sign.id}`}
               longitude={sign.lng}
               latitude={sign.lat}
+              // Only override color for location detail page (red)
+              // All other signs use default color (AGOL uses custom marker component anyway)
               color={sign.isLocationDetailPage ? "red" : undefined}
               onClick={(e) => {
-                // If we let the click event propagates to the map, it will immediately close the popup
-                // with `closeOnClick: true`
-                e.originalEvent.stopPropagation();
-                setPopupInfo(sign);
+                // Only handle clicks for non-AGOL signs here
+                // AGOL signs are handled by their custom AGOLMarker component
+                if (sign.source !== "agol") {
+                  // If we let the click event propagates to the map, it will immediately close the popup
+                  // with `closeOnClick: true`
+                  e.originalEvent.stopPropagation();
+                  setPopupInfo(sign);
+                }
               }}
-            />
+            >
+              {/* Custom marker for AGOL signs */}
+              {sign.source === "agol" && (
+                <AGOLMarker
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    logAGOLSignData(sign);
+                  }}
+                />
+              )}
+            </Marker>
           )
       ),
     [signs, setPopupInfo]
@@ -143,4 +203,69 @@ export const useGeoLocation = () => {
   }, []);
 
   return geoLocation;
+};
+
+/**
+ * Custom hook to fetch AGOL sign assets based on map bounds
+ * @param bounds Current map bounds
+ * @param enabled Whether to fetch data (useful for disabling during initial load)
+ * @returns Object containing AGOL signs, loading state, and error state
+ */
+export const useAGOLSignAssets = (
+  bounds: { north: number; south: number; east: number; west: number } | null,
+  enabled: boolean = true
+) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Use the feature service hook with GeoJSON accumulation
+  const geojson = useSignAssetsFeatureService(
+    bounds,
+    enabled,
+    setLoading,
+    setError
+  );
+
+  // Convert GeoJSON to Sign array format for compatibility
+  const agolSigns = useMemo(() => {
+    try {
+      // Only set error if conversion fails
+      return convertGeoJSONToSigns(geojson);
+    } catch (err) {
+      console.error("Error converting AGOL GeoJSON to signs:", err);
+      const conversionError =
+        err instanceof Error ? err.message : "Unknown error occurred";
+      // Only set conversion error if there's no existing fetch error
+      setError((prevError) => prevError || conversionError);
+      return [];
+    }
+  }, [geojson]);
+
+  return {
+    agolSigns,
+    loading,
+    error,
+  };
+};
+
+/**
+ * Helper function to get current map bounds from MapRef
+ * @param mapRef Reference to the map instance
+ * @returns Map bounds in lat/lon format or null if map not ready
+ */
+export const getMapBounds = (mapRef: React.RefObject<any>) => {
+  if (!mapRef.current) return null;
+
+  try {
+    const bounds = mapRef.current.getBounds();
+    return {
+      north: bounds.getNorth(),
+      south: bounds.getSouth(),
+      east: bounds.getEast(),
+      west: bounds.getWest(),
+    };
+  } catch (error) {
+    console.error("Error getting map bounds:", error);
+    return null;
+  }
 };

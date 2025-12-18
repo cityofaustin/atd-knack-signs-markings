@@ -17,6 +17,10 @@ export interface Sign {
   workOrderId: string;
   /** if the sign id matches the location record id, the payload came from the location details page */
   isLocationDetailPage: boolean;
+  /** source of the sign data - 'knack' for existing data, 'agol' for ArcGIS Online */
+  source?: "knack" | "agol";
+  /** additional attributes from AGOL or other sources */
+  attributes?: any;
 }
 
 export interface KnackRecord {
