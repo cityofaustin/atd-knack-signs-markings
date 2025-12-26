@@ -20,7 +20,7 @@ export interface Sign {
   /** source of the sign data - 'knack' for existing data, 'agol' for ArcGIS Online */
   source?: "knack" | "agol";
   /** additional attributes from AGOL or other sources */
-  attributes?: any;
+  attributes?: Record<string, unknown>;
 }
 
 export interface KnackRecord {
