@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback, startTransition } from "react";
 import bbox from "@turf/bbox";
 import { lineString } from "@turf/helpers";
 import { LngLatBoundsLike } from "mapbox-gl";
@@ -227,19 +227,26 @@ export const useAGOLSignAssets = (
   );
 
   // Convert GeoJSON to Sign array format for compatibility
-  const agolSigns = useMemo(() => {
+  const { agolSigns, conversionError } = useMemo(() => {
     try {
-      // Only set error if conversion fails
-      return convertGeoJSONToSigns(geojson);
+      return { agolSigns: convertGeoJSONToSigns(geojson), conversionError: null };
     } catch (err) {
       console.error("Error converting AGOL GeoJSON to signs:", err);
-      const conversionError =
+      const errorMessage =
         err instanceof Error ? err.message : "Unknown error occurred";
-      // Only set conversion error if there's no existing fetch error
-      setError((prevError) => prevError || conversionError);
-      return [];
+      return { agolSigns: [], conversionError: errorMessage };
     }
   }, [geojson]);
+
+  // Handle conversion error in an effect to avoid setState during render
+  // Using startTransition to mark this as a non-urgent update
+  useEffect(() => {
+    if (conversionError && !error) {
+      startTransition(() => {
+        setError(conversionError);
+      });
+    }
+  }, [conversionError, error]);
 
   return {
     agolSigns,

@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useState, useEffect, useRef, useMemo } from "react";
+import { useCallback, useState, useEffect, useRef, useMemo, startTransition } from "react";
 import MapGL, {
   MapRef,
   Marker,
@@ -119,37 +119,48 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
   const signPins = useCreateSignPins(allSigns, setPopupInfo);
 
   /**
+   * Derive the initial map center position based on editLocation or geoLocation.
+   * This is used to sync the marker position with the map center.
+   */
+  const initialCenter = useMemo(() => {
+    if (signs.length > 0) return null;
+    if (editLocation?.latitude && editLocation?.longitude) {
+      return { latitude: editLocation.latitude, longitude: editLocation.longitude };
+    }
+    if (geoLocation?.latitude && geoLocation?.longitude) {
+      return { latitude: geoLocation.latitude, longitude: geoLocation.longitude };
+    }
+    return null;
+  }, [editLocation, geoLocation, signs.length]);
+
+  /**
    * Map jumpTo center useEffect
    * If there are no sign location pins and not editing an existing location,
    * center at geolocation.
    * If editing an existing location, center at that location.
-   * Set add location marker to same coordinates as center
    */
   useEffect(() => {
-    if (!mapRef?.current || signs.length > 0) {
+    if (!mapRef?.current || !initialCenter) {
       return;
     }
 
-    if (editLocation?.latitude && editLocation?.longitude) {
-      mapRef.current.jumpTo({
-        center: [editLocation?.longitude, editLocation?.latitude],
-      });
+    mapRef.current.jumpTo({
+      center: [initialCenter.longitude, initialCenter.latitude],
+    });
+  }, [initialCenter]);
 
-      setMapLatLon({
-        latitude: editLocation.latitude,
-        longitude: editLocation.longitude,
-      });
-    } else if (geoLocation?.latitude && geoLocation?.longitude) {
-      mapRef.current.jumpTo({
-        center: [geoLocation?.longitude, geoLocation?.latitude],
-      });
-
-      setMapLatLon({
-        latitude: geoLocation.latitude,
-        longitude: geoLocation.longitude,
+  /**
+   * Sync mapLatLon state with initialCenter when it changes.
+   * This ensures the marker position matches the map center.
+   * Using startTransition to mark this as a non-urgent update.
+   */
+  useEffect(() => {
+    if (initialCenter) {
+      startTransition(() => {
+        setMapLatLon(initialCenter);
       });
     }
-  }, [geoLocation, signs, messageType, editLocation]);
+  }, [initialCenter]);
 
   /**
    * Zoom to bounding box containing location pins

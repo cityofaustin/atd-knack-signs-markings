@@ -31,7 +31,6 @@ const ATX_BOUNDING_BOX: [number, number, number, number] = [
   -98.182, 29.987, -97.304, 30.663,
 ];
 
-/* eslint-disable complexity,max-statements */
 export default function GeocoderControl(props: GeocoderControlProps) {
   const [marker, setMarker] = useState<ReactElement | null>(null);
 
