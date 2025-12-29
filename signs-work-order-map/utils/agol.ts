@@ -33,7 +33,7 @@ interface MapBounds {
 interface AGOLFeature {
   type: "Feature";
   properties: {
-    [key: string]: any;
+    [key: string]: unknown;
   };
   geometry: {
     type: string;
@@ -256,16 +256,23 @@ export const useSignAssetsFeatureService = (
  * with existing map components
  */
 export const convertGeoJSONToSigns = (geojson: FeatureCollection) => {
-  return geojson.features.map((feature, index) => ({
-    id: `agol-${feature.properties.OBJECTID_1}`,
-    lng: feature.geometry.coordinates[0],
-    lat: feature.geometry.coordinates[1],
-    spatialId: feature.properties.OBJECTID_1,
-    workOrderId: "",
-    isLocationDetailPage: false,
-    source: "agol" as const,
-    attributes: feature.properties,
-  }));
+  return geojson.features.map((feature) => {
+    // Extract and validate OBJECTID_1 as a number
+    const objectId = feature.properties.OBJECTID_1;
+    const spatialId =
+      typeof objectId === "number" ? objectId : Number(objectId) || 0;
+
+    return {
+      id: `agol-${spatialId}`,
+      lng: feature.geometry.coordinates[0],
+      lat: feature.geometry.coordinates[1],
+      spatialId,
+      workOrderId: "",
+      isLocationDetailPage: false,
+      source: "agol" as const,
+      attributes: feature.properties,
+    };
+  });
 };
 
 /**
