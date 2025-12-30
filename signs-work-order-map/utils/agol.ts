@@ -274,16 +274,3 @@ export const convertGeoJSONToSigns = (geojson: FeatureCollection) => {
     };
   });
 };
-
-/**
- * Find a specific feature in the GeoJSON collection by ID
- */
-export const findFeatureById = (
-  geojson: FeatureCollection,
-  featureId: string | number,
-  idProperty: string = "OBJECTID_1"
-): AGOLFeature | undefined => {
-  return geojson.features.find(
-    (feature) => feature.properties[idProperty] === featureId
-  );
-};
