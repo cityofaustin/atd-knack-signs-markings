@@ -1,5 +1,12 @@
 "use client";
-import { useCallback, useState, useEffect, useRef, useMemo, startTransition } from "react";
+import {
+  useCallback,
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  startTransition,
+} from "react";
 import MapGL, {
   MapRef,
   Marker,
@@ -125,10 +132,16 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
   const initialCenter = useMemo(() => {
     if (signs.length > 0) return null;
     if (editLocation?.latitude && editLocation?.longitude) {
-      return { latitude: editLocation.latitude, longitude: editLocation.longitude };
+      return {
+        latitude: editLocation.latitude,
+        longitude: editLocation.longitude,
+      };
     }
     if (geoLocation?.latitude && geoLocation?.longitude) {
-      return { latitude: geoLocation.latitude, longitude: geoLocation.longitude };
+      return {
+        latitude: geoLocation.latitude,
+        longitude: geoLocation.longitude,
+      };
     }
     return null;
   }, [editLocation, geoLocation, signs.length]);
