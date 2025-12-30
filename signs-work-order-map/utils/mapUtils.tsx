@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback, startTransition } from "react";
+import { useEffect, useMemo, useState, startTransition } from "react";
 import bbox from "@turf/bbox";
 import { lineString } from "@turf/helpers";
 import { LngLatBoundsLike } from "mapbox-gl";
