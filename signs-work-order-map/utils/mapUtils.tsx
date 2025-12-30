@@ -220,7 +220,10 @@ export const useAGOLSignAssets = (
   // Convert GeoJSON to Sign array format for compatibility
   const { agolSigns, conversionError } = useMemo(() => {
     try {
-      return { agolSigns: convertGeoJSONToSigns(geojson), conversionError: null };
+      return {
+        agolSigns: convertGeoJSONToSigns(geojson),
+        conversionError: null,
+      };
     } catch (err) {
       console.error("Error converting AGOL GeoJSON to signs:", err);
       const errorMessage =
