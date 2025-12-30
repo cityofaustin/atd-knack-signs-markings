@@ -87,7 +87,7 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
     sendLatLonToParent({ latitude, longitude });
   }, []);
 
-  const bounds = useFormatBounds(signs);
+  const signLocationBounds = useFormatBounds(signs);
   const geoLocation = useGeoLocation();
 
   // Only fetch AGOL signs when zoomed in enough for performance
@@ -163,15 +163,15 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
   }, [initialCenter]);
 
   /**
-   * Zoom to bounding box containing location pins
+   * Zoom to bounding box containing sign location pins
    * and set "add location marker" coordinates to center
    */
   useEffect(() => {
-    if (!mapRef?.current || !bounds) {
+    if (!mapRef?.current || !signLocationBounds) {
       return;
     }
 
-    mapRef.current.fitBounds(bounds, {
+    mapRef.current.fitBounds(signLocationBounds, {
       padding: 100,
       maxZoom: 16,
       duration: 0,
@@ -182,7 +182,7 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
       latitude: +lat.toFixed(MAP_COORDINATE_PRECISION),
       longitude: +lng.toFixed(MAP_COORDINATE_PRECISION),
     });
-  }, [bounds]);
+  }, [signLocationBounds]);
 
   return (
     <MapGL
