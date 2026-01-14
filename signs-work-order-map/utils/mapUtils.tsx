@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, startTransition } from "react";
 import bbox from "@turf/bbox";
 import { lineString } from "@turf/helpers";
 import { LngLatBoundsLike } from "mapbox-gl";
@@ -97,22 +97,13 @@ export const useFormatLocation = (
 
 /**
  * Custom marker component for AGOL signs (yellow dots with black stroke)
+ * Styles are defined in globals.scss (.agol-marker)
  */
-const AGOLMarker = ({ onClick }: { onClick: (e: any) => void }) => (
-  <div
-    onClick={onClick}
-    style={{
-      width: "8px",
-      height: "8px",
-      borderRadius: "50%",
-      backgroundColor: "#FFD700", // Gold/Yellow color
-      border: "1px solid #000000", // Black stroke
-      cursor: "pointer",
-      boxShadow: "0 1px 2px rgba(0,0,0,0.3)", // Subtle shadow for visibility
-      transform: "translate(-50%, -50%)", // Center the dot on the coordinate
-    }}
-  />
-);
+const AGOLMarker = ({
+  onClick,
+}: {
+  onClick: (e: React.MouseEvent<HTMLDivElement>) => void;
+}) => <div onClick={onClick} className="agol-marker" />;
 
 /**
  * Helper function to log AGOL sign data to console
@@ -227,19 +218,29 @@ export const useAGOLSignAssets = (
   );
 
   // Convert GeoJSON to Sign array format for compatibility
-  const agolSigns = useMemo(() => {
+  const { agolSigns, conversionError } = useMemo(() => {
     try {
-      // Only set error if conversion fails
-      return convertGeoJSONToSigns(geojson);
+      return {
+        agolSigns: convertGeoJSONToSigns(geojson),
+        conversionError: null,
+      };
     } catch (err) {
       console.error("Error converting AGOL GeoJSON to signs:", err);
-      const conversionError =
+      const errorMessage =
         err instanceof Error ? err.message : "Unknown error occurred";
-      // Only set conversion error if there's no existing fetch error
-      setError((prevError) => prevError || conversionError);
-      return [];
+      return { agolSigns: [], conversionError: errorMessage };
     }
   }, [geojson]);
+
+  // Handle conversion error in an effect to avoid setState during render
+  // Using startTransition to mark this as a non-urgent update
+  useEffect(() => {
+    if (conversionError && !error) {
+      startTransition(() => {
+        setError(conversionError);
+      });
+    }
+  }, [conversionError, error]);
 
   return {
     agolSigns,
