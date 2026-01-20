@@ -88,3 +88,16 @@ a {
     color: #ffffff;
   }
 }
+
+/**
+ * Mapbox Popup Close Button Styles
+ */
+.mapboxgl-popup-close-button {
+  color: #000000 !important;
+  padding: 0.25rem 0.75rem 0.75rem 0.75rem;
+  font-size: 1.5rem;
+  
+  &:hover {
+    color: #333333 !important;
+  }
+}

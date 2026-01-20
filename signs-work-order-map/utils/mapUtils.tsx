@@ -105,17 +105,6 @@ const AGOLMarker = ({
   onClick: (e: React.MouseEvent<HTMLDivElement>) => void;
 }) => <div onClick={onClick} className="agol-marker" />;
 
-/**
- * Helper function to log AGOL sign data to console
- */
-const logAGOLSignData = (sign: Sign) => {
-  console.group(`🟡 AGOL Sign Asset - ID: ${sign.spatialId}`);
-  console.info(
-    "📍 Location:",
-    `${sign.lat.toFixed(MAP_COORDINATE_PRECISION)}, ${sign.lng.toFixed(MAP_COORDINATE_PRECISION)}`
-  );
-  console.groupEnd();
-};
 
 /**
  * Takes array of Signs and returns array of map markers, one marker per sign
@@ -127,7 +116,7 @@ const logAGOLSignData = (sign: Sign) => {
  *
  * Interaction logic:
  * - Knack signs: Show popup with work order info when clicked
- * - AGOL signs: Log data to console when clicked (handled by AGOLMarker)
+ * - AGOL signs: Show popup with asset location ID and sign messages when clicked (handled by AGOLMarker)
  *
  * @param signs Array of Signs (can include both Knack and AGOL signs)
  * @param setPopupInfo State setter for popup display
@@ -166,7 +155,8 @@ export const useCreateSignPins = (
                 <AGOLMarker
                   onClick={(e) => {
                     e.stopPropagation();
-                    logAGOLSignData(sign);
+                    // Show popup for AGOL signs
+                    setPopupInfo(sign);
                   }}
                 />
               )}

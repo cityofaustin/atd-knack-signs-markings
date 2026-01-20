@@ -209,6 +209,12 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
       {...DEFAULT_MAP_PARAMS}
       onDrag={updateCenterMarker}
       onZoom={updateCenterMarker}
+      onClick={(e) => {
+        // Close popup when clicking on the map (not on markers, which stop propagation)
+        if (popupInfo) {
+          setPopupInfo(null);
+        }
+      }}
       onMoveEnd={(e) => {
         updateCenterMarker(e);
         const moveEndZoom = e.viewState.zoom;
