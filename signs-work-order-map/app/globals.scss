@@ -90,13 +90,20 @@ a {
 }
 
 /**
- * Mapbox Popup Close Button Styles
+ * Mapbox Popup Customizations
  */
+
+//  Makes popup wider to accommodate title & X close button.
+// See: https://github.com/cityofaustin/atd-knack-signs-markings/pull/338#discussion_r2723053051
+.mapboxgl-popup {
+  min-width: 215px;
+}
+
 .mapboxgl-popup-close-button {
   color: #000000 !important;
   padding: 0.25rem 0.75rem 0.75rem 0.75rem;
   font-size: 1.5rem;
-  
+
   &:hover {
     color: #333333 !important;
   }
