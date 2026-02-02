@@ -10,15 +10,15 @@ interface SignPopupProps {
 export default function SignPopup({ popupInfo, setPopupInfo }: SignPopupProps) {
   // Check if this is an AGOL sign
   const isAGOLSign = popupInfo.source === "agol";
-  
+
   // Extract AGOL-specific fields
-  const assetLocationId = isAGOLSign 
-    ? popupInfo.attributes?.ASSET_LOCATION_ID 
+  const assetLocationId = isAGOLSign
+    ? popupInfo.attributes?.ASSET_LOCATION_ID
     : null;
   const signMessagesAtLocation = isAGOLSign
     ? popupInfo.attributes?.SIGN_MESSAGES_AT_LOCATION
     : null;
-  
+
   // Split sign messages by comma and filter out empty strings
   const signMessagesList = signMessagesAtLocation
     ? String(signMessagesAtLocation)
@@ -46,7 +46,9 @@ export default function SignPopup({ popupInfo, setPopupInfo }: SignPopupProps) {
             {assetLocationId != null && (
               <div className="mb-0 mt-2 d-flex align-items-center">
                 <span className="fw-bold me-2">Location ID:</span>
-                <span className="text-muted mb-0">{String(assetLocationId)}</span>
+                <span className="text-muted mb-0">
+                  {String(assetLocationId)}
+                </span>
               </div>
             )}
             {signMessagesList.length > 0 && (
@@ -63,7 +65,9 @@ export default function SignPopup({ popupInfo, setPopupInfo }: SignPopupProps) {
               </div>
             )}
             {signMessagesList.length === 0 && assetLocationId == null && (
-              <div className="text-muted">No additional information available</div>
+              <div className="text-muted">
+                No additional information available
+              </div>
             )}
           </div>
         </div>
