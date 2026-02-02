@@ -53,7 +53,7 @@ export default function SignPopup({ popupInfo, setPopupInfo }: SignPopupProps) {
             )}
             {signMessagesList.length > 0 && (
               <div className="mt-2">
-                <div className="fw-bold mb-1">Exisiting signs:</div>
+                <div className="fw-bold mb-1">Existing signs:</div>
                 <div className="text-muted">
                   {signMessagesList.map((message, index) => (
                     <div key={index}>
