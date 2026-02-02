@@ -41,7 +41,7 @@ export default function SignPopup({ popupInfo, setPopupInfo }: SignPopupProps) {
         <div className="h-100 nav-tile card border-0">
           <div className="card-body p-2">
             <div className="fw-bold fs-6 pb-2 border-bottom card-title h5">
-              Exisiting sign details
+              Existing sign details
             </div>
             {assetLocationId != null && (
               <div className="mb-0 mt-2 d-flex align-items-center">
