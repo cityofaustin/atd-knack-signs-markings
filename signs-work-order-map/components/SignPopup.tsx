@@ -27,6 +27,13 @@ export default function SignPopup({ popupInfo, setPopupInfo }: SignPopupProps) {
         .filter((msg) => msg.length > 0)
     : [];
 
+  // Group identical sign messages and count occurrences:
+  const signMessageCounts = new Map<string, number>();
+  signMessagesList.forEach((message) => {
+    const current = signMessageCounts.get(message) ?? 0;
+    signMessageCounts.set(message, current + 1);
+  });
+
   return (
     <Popup
       anchor="top"
@@ -55,12 +62,14 @@ export default function SignPopup({ popupInfo, setPopupInfo }: SignPopupProps) {
               <div className="mt-2">
                 <div className="fw-bold mb-1">Existing signs:</div>
                 <div className="text-muted">
-                  {signMessagesList.map((message, index) => (
-                    <div key={index}>
-                      {message}
-                      {index < signMessagesList.length - 1 && ","}
-                    </div>
-                  ))}
+                  {Array.from(signMessageCounts.entries()).map(
+                    ([message, count]) => (
+                      <div key={message}>
+                        {message}
+                        {count > 1 && ` (x${count})`}
+                      </div>
+                    )
+                  )}
                 </div>
               </div>
             )}
