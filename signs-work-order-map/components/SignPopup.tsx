@@ -33,7 +33,7 @@ export default function SignPopup({ popupInfo, setPopupInfo }: SignPopupProps) {
       longitude={popupInfo.lng}
       latitude={popupInfo.lat}
       onClose={() => setPopupInfo(null)}
-      offset={[-5, 1]}
+      offset={[-8, 0]}
       maxWidth="300px"
     >
       {isAGOLSign ? (
