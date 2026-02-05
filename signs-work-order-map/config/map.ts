@@ -1,4 +1,5 @@
 import "mapbox-gl/dist/mapbox-gl.css";
+import type { CircleLayerSpecification } from "mapbox-gl";
 // import { SymbolLayerSpecification, RasterLayerSpecification } from "mapbox-gl";
 
 // // The Nearmap API key is managed by CTM. Contact help desk for maintenance and troubleshooting.
@@ -23,6 +24,26 @@ export const DEFAULT_MAP_PAN_ZOOM = {
  * Zoom levels below this threshold will hide signs to improve performance
  */
 export const AGOL_SIGNS_MIN_ZOOM = 16.75;
+
+/** Mapbox source and layer ids for the AGOL signs GeoJSON layer */
+export const AGOL_SIGNS_SOURCE_ID = "agol-signs";
+export const AGOL_SIGNS_LAYER_ID = "agol-signs-layer";
+
+/**
+ * Mapbox circle layer style for AGOL sign points.
+ * Single WebGL layer for performance; radius tuned for touch (e.g. iPad).
+ */
+export const AGOL_SIGNS_LAYER_STYLE: CircleLayerSpecification = {
+  id: AGOL_SIGNS_LAYER_ID,
+  type: "circle",
+  source: AGOL_SIGNS_SOURCE_ID,
+  paint: {
+    "circle-radius": 8,
+    "circle-color": "#FFD700",
+    "circle-stroke-color": "#000000",
+    "circle-stroke-width": 1,
+  },
+};
 
 export const MAP_MAX_BOUNDS: [[number, number], [number, number]] = [
   [-99, 29],

@@ -35,10 +35,7 @@ interface AGOLFeature {
   properties: {
     [key: string]: unknown;
   };
-  geometry: {
-    type: string;
-    coordinates: number[];
-  };
+  geometry: GeoJSON.Point;
 }
 
 interface FeatureCollection {
