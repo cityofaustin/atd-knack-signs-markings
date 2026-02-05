@@ -8,7 +8,7 @@
   var myView = window.viewIdsArray.shift(0);
 
   const nextAppUrl =
-    "https://deploy-preview-339--nextjs-knack-signs-markings.netlify.app;
+    "https://deploy-preview-339--nextjs-knack-signs-markings.netlify.app";
   // const nextAppUrl = "http://localhost:3000";
 
   // Import jQuery into this file from CDN
