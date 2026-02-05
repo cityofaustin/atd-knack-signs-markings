@@ -7,9 +7,9 @@
 (function () {
   var myView = window.viewIdsArray.shift(0);
 
-  // const nextAppUrl =
-  //   "https://deploy-preview-328--nextjs-knack-signs-markings.netlify.app/";
-  const nextAppUrl = "http://localhost:3000";
+  const nextAppUrl =
+    "https://deploy-preview-339--nextjs-knack-signs-markings.netlify.app;
+  // const nextAppUrl = "http://localhost:3000";
 
   // Import jQuery into this file from CDN
   // https://stackoverflow.com/questions/34338411/how-to-import-jquery-using-es6-syntax
