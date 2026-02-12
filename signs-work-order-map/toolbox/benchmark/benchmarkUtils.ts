@@ -1,9 +1,18 @@
 /**
- * Performance benchmarking utilities for map marker vs layer rendering.
+ * ONE-TIME / EXPERIMENTAL TOOLING — NOT PART OF THE CORE APP.
  *
- * Usage: Import useMarkerPerformanceBenchmark / useLayerPerformanceBenchmark
- * in Map or the benchmark page; open DevTools Console to see results.
- * Use window.getBenchmarkResults() or window.exportBenchmarkResults() to export.
+ * These utilities exist only to benchmark different rendering approaches
+ * (individual markers vs a Mapbox circle layer) for AGOL sign data.
+ *
+ * They should only be used from the `/benchmark` route in local/dev
+ * environments to inform performance decisions. They are not intended
+ * to run in Knack iframes or any production user flows.
+ *
+ * Usage:
+ * - See `app/benchmark/page.tsx` for the dedicated benchmark page.
+ * - Open DevTools Console to view results.
+ * - Use `window.getBenchmarkResults()` or
+ *   `window.exportBenchmarkResults()` to export history as JSON.
  */
 
 import { useEffect, useRef } from "react";
@@ -114,10 +123,15 @@ export const useMarkerPerformanceBenchmark = (
           timestamp: new Date().toISOString(),
         };
         console.log("📊 MARKER BENCHMARK", result);
-        (window as unknown as { __lastBenchmark?: BenchmarkResult }).__lastBenchmark = result;
-        (window as unknown as { __benchmarkHistory?: BenchmarkResult[] }).__benchmarkHistory =
-          (window as unknown as { __benchmarkHistory?: BenchmarkResult[] }).__benchmarkHistory || [];
-        (window as unknown as { __benchmarkHistory: BenchmarkResult[] }).__benchmarkHistory.push(result);
+        (window as unknown as { __lastBenchmark?: BenchmarkResult }).__lastBenchmark =
+          result;
+        (window as unknown as { __benchmarkHistory?: BenchmarkResult[] })
+          .__benchmarkHistory =
+          (window as unknown as { __benchmarkHistory?: BenchmarkResult[] })
+            .__benchmarkHistory || [];
+        (window as unknown as { __benchmarkHistory: BenchmarkResult[] }).__benchmarkHistory.push(
+          result
+        );
         hasLoggedRef.current = signCount;
         startTimeRef.current = null;
       }, 100);
@@ -164,10 +178,15 @@ export const useLayerPerformanceBenchmark = (
           timestamp: new Date().toISOString(),
         };
         console.log("📊 LAYER BENCHMARK", result);
-        (window as unknown as { __lastLayerBenchmark?: BenchmarkResult }).__lastLayerBenchmark = result;
-        (window as unknown as { __layerBenchmarkHistory?: BenchmarkResult[] }).__layerBenchmarkHistory =
-          (window as unknown as { __layerBenchmarkHistory?: BenchmarkResult[] }).__layerBenchmarkHistory || [];
-        (window as unknown as { __layerBenchmarkHistory: BenchmarkResult[] }).__layerBenchmarkHistory.push(result);
+        (window as unknown as { __lastLayerBenchmark?: BenchmarkResult }).__lastLayerBenchmark =
+          result;
+        (window as unknown as { __layerBenchmarkHistory?: BenchmarkResult[] })
+          .__layerBenchmarkHistory =
+          (window as unknown as { __layerBenchmarkHistory?: BenchmarkResult[] })
+            .__layerBenchmarkHistory || [];
+        (window as unknown as { __layerBenchmarkHistory: BenchmarkResult[] }).__layerBenchmarkHistory.push(
+          result
+        );
         hasLoggedRef.current = featureCount;
         startTimeRef.current = null;
       }, 100);
@@ -179,7 +198,10 @@ export const useLayerPerformanceBenchmark = (
 export const setupBenchmarkConsoleUtils = () => {
   if (typeof window === "undefined") return;
   const w = window as unknown as {
-    getBenchmarkResults?: () => { marker: BenchmarkResult[]; layer: BenchmarkResult[] };
+    getBenchmarkResults?: () => {
+      marker: BenchmarkResult[];
+      layer: BenchmarkResult[];
+    };
     clearBenchmarkHistory?: () => void;
     exportBenchmarkResults?: () => string;
     __benchmarkHistory?: BenchmarkResult[];
@@ -200,3 +222,4 @@ export const setupBenchmarkConsoleUtils = () => {
     return json;
   };
 };
+

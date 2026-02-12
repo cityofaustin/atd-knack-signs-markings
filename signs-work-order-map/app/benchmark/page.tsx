@@ -1,3 +1,15 @@
+/**
+ * ONE-TIME / EXPERIMENTAL TOOLING PAGE.
+ *
+ * This `/benchmark` route is a developer-only tool for comparing
+ * performance of individual markers vs a Mapbox circle layer when
+ * rendering large numbers of AGOL sign points.
+ *
+ * It is **not** part of any Knack iframe flow or production UX.
+ * Treat it as a throwaway experiment: safe to modify or delete once
+ * we are satisfied with the performance decisions it informed.
+ */
+
 "use client";
 
 import { useState, useMemo, useRef, useCallback, useEffect } from "react";
@@ -16,7 +28,7 @@ import {
   useMarkerPerformanceBenchmark,
   useLayerPerformanceBenchmark,
   setupBenchmarkConsoleUtils,
-} from "@/utils/benchmark";
+} from "@/toolbox/benchmark/benchmarkUtils";
 import {
   DEFAULT_MAP_PARAMS,
   DEFAULT_MAP_PAN_ZOOM,

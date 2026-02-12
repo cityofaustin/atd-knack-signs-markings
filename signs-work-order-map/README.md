@@ -54,3 +54,10 @@ First-time setup: run `nvm use`, `npm install`, and `cp env_template .env` (add 
 2. Copy `knack/iframeMapMessenger.js` to a file named **`iframeMapMessengerDev.js`**.
 3. Upload **iframeMapMessengerDev.js** to the **atd-knack-signs-markings** S3 bucket under the **staging** prefix, replacing the existing file.  
    **Do not** change **iframeMapMessenger.js** in S3 (that is used for production).
+
+## Developer toolbox and one-time benchmarking tools
+
+- **Benchmark page (`/benchmark`)**: A developer-only page used to compare performance between rendering thousands of AGOL sign points as individual markers vs a single Mapbox circle layer.
+- **Benchmark utilities**: Implemented in `toolbox/benchmark/benchmarkUtils.ts`. These utilities set globals on `window` (ex: `getBenchmarkResults`, `exportBenchmarkResults`) and should **not** be wired into Knack or any production user flows.
+
+These tools are intended as **one-time / experimental** helpers to guide performance decisions. It is safe to refactor or remove them once they have served their purpose.
