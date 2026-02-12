@@ -183,7 +183,7 @@ export const useAGOLSignAssets = (
  * Converts a GeoJSON point feature from the AGOL layer (e.g. from map click) into a Sign
  * for use in the popup.
  *
- * @param feature Clicked feature with Point geometry and AGOL properties (OBJECTID_1, etc.)
+ * @param feature Clicked GeoJSON point feature with AGOL properties (OBJECTID_1, etc.)
  * @returns Sign for popup, or null if feature is invalid
  */
 export function agolFeatureToSign(feature: unknown): Sign | null {
