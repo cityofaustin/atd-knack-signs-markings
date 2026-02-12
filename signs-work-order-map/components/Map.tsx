@@ -13,6 +13,9 @@ import MapGL, {
   ViewStateChangeEvent,
   NavigationControl,
   GeolocateControl,
+  Source,
+  Layer,
+  MapMouseEvent,
 } from "react-map-gl/mapbox";
 import GeocoderControl from "@/components/MapGeocoderControl";
 import SignPopup from "./SignPopup";
@@ -25,19 +28,21 @@ import {
   useGeoLocation,
   useAGOLSignAssets,
   getMapBounds,
+  agolFeatureToSign,
 } from "@/utils/mapUtils";
 import {
   DEFAULT_MAP_PARAMS,
   DEFAULT_MAP_PAN_ZOOM,
   MAP_COORDINATE_PRECISION,
   AGOL_SIGNS_MIN_ZOOM,
+  AGOL_SIGNS_LAYER_ID,
+  AGOL_SIGNS_SOURCE_ID,
+  AGOL_SIGNS_LAYER_STYLE,
 } from "@/config/map";
 
 /**
- *
  * @param signs Array of Signs from knack payload, or empty array
  * @param messageType String from knack payload
- * @returns
  */
 export default function Map({ signs, messageType, editLocation }: MapProps) {
   const mapRef = useRef<MapRef>(null);
@@ -100,30 +105,42 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
   // Only fetch AGOL signs when zoomed in enough for performance
   const isZoomedInEnough = zoom >= AGOL_SIGNS_MIN_ZOOM;
 
-  // Fetch AGOL sign assets based on current map bounds
+  // Fetch AGOL sign assets as GeoJSON for Layer rendering
   const {
-    agolSigns,
+    agolSignsGeoJSON,
     loading: agolLoading,
     error: agolError,
   } = useAGOLSignAssets(
     mapBounds,
-    mapLoaded && isZoomedInEnough // Only fetch when map is loaded and zoomed in enough
+    mapLoaded && isZoomedInEnough
   );
 
-  // Combine Knack signs with AGOL signs (only include AGOL signs if zoomed in enough)
-  const allSigns = useMemo(() => {
-    // Mark Knack signs with source
-    const knackSigns = signs.map((sign) => ({
-      ...sign,
-      source: "knack" as const,
-    }));
-    // Only include AGOL signs when zoomed in enough for performance
-    const visibleAgolSigns = isZoomedInEnough ? agolSigns : [];
+  const knackSigns = useMemo(
+    () => signs.map((sign) => ({ ...sign, source: "knack" as const })),
+    [signs]
+  );
+  const signPins = useCreateSignPins(knackSigns, setPopupInfo);
 
-    return [...knackSigns, ...visibleAgolSigns];
-  }, [signs, agolSigns, isZoomedInEnough]);
+  const handleMouseEnter = useCallback(() => {
+    if (mapRef.current) {
+      mapRef.current.getCanvas().style.cursor = "pointer";
+    }
+  }, []);
 
-  const signPins = useCreateSignPins(allSigns, setPopupInfo);
+  const handleMouseLeave = useCallback(() => {
+    if (mapRef.current) {
+      mapRef.current.getCanvas().style.cursor = "";
+    }
+  }, []);
+
+  const handleAGOLLayerClick = useCallback(
+    (e: MapMouseEvent) => {
+      if (!e.features || e.features.length === 0) return;
+      const sign = agolFeatureToSign(e.features[0]);
+      if (sign) setPopupInfo(sign);
+    },
+    [setPopupInfo]
+  );
 
   /**
    * Derive the initial map center position based on editLocation or geoLocation.
@@ -207,8 +224,18 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
       }}
       cooperativeGestures={true}
       {...DEFAULT_MAP_PARAMS}
+      interactiveLayerIds={isZoomedInEnough ? [AGOL_SIGNS_LAYER_ID] : []}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       onDrag={updateCenterMarker}
       onZoom={updateCenterMarker}
+      onClick={(e) => {
+        if (e.features && e.features.length > 0) {
+          handleAGOLLayerClick(e);
+          return;
+        }
+        if (popupInfo) setPopupInfo(null);
+      }}
       onMoveEnd={(e) => {
         updateCenterMarker(e);
         const moveEndZoom = e.viewState.zoom;
@@ -238,6 +265,13 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
       }
 
       {signPins}
+
+      {isZoomedInEnough && agolSignsGeoJSON.features.length > 0 && (
+        <Source id={AGOL_SIGNS_SOURCE_ID} type="geojson" data={agolSignsGeoJSON}>
+          <Layer {...AGOL_SIGNS_LAYER_STYLE} />
+        </Source>
+      )}
+
       {popupInfo && (
         <SignPopup popupInfo={popupInfo} setPopupInfo={setPopupInfo} />
       )}

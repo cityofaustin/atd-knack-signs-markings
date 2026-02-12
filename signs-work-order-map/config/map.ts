@@ -1,4 +1,5 @@
 import "mapbox-gl/dist/mapbox-gl.css";
+import type { CircleLayerSpecification } from "mapbox-gl";
 // import { SymbolLayerSpecification, RasterLayerSpecification } from "mapbox-gl";
 
 // // The Nearmap API key is managed by CTM. Contact help desk for maintenance and troubleshooting.
@@ -22,7 +23,43 @@ export const DEFAULT_MAP_PAN_ZOOM = {
  * Minimum zoom level required to display AGOL sign assets
  * Zoom levels below this threshold will hide signs to improve performance
  */
-export const AGOL_SIGNS_MIN_ZOOM = 16.75;
+export const AGOL_SIGNS_MIN_ZOOM = 15.5;
+
+/** Mapbox source and layer ids for the AGOL signs GeoJSON layer */
+export const AGOL_SIGNS_SOURCE_ID = "agol-signs";
+export const AGOL_SIGNS_LAYER_ID = "agol-signs-layer";
+
+/**
+ * Mapbox circle layer style for AGOL sign points.
+ * Single WebGL layer for performance; radius tuned for touch (e.g. iPad).
+ */
+export const AGOL_SIGNS_LAYER_STYLE: CircleLayerSpecification = {
+  id: AGOL_SIGNS_LAYER_ID,
+  type: "circle",
+  source: AGOL_SIGNS_SOURCE_ID,
+  paint: {
+    // Interpolate radius by zoom so points get larger
+    // (and easier to tap) as you zoom in.
+    "circle-radius": [
+      "interpolate",
+      ["linear"],
+      ["zoom"],
+      // Just above min zoom for signs
+      15,
+      6,
+      // Very close in
+      20,
+      18,
+    ],
+    // Base fill color; tuned for contrast over aerial imagery.
+    "circle-color": "#00FFFF",
+    // White stroke to improve contrast between overlapping points
+    // and against dark / light aerial backgrounds.
+    "circle-stroke-color": "#FFFFFF",
+    // Thicker stroke at higher zoom to match larger circles
+    "circle-stroke-width": ["interpolate", ["linear"], ["zoom"], 15, 1, 20, 4],
+  },
+};
 
 export const MAP_MAX_BOUNDS: [[number, number], [number, number]] = [
   [-99, 29],
