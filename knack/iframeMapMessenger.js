@@ -46,7 +46,7 @@
     // Add React app as iframe if iframe doesn't already exist
     if ($(myView + " #mapIFrame").length === 0) {
       https: $(
-        `<iframe src=${nextAppUrl} frameborder="0" allow="geolocation" scrolling="yes" \
+        `<iframe src=${nextAppUrl} frameborder="0" allow="geolocation fullscreen" scrolling="yes" \
         id="mapIFrame" style="width: 100%;height: 523px;"></iframe>`
       ).appendTo($viewSelector);
     }

@@ -17,6 +17,7 @@ import MapGL, {
   Layer,
   MapMouseEvent,
 } from "react-map-gl/mapbox";
+import mapboxgl from "mapbox-gl";
 import GeocoderControl from "@/components/MapGeocoderControl";
 import SignPopup from "./SignPopup";
 import { MapStatusIndicator } from "./MapStatusIndicator";
@@ -243,11 +244,14 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
         updateMapBounds();
       }}
       onLoad={(e) => {
-        const initialZoom = e.target.getZoom();
+        const map = e.target;
+        const initialZoom = map.getZoom();
         setMapLoaded(true);
         setZoom(initialZoom);
         updateMapBounds();
         sendLatLonToParent(mapLatLon);
+        // Add fullscreen control for when embedded in iframe (parent must use allow="fullscreen")
+        map.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
       }}
     >
       {
