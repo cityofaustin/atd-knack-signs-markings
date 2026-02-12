@@ -68,13 +68,17 @@ export default function FullscreenControl({
         };
 
         const requestFullscreen = (el: Element) => {
-          if (el.requestFullscreen) el.requestFullscreen();
-          else if ((el as Element & { webkitRequestFullscreen?: () => void }).webkitRequestFullscreen)
-            (el as Element & { webkitRequestFullscreen: () => void }).webkitRequestFullscreen();
-          else if ((el as Element & { mozRequestFullScreen?: () => void }).mozRequestFullScreen)
-            (el as Element & { mozRequestFullScreen: () => void }).mozRequestFullScreen();
-          else if ((el as Element & { msRequestFullscreen?: () => void }).msRequestFullscreen)
-            (el as Element & { msRequestFullscreen: () => void }).msRequestFullscreen();
+          const req =
+            el.requestFullscreen?.() ??
+            (el as Element & { webkitRequestFullscreen?: () => Promise<void> }).webkitRequestFullscreen?.() ??
+            (el as Element & { mozRequestFullScreen?: () => Promise<void> }).mozRequestFullScreen?.() ??
+            (el as Element & { msRequestFullscreen?: () => Promise<void> }).msRequestFullscreen?.();
+          if (req && typeof req.catch === "function") {
+            req.catch(() => {
+              // Fullscreen blocked by permissions policy (e.g. Knack parent restricts it).
+              // Fail silently to avoid uncaught promise rejection.
+            });
+          }
         };
 
         const onFullscreenChange = () => updateIcon(container);
