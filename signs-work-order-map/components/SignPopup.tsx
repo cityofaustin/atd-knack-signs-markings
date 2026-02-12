@@ -46,14 +46,14 @@ export default function SignPopup({ popupInfo, setPopupInfo }: SignPopupProps) {
     >
       {isAGOLSign ? (
         // AGOL sign popup content with card styling
-        <div className="h-100 nav-tile card border-0">
+        <div className="h-100 nav-tile card border-0 fs-6">
           <div className="card-body p-2">
-            <div className="fw-bold fs-6 pb-2 border-bottom card-title h5">
+            {/* <div className="fw-bold fs-6 pb-2 border-bottom card-title h5">
               Existing sign details
-            </div>
+            </div> */}
             {assetLocationId != null && (
               <div className="mb-0 mt-2 d-flex align-items-center">
-                <span className="fw-bold me-2">Location ID:</span>
+                <span className="fw-bold me-2">Location ID</span>
                 <span className="text-muted mb-0">
                   {String(assetLocationId)}
                 </span>
@@ -61,17 +61,24 @@ export default function SignPopup({ popupInfo, setPopupInfo }: SignPopupProps) {
             )}
             {signMessagesList.length > 0 && (
               <div className="mt-2">
-                <div className="fw-bold mb-1">Existing signs:</div>
-                <div className="text-muted">
+                {/* <div className="fw-bold mb-1">Existing signs</div> */}
+                <ul className="list-group list-group-flush">
                   {Array.from(signMessageCounts.entries()).map(
                     ([message, count]) => (
-                      <div key={message}>
+                      <li
+                        key={message}
+                        className="list-group-item px-0 py-3 fs-6"
+                      >
                         {message}
-                        {count > 1 && ` (x${count})`}
-                      </div>
+                        {count > 1 && (
+                          <span className="badge border text-dark bg-light ms-2">
+                            x {count}
+                          </span>
+                        )}
+                      </li>
                     )
                   )}
-                </div>
+                </ul>
               </div>
             )}
             {signMessagesList.length === 0 && assetLocationId == null && (
