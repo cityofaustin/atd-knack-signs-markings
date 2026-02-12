@@ -17,8 +17,8 @@ import MapGL, {
   Layer,
   MapMouseEvent,
 } from "react-map-gl/mapbox";
-import mapboxgl from "mapbox-gl";
 import GeocoderControl from "@/components/MapGeocoderControl";
+import FullscreenControl from "@/components/FullscreenControl";
 import SignPopup from "./SignPopup";
 import { MapStatusIndicator } from "./MapStatusIndicator";
 import { sendLatLonToParent } from "@/utils/iFrameMessenger";
@@ -250,8 +250,6 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
         setZoom(initialZoom);
         updateMapBounds();
         sendLatLonToParent(mapLatLon);
-        // Add fullscreen control for when embedded in iframe (parent must use allow="fullscreen")
-        map.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
       }}
     >
       {
@@ -306,6 +304,7 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
         onGeolocate={onGeolocate}
       />
       <NavigationControl position="bottom-right" showCompass={false} />
+      <FullscreenControl position="bottom-right" />
     </MapGL>
   );
 }
