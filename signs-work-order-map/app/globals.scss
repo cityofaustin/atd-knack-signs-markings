@@ -88,3 +88,52 @@ a {
     color: #333333 !important;
   }
 }
+
+/**
+ * Location Mode Toggle
+ * Button group overlay for switching between Create Location and Select Existing modes
+ */
+.location-mode-toggle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1001;
+  display: flex;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+
+  &__btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s;
+
+    &:first-child {
+      border-right: none;
+      border-radius: 6px 0 0 6px;
+    }
+
+    &:last-child {
+      border-radius: 0 6px 6px 0;
+    }
+
+    &:hover:not(&--active) {
+      background: rgba(240, 240, 240, 0.95);
+    }
+
+    &--active {
+      background: #2563eb;
+      color: #fff;
+      border-color: #2563eb;
+    }
+  }
+}
