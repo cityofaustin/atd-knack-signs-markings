@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { KnackToIFrameMessage, LatLon } from "@/types/map";
+import { KnackToIFrameMessage, LatLon, LocationMode } from "@/types/map";
 
 export function useIFrameMessenger() {
   const [message, setMessage] = useState<KnackToIFrameMessage | null>(null);
@@ -31,3 +31,26 @@ export function sendLatLonToParent(coords: LatLon) {
     "https://atd.knack.com"
   );
 }
+
+export function sendExistingLocationToParent(
+  coords: LatLon,
+  assetLocationId: string | number
+) {
+  window.parent.postMessage(
+    {
+      message: "EXISTING_LOCATION_SELECTED",
+      lat: coords.latitude,
+      lng: coords.longitude,
+      assetLocationId,
+    },
+    "https://atd.knack.com"
+  );
+}
+
+export function sendLocationModeToParent(mode: LocationMode) {
+  window.parent.postMessage(
+    { message: "LOCATION_MODE_CHANGE", mode },
+    "https://atd.knack.com"
+  );
+}
+

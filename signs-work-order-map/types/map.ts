@@ -3,6 +3,8 @@ export interface LatLon {
   longitude: number | undefined;
 }
 
+export type LocationMode = "create" | "select_existing";
+
 export interface MapProps {
   editLocation?: LatLon | null;
   messageType?: "KNACK_LOCATION_DETAILS" | "EDIT_LOCATION" | "WORK_ORDER_SIGNS";
