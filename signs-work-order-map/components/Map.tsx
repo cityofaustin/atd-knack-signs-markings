@@ -19,9 +19,14 @@ import MapGL, {
 } from "react-map-gl/mapbox";
 import GeocoderControl from "@/components/MapGeocoderControl";
 import SignPopup from "./SignPopup";
+import LocationModeToggle from "./LocationModeToggle";
 import { MapStatusIndicator } from "./MapStatusIndicator";
-import { sendLatLonToParent } from "@/utils/iFrameMessenger";
-import { MapProps, LatLon, Sign } from "@/types/map";
+import {
+  sendLatLonToParent,
+  sendExistingLocationToParent,
+  sendLocationModeToParent,
+} from "@/utils/iFrameMessenger";
+import { MapProps, LatLon, Sign, LocationMode } from "@/types/map";
 import {
   useCreateSignPins,
   useFormatBounds,
@@ -47,6 +52,17 @@ import {
 export default function Map({ signs, messageType, editLocation }: MapProps) {
   const mapRef = useRef<MapRef>(null);
   const [popupInfo, setPopupInfo] = useState<Sign | null>(null);
+  const [locationMode, setLocationMode] = useState<LocationMode>("create");
+
+  const handleLocationModeChange = useCallback((mode: LocationMode) => {
+    setLocationMode(mode);
+    sendLocationModeToParent(mode);
+  }, []);
+
+  const showLocationToggle =
+    messageType === "WORK_ORDER_SIGNS" || messageType === "EDIT_LOCATION";
+  const isCreateMode = locationMode === "create";
+
   const [mapLatLon, setMapLatLon] = useState<LatLon>({
     latitude: DEFAULT_MAP_PAN_ZOOM.latitude,
     longitude: DEFAULT_MAP_PAN_ZOOM.longitude,
@@ -58,7 +74,11 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
     west: number;
   } | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [initialViewApplied, setInitialViewApplied] = useState(false);
   const [zoom, setZoom] = useState<number>(DEFAULT_MAP_PAN_ZOOM.zoom);
+  const locationModeRef = useRef<LocationMode>(locationMode);
+  locationModeRef.current = locationMode;
+
   const updateCenterMarker = useCallback((event: ViewStateChangeEvent) => {
     // truncate values to our preferred precision
     const latitude = +event.viewState.latitude.toFixed(
@@ -75,7 +95,9 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
     });
     setZoom(currentZoom);
 
-    sendLatLonToParent({ latitude, longitude });
+    if (locationModeRef.current === "create") {
+      sendLatLonToParent({ latitude, longitude });
+    }
   }, []);
 
   // Update map bounds when the map moves
@@ -96,7 +118,9 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
       longitude,
     });
 
-    sendLatLonToParent({ latitude, longitude });
+    if (locationModeRef.current === "create") {
+      sendLatLonToParent({ latitude, longitude });
+    }
   }, []);
 
   const signLocationBounds = useFormatBounds(signs);
@@ -141,6 +165,14 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
     },
     [setPopupInfo]
   );
+
+  const handleSelectExistingLocation = useCallback((sign: Sign) => {
+    const assetLocationId = sign.attributes?.ASSET_LOCATION_ID;
+    sendExistingLocationToParent(
+      { latitude: sign.lat, longitude: sign.lng },
+      assetLocationId != null ? assetLocationId as string | number : ""
+    );
+  }, []);
 
   /**
    * Derive the initial map center position based on editLocation or geoLocation.
@@ -215,7 +247,16 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
   }, [signLocationBounds]);
 
   return (
-    <MapGL
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        opacity: initialViewApplied ? 1 : 0,
+        pointerEvents: initialViewApplied ? "auto" : "none",
+        transition: "opacity 0.2s ease-out",
+      }}
+    >
+      <MapGL
       ref={mapRef}
       initialViewState={{
         latitude: DEFAULT_MAP_PAN_ZOOM.latitude,
@@ -243,26 +284,48 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
         updateMapBounds();
       }}
       onLoad={(e) => {
-        const initialZoom = e.target.getZoom();
+        const map = e.target;
+        const initialZoom = map.getZoom();
         setMapLoaded(true);
         setZoom(initialZoom);
         updateMapBounds();
-        sendLatLonToParent(mapLatLon);
+
+        if (signLocationBounds) {
+          map.fitBounds(signLocationBounds, {
+            padding: 100,
+            maxZoom: 16,
+            duration: 0,
+          });
+          const { lng, lat } = map.getCenter();
+          const center = {
+            latitude: +lat.toFixed(MAP_COORDINATE_PRECISION),
+            longitude: +lng.toFixed(MAP_COORDINATE_PRECISION),
+          };
+          setMapLatLon(center);
+          sendLatLonToParent(center);
+        } else if (initialCenter) {
+          map.jumpTo({
+            center: [initialCenter.longitude, initialCenter.latitude],
+          });
+          setMapLatLon(initialCenter);
+          sendLatLonToParent(initialCenter);
+        } else {
+          sendLatLonToParent(mapLatLon);
+        }
+
+        setInitialViewApplied(true);
       }}
     >
-      {
-        // red "add location" marker that is situated at center of map. This marker's location is
-        // what is sent to knack in the LAT_LON_UPDATE payload message
-        mapLatLon?.latitude &&
-          mapLatLon?.longitude &&
-          messageType !== "KNACK_LOCATION_DETAILS" && (
-            <Marker
-              longitude={mapLatLon.longitude}
-              latitude={mapLatLon.latitude}
-              color={"red"}
-            />
-          )
-      }
+      {mapLatLon?.latitude &&
+        mapLatLon?.longitude &&
+        messageType !== "KNACK_LOCATION_DETAILS" &&
+        isCreateMode && (
+          <Marker
+            longitude={mapLatLon.longitude}
+            latitude={mapLatLon.latitude}
+            color={"red"}
+          />
+        )}
 
       {signPins}
 
@@ -273,24 +336,50 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
       )}
 
       {popupInfo && (
-        <SignPopup popupInfo={popupInfo} setPopupInfo={setPopupInfo} />
+        <SignPopup
+          popupInfo={popupInfo}
+          setPopupInfo={setPopupInfo}
+          locationMode={locationMode}
+          onSelectExistingLocation={handleSelectExistingLocation}
+        />
       )}
 
-      {/* Status indicators for AGOL data */}
+      {showLocationToggle && (
+        <LocationModeToggle
+          mode={locationMode}
+          onModeChange={handleLocationModeChange}
+        />
+      )}
+
+      {/* Status indicators for AGOL data — pushed below the toggle when it's visible */}
       {!isZoomedInEnough && (
         <MapStatusIndicator
           type="loading"
           message="Zoom in to view sign features"
-          position={{ top: "10px", right: "10px" }}
+          position={{
+            top: showLocationToggle ? "48px" : "10px",
+            right: "10px",
+          }}
         />
       )}
       {isZoomedInEnough && agolLoading && (
-        <MapStatusIndicator type="loading" message="Loading sign assets..." />
+        <MapStatusIndicator
+          type="loading"
+          message="Loading sign assets..."
+          position={{
+            top: showLocationToggle ? "48px" : "10px",
+            right: "10px",
+          }}
+        />
       )}
       {isZoomedInEnough && agolError && (
         <MapStatusIndicator
           type="error"
           message={`Error loading signs: ${agolError}`}
+          position={{
+            top: showLocationToggle ? "48px" : "10px",
+            right: "10px",
+          }}
         />
       )}
 
@@ -303,5 +392,6 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
       />
       <NavigationControl position="bottom-right" showCompass={false} />
     </MapGL>
+    </div>
   );
 }

@@ -1,13 +1,20 @@
 import { Popup } from "react-map-gl/mapbox";
-import { Sign } from "@/types/map";
+import { Sign, LocationMode } from "@/types/map";
 import { KNACK_APP_URL } from "@/config/map";
 
 interface SignPopupProps {
   popupInfo: Sign;
   setPopupInfo: React.Dispatch<React.SetStateAction<Sign | null>>;
+  locationMode?: LocationMode;
+  onSelectExistingLocation?: (sign: Sign) => void;
 }
 
-export default function SignPopup({ popupInfo, setPopupInfo }: SignPopupProps) {
+export default function SignPopup({
+  popupInfo,
+  setPopupInfo,
+  locationMode,
+  onSelectExistingLocation,
+}: SignPopupProps) {
   // Check if this is an AGOL sign
   const isAGOLSign = popupInfo.source === "agol";
 
@@ -36,7 +43,6 @@ export default function SignPopup({ popupInfo, setPopupInfo }: SignPopupProps) {
 
   return (
     <Popup
-      anchor="top"
       longitude={popupInfo.lng}
       latitude={popupInfo.lat}
       onClose={() => setPopupInfo(null)}
@@ -86,6 +92,18 @@ export default function SignPopup({ popupInfo, setPopupInfo }: SignPopupProps) {
                 No additional information available
               </div>
             )}
+            {locationMode === "select_existing" &&
+              onSelectExistingLocation && (
+                <button
+                  className="btn btn-primary btn-sm w-100 mt-2"
+                  onClick={() => {
+                    onSelectExistingLocation(popupInfo);
+                    setPopupInfo(null);
+                  }}
+                >
+                  Add this Location
+                </button>
+              )}
           </div>
         </div>
       ) : (
