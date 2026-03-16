@@ -88,8 +88,15 @@
         console.log("knack received existing location selection ", data);
         var $latLonFields = $("#kn-input-field_3300");
         $latLonFields.find("#latitude").val(data.lat).trigger("change");
-        $latLonFields.find("[name='longitude']").val(data.lng).trigger("change");
-        $("#kn-input-field_4461").val(data.assetLocationId).trigger("change");
+        $latLonFields
+          .find("[name='longitude']")
+          .val(data.lng)
+          .trigger("change");
+        // Populate hidden ASSET_LOCATION_ID field_4461.
+        $("#kn-input-field_4461")
+          .find("input, select, textarea")
+          .val(data.assetLocationId)
+          .trigger("change");
 
         // Auto-submit the Add Location form after a short delay
         // to let Knack register the field value changes
