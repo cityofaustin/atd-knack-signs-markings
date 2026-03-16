@@ -160,8 +160,22 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
   const handleAGOLLayerClick = useCallback(
     (e: MapMouseEvent) => {
       if (!e.features || e.features.length === 0) return;
-      const sign = agolFeatureToSign(e.features[0]);
-      if (sign) setPopupInfo(sign);
+
+      const feature = e.features[0];
+      const sign = agolFeatureToSign(feature);
+
+      if (feature) {
+        // Log the raw AGOL feature data for debugging/inspection
+        // Includes geometry and all available properties for the clicked pin
+        // eslint-disable-next-line no-console
+        console.log("AGOL sign feature clicked:", feature);
+      }
+
+      if (sign) {
+        // eslint-disable-next-line no-console
+        console.log("Derived AGOL sign object:", sign);
+        setPopupInfo(sign);
+      }
     },
     [setPopupInfo]
   );

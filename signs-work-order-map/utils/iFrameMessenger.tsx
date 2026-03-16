@@ -36,6 +36,12 @@ export function sendExistingLocationToParent(
   coords: LatLon,
   assetLocationId: string | number
 ) {
+  // eslint-disable-next-line no-console
+  console.log("Sending EXISTING_LOCATION_SELECTED message", {
+    lat: coords.latitude,
+    lng: coords.longitude,
+    assetLocationId,
+  });
   window.parent.postMessage(
     {
       message: "EXISTING_LOCATION_SELECTED",
