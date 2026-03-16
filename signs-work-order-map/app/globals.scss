@@ -67,6 +67,11 @@ a {
     background: rgba(255, 0, 0, 0.9);
     color: #ffffff;
   }
+  &--column {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
 }
 
 /**
@@ -115,7 +120,9 @@ a {
     font-weight: 500;
     cursor: pointer;
     white-space: nowrap;
-    transition: background 0.15s, color 0.15s;
+    transition:
+      background 0.15s,
+      color 0.15s;
 
     &:first-child {
       border-right: none;

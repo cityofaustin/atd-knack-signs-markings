@@ -12,7 +12,7 @@ const STANDALONE_TIMEOUT_MS = 3000;
 const Map = dynamic(() => import("@/components/Map"), {
   ssr: false,
   loading: () => (
-    <div className={styles.map} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+    <div className={styles.map}>
       <div className="map-status-indicator map-status-indicator--loading">
         <span aria-hidden="true">⏳</span>
         <span>Loading map...</span>
@@ -37,7 +37,9 @@ function LoadingOrStandalonePrompt({
     );
   }
   return (
-    <div className="map-status-indicator map-status-indicator--loading" style={{ flexDirection: "column", gap: "12px", textAlign: "center" }}>
+    <div
+      className={`map-status-indicator map-status-indicator--loading map-status-indicator--column`}
+    >
       <span>No Knack payload found.</span>
       <button
         type="button"
@@ -60,7 +62,10 @@ export default function Home() {
 
   useEffect(() => {
     if (knackPayload) return;
-    const timer = setTimeout(() => setShowStandalonePrompt(true), STANDALONE_TIMEOUT_MS);
+    const timer = setTimeout(
+      () => setShowStandalonePrompt(true),
+      STANDALONE_TIMEOUT_MS
+    );
     return () => clearTimeout(timer);
   }, [knackPayload]);
 
@@ -70,10 +75,7 @@ export default function Home() {
     return (
       <div className={styles.page}>
         <main className={styles.main}>
-          <div
-            className={styles.map}
-            style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
-          >
+          <div className={styles.map}>
             <LoadingOrStandalonePrompt
               showStandalonePrompt={showStandalonePrompt}
               onRenderAnyway={() => setStandaloneOverride(true)}
