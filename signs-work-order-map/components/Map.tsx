@@ -184,7 +184,7 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
     const assetLocationId = sign.attributes?.ASSET_LOCATION_ID;
     sendExistingLocationToParent(
       { latitude: sign.lat, longitude: sign.lng },
-      assetLocationId != null ? assetLocationId as string | number : ""
+      assetLocationId != null ? Number(assetLocationId) : ""
     );
   }, []);
 
