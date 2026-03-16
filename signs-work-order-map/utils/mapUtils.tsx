@@ -118,7 +118,7 @@ export const useCreateSignPins = (
               key={`marker-${sign.id}`}
               longitude={sign.lng}
               latitude={sign.lat}
-              color={sign.isLocationDetailPage ? "red" : undefined}
+              color={sign.isLocationDetailPage ? "red" : "#FFC600"}
               onClick={(e) => {
                 e.originalEvent.stopPropagation();
                 setPopupInfo(sign);
