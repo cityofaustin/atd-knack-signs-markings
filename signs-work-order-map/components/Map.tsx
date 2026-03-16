@@ -262,12 +262,10 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
 
   return (
     <div
+      className="map-container-wrapper"
       style={{
-        width: "100%",
-        height: "100%",
         opacity: initialViewApplied ? 1 : 0,
         pointerEvents: initialViewApplied ? "auto" : "none",
-        transition: "opacity 0.2s ease-out",
       }}
     >
       <MapGL

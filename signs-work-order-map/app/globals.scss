@@ -75,6 +75,16 @@ a {
 }
 
 /**
+ * Map container wrapper
+ * Full-size wrapper with fade-in transition; opacity/pointer-events toggled in JS
+ */
+.map-container-wrapper {
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.2s ease-out;
+}
+
+/**
  * Mapbox Popup Customizations
  */
 
