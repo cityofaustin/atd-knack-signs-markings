@@ -104,6 +104,25 @@ a {
   }
 }
 
+.mapboxgl-popup.sign-popup .mapboxgl-popup-content {
+  box-sizing: border-box;
+  min-width: 175px;
+  width: 100%;
+  padding: 10px 2.5rem 12px 12px;
+}
+
+.sign-popup-agol__inner {
+  max-height: min(52vh, 380px);
+  min-height: 0;
+}
+
+.sign-popup-agol__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 /**
  * Location Mode Toggle
  * Button group overlay for switching between Create Location and Select Existing modes
