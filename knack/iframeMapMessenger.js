@@ -128,7 +128,7 @@
 
       var headers = getHeaders(Knack.getUserToken(), Knack.application_id);
       var signsMarkerMessage = {
-        message: "KNACK_LOCATION_DETAILS",
+        message: "LOAD_WORK_ORDER_LOCATION_DETAILS_PAGE",
         payload: {
           records: [],
           location: {
@@ -190,7 +190,7 @@
         .then(function (res) {
           console.log("WORK ORDER SIGNS: ", res.records);
           var signsMarkerMessage = {
-            message: "WORK_ORDER_SIGNS",
+            message: "LOAD_WORK_ORDER_DETAILS_PAGE",
             payload: {
               records: res.records,
               workOrderId: recordId,
@@ -221,9 +221,9 @@
       })
         .then(function (res) {
           var locationField = res["field_3300_raw"];
-          console.log("EDIT_LOCATION: ", locationField);
+          console.log("OPEN_LOCATION_EDITOR: ", locationField);
           var locationMessage = {
-            message: "EDIT_LOCATION",
+            message: "OPEN_LOCATION_EDITOR",
             payload: {
               location: {
                 longitude: locationField?.longitude,

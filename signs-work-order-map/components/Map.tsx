@@ -71,7 +71,8 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
   }, []);
 
   const showLocationToggle =
-    messageType === "WORK_ORDER_SIGNS" || messageType === "EDIT_LOCATION";
+    messageType === "LOAD_WORK_ORDER_DETAILS_PAGE" ||
+    messageType === "OPEN_LOCATION_EDITOR";
   const isCreateMode = locationMode === "create";
 
   const [mapLatLon, setMapLatLon] = useState<LatLon>({
@@ -327,7 +328,7 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
     >
       {mapLatLon?.latitude &&
         mapLatLon?.longitude &&
-        messageType !== "KNACK_LOCATION_DETAILS" &&
+        messageType !== "LOAD_WORK_ORDER_LOCATION_DETAILS_PAGE" &&
         isCreateMode && (
           <Marker
             longitude={mapLatLon.longitude}
