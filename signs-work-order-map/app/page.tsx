@@ -45,7 +45,7 @@ function LoadingOrStandalonePrompt({
     <div
       className={`map-status-indicator map-status-indicator--loading map-status-indicator--column`}
     >
-      <span>No Knack payload found.</span>
+      <span>No work order locations found.</span>
       <button
         type="button"
         onClick={onRenderAnyway}
