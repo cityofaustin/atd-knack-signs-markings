@@ -44,6 +44,7 @@ import {
   DEFAULT_MAP_PAN_ZOOM,
   MAP_COORDINATE_PRECISION,
   AGOL_SIGNS_MIN_ZOOM,
+  SIGN_LOCATION_BOUNDS_FIT_OPTIONS,
   AGOL_SIGNS_LAYER_ID,
   AGOL_SIGNS_SOURCE_ID,
   AGOL_SIGNS_LAYER_STYLE,
@@ -245,11 +246,7 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
       return;
     }
 
-    mapRef.current.fitBounds(signLocationBounds, {
-      padding: 100,
-      maxZoom: 16,
-      duration: 0,
-    });
+    mapRef.current.fitBounds(signLocationBounds, SIGN_LOCATION_BOUNDS_FIT_OPTIONS);
 
     const { lng, lat } = mapRef.current.getCenter();
     setMapLatLon({
@@ -257,6 +254,14 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
       longitude: +lng.toFixed(MAP_COORDINATE_PRECISION),
     });
   }, [signLocationBounds]);
+
+  const statusIndicatorPosition = useMemo(
+    () => ({
+      top: showLocationToggle ? "48px" : "10px",
+      right: "10px",
+    }),
+    [showLocationToggle]
+  );
 
   return (
     <div
@@ -301,11 +306,7 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
         updateMapBounds();
 
         if (signLocationBounds) {
-          map.fitBounds(signLocationBounds, {
-            padding: 100,
-            maxZoom: 16,
-            duration: 0,
-          });
+          map.fitBounds(signLocationBounds, SIGN_LOCATION_BOUNDS_FIT_OPTIONS);
           const { lng, lat } = map.getCenter();
           const center = {
             latitude: +lat.toFixed(MAP_COORDINATE_PRECISION),
@@ -366,30 +367,21 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
         <MapStatusIndicator
           type="loading"
           message="Zoom in to view sign features"
-          position={{
-            top: showLocationToggle ? "48px" : "10px",
-            right: "10px",
-          }}
+          position={statusIndicatorPosition}
         />
       )}
       {isZoomedInEnough && agolLoading && (
         <MapStatusIndicator
           type="loading"
           message="Loading sign assets..."
-          position={{
-            top: showLocationToggle ? "48px" : "10px",
-            right: "10px",
-          }}
+          position={statusIndicatorPosition}
         />
       )}
       {isZoomedInEnough && agolError && (
         <MapStatusIndicator
           type="error"
           message={`Error loading signs: ${agolError}`}
-          position={{
-            top: showLocationToggle ? "48px" : "10px",
-            right: "10px",
-          }}
+          position={statusIndicatorPosition}
         />
       )}
 

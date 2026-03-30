@@ -19,6 +19,12 @@ export const DEFAULT_MAP_PAN_ZOOM = {
   zoom: 17,
 };
 
+export const SIGN_LOCATION_BOUNDS_FIT_OPTIONS = {
+  padding: 100,
+  maxZoom: 16,
+  duration: 0,
+} as const;
+
 /**
  * Minimum zoom level required to display AGOL sign assets
  * Zoom levels below this threshold will hide signs to improve performance
