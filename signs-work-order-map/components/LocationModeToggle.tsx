@@ -1,6 +1,11 @@
+import { MapPin, Pointer } from "lucide-react";
 import { LocationMode } from "@/types/map";
-import PinIcon from "./PinIcon";
-import CrosshairIcon from "./CrosshairIcon";
+
+const TOGGLE_ICON_PROPS = {
+  size: 14,
+  strokeWidth: 2.5,
+  "aria-hidden": true as const,
+};
 
 interface LocationModeToggleProps {
   mode: LocationMode;
@@ -20,7 +25,7 @@ export default function LocationModeToggle({
         onClick={() => onModeChange("create")}
         title="Create a new location by positioning the pin"
       >
-        <PinIcon />
+        <MapPin {...TOGGLE_ICON_PROPS} />
         <span>Create Location</span>
       </button>
       <button
@@ -32,7 +37,7 @@ export default function LocationModeToggle({
         onClick={() => onModeChange("select_existing")}
         title="Select an existing AGOL asset location"
       >
-        <CrosshairIcon />
+        <Pointer {...TOGGLE_ICON_PROPS} />
         <span>Select Existing</span>
       </button>
     </div>
