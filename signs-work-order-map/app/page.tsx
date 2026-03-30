@@ -21,6 +21,11 @@ const Map = dynamic(() => import("@/components/Map"), {
   ),
 });
 
+/**
+ * Shows a loading state while waiting for the Knack iframe to receive a work-order payload.
+ * If the payload never arrives (timeout), shows an inline prompt — not a modal — with
+ * “Render map anyway” so the map can still load for local dev or when embedded messaging fails.
+ */
 function LoadingOrStandalonePrompt({
   showStandalonePrompt,
   onRenderAnyway,
