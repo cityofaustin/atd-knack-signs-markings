@@ -7,7 +7,6 @@
 (function () {
   var myView = window.viewIdsArray.shift(0);
 
-  console.log("mateo is testing: ", new Date().toISOString());
   // const nextAppUrl =
   //   "https://deploy-preview-339--nextjs-knack-signs-markings.netlify.app";
   const nextAppUrl = "http://localhost:3000";
