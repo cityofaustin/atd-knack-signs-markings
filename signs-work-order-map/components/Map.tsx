@@ -26,6 +26,10 @@ import {
   sendExistingLocationToParent,
   sendLocationModeToParent,
 } from "@/utils/iFrameMessenger";
+import {
+  getStoredLocationMode,
+  setStoredLocationMode,
+} from "@/utils/locationModeStorage";
 import { MapProps, LatLon, Sign, LocationMode } from "@/types/map";
 import {
   useCreateSignPins,
@@ -52,11 +56,18 @@ import {
 export default function Map({ signs, messageType, editLocation }: MapProps) {
   const mapRef = useRef<MapRef>(null);
   const [popupInfo, setPopupInfo] = useState<Sign | null>(null);
-  const [locationMode, setLocationMode] = useState<LocationMode>("create");
+  const [locationMode, setLocationMode] = useState<LocationMode>(
+    getStoredLocationMode
+  );
+
+  // Sync parent Knack app with restored mode after iframe reload
+  useEffect(() => {
+    sendLocationModeToParent(locationMode);
+  }, [locationMode]);
 
   const handleLocationModeChange = useCallback((mode: LocationMode) => {
     setLocationMode(mode);
-    sendLocationModeToParent(mode);
+    setStoredLocationMode(mode);
   }, []);
 
   const showLocationToggle =
@@ -160,22 +171,8 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
   const handleAGOLLayerClick = useCallback(
     (e: MapMouseEvent) => {
       if (!e.features || e.features.length === 0) return;
-
-      const feature = e.features[0];
-      const sign = agolFeatureToSign(feature);
-
-      if (feature) {
-        // Log the raw AGOL feature data for debugging/inspection
-        // Includes geometry and all available properties for the clicked pin
-        // eslint-disable-next-line no-console
-        console.log("AGOL sign feature clicked:", feature);
-      }
-
-      if (sign) {
-        // eslint-disable-next-line no-console
-        console.log("Derived AGOL sign object:", sign);
-        setPopupInfo(sign);
-      }
+      const sign = agolFeatureToSign(e.features[0]);
+      if (sign) setPopupInfo(sign);
     },
     [setPopupInfo]
   );
