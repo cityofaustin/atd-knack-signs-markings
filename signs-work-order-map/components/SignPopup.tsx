@@ -43,7 +43,6 @@ export default function SignPopup({
 
   return (
     <Popup
-      anchor="top"
       longitude={popupInfo.lng}
       latitude={popupInfo.lat}
       onClose={() => setPopupInfo(null)}

@@ -112,7 +112,7 @@ a {
 }
 
 .sign-popup-agol__inner {
-  max-height: min(52vh, 380px);
+  max-height: min(45vh, 300px);
   min-height: 0;
 }
 
@@ -120,6 +120,8 @@ a {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
+  margin-right: -2.5rem;
+  padding-right: 2.5rem;
   -webkit-overflow-scrolling: touch;
 }
 
