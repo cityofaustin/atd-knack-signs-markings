@@ -42,12 +42,12 @@ export const useFormatSignsRecords = (
 ): Sign[] =>
   useMemo(() => {
     if (!knackPayload) return [];
-    if (knackPayload?.message === "EDIT_LOCATION") {
+    if (knackPayload?.message === "OPEN_LOCATION_EDITOR") {
       return [];
     }
 
     const locationId =
-      knackPayload.message === "KNACK_LOCATION_DETAILS"
+      knackPayload.message === "LOAD_WORK_ORDER_LOCATION_DETAILS_PAGE"
         ? knackPayload?.payload?.locationRecordId
         : null;
 
@@ -82,7 +82,7 @@ export const useFormatLocation = (
   knackPayload: KnackToIFrameMessage | null
 ): LatLon | null =>
   useMemo(() => {
-    if (!knackPayload || knackPayload?.message !== "EDIT_LOCATION") {
+    if (!knackPayload || knackPayload?.message !== "OPEN_LOCATION_EDITOR") {
       return null;
     }
 
@@ -118,7 +118,7 @@ export const useCreateSignPins = (
               key={`marker-${sign.id}`}
               longitude={sign.lng}
               latitude={sign.lat}
-              color={sign.isLocationDetailPage ? "red" : undefined}
+              color={sign.isLocationDetailPage ? "red" : "#FFC600"}
               onClick={(e) => {
                 e.originalEvent.stopPropagation();
                 setPopupInfo(sign);

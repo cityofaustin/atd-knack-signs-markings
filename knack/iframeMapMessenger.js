@@ -7,9 +7,9 @@
 (function () {
   var myView = window.viewIdsArray.shift(0);
 
-  const nextAppUrl =
-    "https://deploy-preview-339--nextjs-knack-signs-markings.netlify.app";
-  // const nextAppUrl = "http://localhost:3000";
+  // const nextAppUrl =
+  //   "https://deploy-preview-339--nextjs-knack-signs-markings.netlify.app";
+  const nextAppUrl = "http://localhost:3000";
 
   // Import jQuery into this file from CDN
   // https://stackoverflow.com/questions/34338411/how-to-import-jquery-using-es6-syntax
@@ -47,9 +47,17 @@
     if ($(myView + " #mapIFrame").length === 0) {
       https: $(
         `<iframe src=${nextAppUrl} frameborder="0" allow="geolocation" scrolling="yes" \
-        id="mapIFrame" style="width: 100%;height: 523px;"></iframe>`
+        id="mapIFrame" style="width: 100%;height: 523px;"></iframe>`,
       ).appendTo($viewSelector);
     }
+
+    // Always hide the ASSET_LOCATION_ID field — it is populated
+    // programmatically and never needs to be visible to the user
+    $("#kn-input-field_4461").closest(".kn-input").css({
+      visibility: "hidden",
+      height: 0,
+      overflow: "hidden",
+    });
 
     /**
      * Posts message to specified iframe
@@ -75,6 +83,40 @@
         $latLonFields.find("#latitude").val(data.lat);
         $latLonFields.find("[name='longitude']").val(data.lng);
       }
+      if (data.message === "EXISTING_LOCATION_SELECTED") {
+        console.log("knack received existing location selection ", data);
+        var $latLonFields = $("#kn-input-field_3300");
+        $latLonFields.find("#latitude").val(data.lat).trigger("change");
+        $latLonFields
+          .find("[name='longitude']")
+          .val(data.lng)
+          .trigger("change");
+        // Populate hidden ASSET_LOCATION_ID field_4461.
+        $("#kn-input-field_4461")
+          .find("input, select, textarea")
+          .val(data.assetLocationId)
+          .trigger("change");
+
+        // Auto-submit the Add Location form after a short delay
+        // to let Knack register the field value changes
+        setTimeout(function () {
+          var $submitBtn = $latLonFields
+            .closest("form")
+            .find("[type='submit']");
+          if ($submitBtn.length) {
+            console.log("Auto-submitting Add Location form");
+            $submitBtn.trigger("click");
+          }
+        }, 300);
+      }
+      if (data.message === "LOCATION_MODE_CHANGE") {
+        var $form = $("#lat-lon-form");
+        if (data.mode === "select_existing") {
+          $form.css("visibility", "hidden");
+        } else {
+          $form.css("visibility", "visible");
+        }
+      }
     });
 
     // Location Details Page Maps
@@ -86,7 +128,7 @@
 
       var headers = getHeaders(Knack.getUserToken(), Knack.application_id);
       var signsMarkerMessage = {
-        message: "KNACK_LOCATION_DETAILS",
+        message: "LOAD_WORK_ORDER_LOCATION_DETAILS_PAGE",
         payload: {
           records: [],
           location: {
@@ -148,7 +190,7 @@
         .then(function (res) {
           console.log("WORK ORDER SIGNS: ", res.records);
           var signsMarkerMessage = {
-            message: "WORK_ORDER_SIGNS",
+            message: "LOAD_WORK_ORDER_DETAILS_PAGE",
             payload: {
               records: res.records,
               workOrderId: recordId,
@@ -179,9 +221,9 @@
       })
         .then(function (res) {
           var locationField = res["field_3300_raw"];
-          console.log("EDIT_LOCATION: ", locationField);
+          console.log("OPEN_LOCATION_EDITOR: ", locationField);
           var locationMessage = {
-            message: "EDIT_LOCATION",
+            message: "OPEN_LOCATION_EDITOR",
             payload: {
               location: {
                 longitude: locationField?.longitude,
@@ -209,15 +251,18 @@
     // Work Order Details Page - Editable
     $("#view_2573 #mapIFrame").on("load", function () {
       workOrdersDetailsMapMessage("view_2573");
+      $("#lat-lon-form").css("visibility", "visible");
     });
     // Work Order Details Page - Viewable
     $("#view_2619 #mapIFrame").on("load", function () {
       workOrdersDetailsMapMessage("view_2619");
+      $("#lat-lon-form").css("visibility", "visible");
     });
 
     // Edit Location Page
     $("#view_2682 #mapIFrame").on("load", function () {
       sendLocationMapMessage("view_2682");
+      $("#lat-lon-form").css("visibility", "visible");
     });
   });
 })();

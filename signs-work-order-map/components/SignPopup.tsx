@@ -1,13 +1,20 @@
 import { Popup } from "react-map-gl/mapbox";
-import { Sign } from "@/types/map";
+import { Sign, LocationMode } from "@/types/map";
 import { KNACK_APP_URL } from "@/config/map";
 
 interface SignPopupProps {
   popupInfo: Sign;
   setPopupInfo: React.Dispatch<React.SetStateAction<Sign | null>>;
+  locationMode?: LocationMode;
+  onSelectExistingLocation?: (sign: Sign) => void;
 }
 
-export default function SignPopup({ popupInfo, setPopupInfo }: SignPopupProps) {
+export default function SignPopup({
+  popupInfo,
+  setPopupInfo,
+  locationMode,
+  onSelectExistingLocation,
+}: SignPopupProps) {
   // Check if this is an AGOL sign
   const isAGOLSign = popupInfo.source === "agol";
 
@@ -36,23 +43,19 @@ export default function SignPopup({ popupInfo, setPopupInfo }: SignPopupProps) {
 
   return (
     <Popup
-      anchor="top"
       longitude={popupInfo.lng}
       latitude={popupInfo.lat}
       onClose={() => setPopupInfo(null)}
       closeOnClick={false}
       offset={[0, 6]}
-      maxWidth="300px"
+      maxWidth="min(92vw, 320px)"
+      className="sign-popup"
     >
       {isAGOLSign ? (
-        // AGOL sign popup content with card styling
-        <div className="h-100 nav-tile card border-0 fs-6">
-          <div className="card-body p-2">
-            {/* <div className="fw-bold fs-6 pb-2 border-bottom card-title h5">
-              Existing sign details
-            </div> */}
+        <div className="sign-popup-agol nav-tile card border-0 fs-6">
+          <div className="card-body p-2 d-flex flex-column sign-popup-agol__inner">
             {assetLocationId != null && (
-              <div className="mb-0 mt-2 d-flex align-items-center">
+              <div className="mb-0 mt-2 d-flex align-items-center flex-shrink-0">
                 <span className="fw-bold me-2">Location ID</span>
                 <span className="text-muted mb-0">
                   {String(assetLocationId)}
@@ -60,9 +63,8 @@ export default function SignPopup({ popupInfo, setPopupInfo }: SignPopupProps) {
               </div>
             )}
             {signMessagesList.length > 0 && (
-              <div className="mt-2">
-                {/* <div className="fw-bold mb-1">Existing signs</div> */}
-                <ul className="list-group list-group-flush">
+              <div className="mt-2 sign-popup-agol__scroll">
+                <ul className="list-group list-group-flush mb-0">
                   {Array.from(signMessageCounts.entries()).map(
                     ([message, count]) => (
                       <li
@@ -82,10 +84,23 @@ export default function SignPopup({ popupInfo, setPopupInfo }: SignPopupProps) {
               </div>
             )}
             {signMessagesList.length === 0 && assetLocationId == null && (
-              <div className="text-muted">
+              <div className="text-muted flex-shrink-0">
                 No additional information available
               </div>
             )}
+            {locationMode === "select_existing" &&
+              onSelectExistingLocation && (
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm w-100 mt-2 flex-shrink-0 sign-popup-agol__action"
+                  onClick={() => {
+                    onSelectExistingLocation(popupInfo);
+                    setPopupInfo(null);
+                  }}
+                >
+                  Add this Location
+                </button>
+              )}
           </div>
         </div>
       ) : (

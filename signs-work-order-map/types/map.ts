@@ -3,9 +3,17 @@ export interface LatLon {
   longitude: number | undefined;
 }
 
+export type LocationMode = "create" | "select_existing";
+
+/** Knack → iframe events: which page/view opened the map and what payload shape to expect */
+export type KnackMapMessageType =
+  | "LOAD_WORK_ORDER_LOCATION_DETAILS_PAGE"
+  | "LOAD_WORK_ORDER_DETAILS_PAGE"
+  | "OPEN_LOCATION_EDITOR";
+
 export interface MapProps {
   editLocation?: LatLon | null;
-  messageType?: "KNACK_LOCATION_DETAILS" | "EDIT_LOCATION" | "WORK_ORDER_SIGNS";
+  messageType?: KnackMapMessageType;
   signs: Sign[];
 }
 
@@ -72,7 +80,8 @@ export interface KnackRecord {
 
 export type KnackToIFrameMessage =
   | {
-      message: "KNACK_LOCATION_DETAILS";
+      /** Work order → sign location details page (single location + its signs on the map) */
+      message: "LOAD_WORK_ORDER_LOCATION_DETAILS_PAGE";
       payload: {
         records: KnackRecord[];
         location: {
@@ -84,14 +93,16 @@ export type KnackToIFrameMessage =
       };
     }
   | {
-      message: "WORK_ORDER_SIGNS";
+      /** Work order details page (all signs for that work order) */
+      message: "LOAD_WORK_ORDER_DETAILS_PAGE";
       payload: {
         records: KnackRecord[];
         workOrderId: string;
       };
     }
   | {
-      message: "EDIT_LOCATION";
+      /** Add / edit location form — map for placing the pin */
+      message: "OPEN_LOCATION_EDITOR";
       payload: {
         location: {
           longitude: number | undefined;
