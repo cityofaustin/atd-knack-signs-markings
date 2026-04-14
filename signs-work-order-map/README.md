@@ -48,7 +48,7 @@ To embed a Netlify deploy preview (ex: from a PR) in the Knack Signs and Marking
 
 In order to develop locally, use a test application in Knack (ex: ["test-30-may-2024-signs-and-markings-operations"](https://atd.knack.com/test-30-may-2024-signs-and-markings-operations#work-order-signs/?view_2565_filters=%5B%7B%22text%22%3A%22Issued%22%2C%22field%22%3A%22field_3265%22%2C%22value%22%3A%22ISSUED%22%2C%22operator%22%3A%22is%22%7D%5D&view_2565_page=1)).
 
-First-time setup: run `nvm use`, `npm install`, and `cp env_template .env` (add your Mapbox token, ex: from 1Password). Then `npm run dev` to run the app at http://localhost:3000.
+First-time setup: run `nvm use`, `nvm install-latest-npm`, `npm install`, and `cp env_template .env` (add your Mapbox token, ex: from 1Password). Then `npm run dev` to run the app at http://localhost:3000.
 
 1. Set `nextAppUrl` to `"http://localhost:3000"` in **iframeMapMessenger.js**.
 2. Copy `knack/iframeMapMessenger.js` to a file named **`iframeMapMessengerDev.js`**.
