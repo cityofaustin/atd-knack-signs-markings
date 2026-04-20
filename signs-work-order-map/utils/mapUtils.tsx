@@ -55,13 +55,18 @@ export const useFormatSignsRecords = (
     const signsArray: Sign[] = knackPayload.payload.records.reduce(
       (acc: Sign[], sign) => {
         if (sign.field_3300_raw.latitude && sign.field_3300_raw.longitude) {
-          const newSign = {
+          const assetLocationId = sign.field_4461_raw ?? sign.field_4461;
+          const newSign: Sign = {
             id: sign.id,
             lat: sign.field_3300_raw.latitude,
             lng: sign.field_3300_raw.longitude,
             spatialId: sign.field_3297,
             workOrderId: knackPayload.payload.workOrderId,
             isLocationDetailPage: sign.id === locationId,
+            ...(assetLocationId != null &&
+            String(assetLocationId).trim() !== ""
+              ? { attributes: { ASSET_LOCATION_ID: assetLocationId } }
+              : {}),
           };
           acc.push(newSign);
         }
@@ -217,6 +222,79 @@ export function agolFeatureToSign(feature: unknown): Sign | null {
     source: "agol",
     attributes: properties,
   };
+}
+
+const COLOCATION_THRESHOLD_METERS = 5;
+
+function haversineDistanceMeters(
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number
+): number {
+  const R = 6371000;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+/**
+ * For each Knack sign, find the nearest co-located AGOL feature (within ~5 m)
+ * and merge its properties into the sign's `attributes`.
+ *
+ * Returns the (possibly-enriched) signs and the set of AGOL `OBJECTID_1` values
+ * that were matched, so the caller can filter them out of the AGOL layer.
+ */
+export function enrichKnackSignsWithAgol(
+  knackSigns: Sign[],
+  agolFeatures: ReadonlyArray<{
+    properties: Record<string, unknown>;
+    geometry: { type: string; coordinates: number[] };
+  }>
+): {
+  enrichedSigns: Sign[];
+  matchedAgolObjectIds: Set<unknown>;
+} {
+  const matchedAgolObjectIds = new Set<unknown>();
+
+  const enrichedSigns = knackSigns.map((sign) => {
+    let bestMatch: (typeof agolFeatures)[number] | null = null;
+    let bestDist = Infinity;
+
+    for (const feature of agolFeatures) {
+      if (
+        feature.geometry.type !== "Point" ||
+        feature.geometry.coordinates.length < 2
+      )
+        continue;
+      const [fLng, fLat] = feature.geometry.coordinates;
+      const dist = haversineDistanceMeters(sign.lat, sign.lng, fLat, fLng);
+      if (dist <= COLOCATION_THRESHOLD_METERS && dist < bestDist) {
+        bestDist = dist;
+        bestMatch = feature;
+      }
+    }
+
+    if (!bestMatch) return sign;
+
+    matchedAgolObjectIds.add(bestMatch.properties.OBJECTID_1);
+
+    return {
+      ...sign,
+      attributes: {
+        ...bestMatch.properties,
+        ...(sign.attributes ?? {}),
+      },
+    };
+  });
+
+  return { enrichedSigns, matchedAgolObjectIds };
 }
 
 /**

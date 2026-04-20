@@ -74,6 +74,9 @@ export interface KnackRecord {
   field_3425?: number;
   /** count of assets raw format*/
   field_3425_raw?: number;
+  /** AGOL asset location ID (set when location was added from an AGOL feature) */
+  field_4461?: string | number;
+  field_4461_raw?: string | number;
   /** knack record id */
   id: string;
 }
