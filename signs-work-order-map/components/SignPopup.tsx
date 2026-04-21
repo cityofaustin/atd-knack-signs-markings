@@ -59,6 +59,19 @@ export default function SignPopup({
     assetLocationId != null && String(assetLocationId).trim() !== "";
   const signMessages = popupInfo.attributes?.SIGN_MESSAGES_AT_LOCATION ?? null;
 
+  // Knack signs can link to their location details page. We don't link when
+  // viewing the popup on the location details page itself, or for AGOL-only
+  // signs (no Knack record yet).
+  const locationDetailHref =
+    !isAGOLSign && !popupInfo.isLocationDetailPage
+      ? `${KNACK_APP_URL}#work-order-signs/view-work-orders-details-sign/${popupInfo.workOrderId}/view-work-order-signs-location-details/${popupInfo.id}`
+      : null;
+
+  const idLabel = hasLocationId ? "Location ID" : "Spatial ID";
+  const idValue = hasLocationId ? String(assetLocationId) : popupInfo.spatialId;
+  // AGOL-only signs: only show the ID if it's a Location ID (ASSET_LOCATION_ID)
+  const showIdRow = hasLocationId || !isAGOLSign;
+
   return (
     <Popup
       longitude={popupInfo.lng}
@@ -71,31 +84,18 @@ export default function SignPopup({
     >
       <div className="sign-popup-agol nav-tile card border-0 fs-6">
         <div className="card-body p-2 d-flex flex-column sign-popup-agol__inner">
-          {/* Location Detail Page link — Knack signs only */}
-          {!isAGOLSign && !popupInfo.isLocationDetailPage && (
-            <div className="mt-2 flex-shrink-0">
-              <a
-                href={`${KNACK_APP_URL}#work-order-signs/view-work-orders-details-sign/${popupInfo.workOrderId}/view-work-order-signs-location-details/${popupInfo.id}`}
-                target="_top"
-              >
-                Location Detail Page
-              </a>
-            </div>
-          )}
-
-          {/* Prefer Location ID; fall back to Spatial ID for Knack signs */}
-          {hasLocationId ? (
+          {/* ID row — Location ID preferred, Spatial ID fallback for Knack */}
+          {showIdRow && (
             <div className="mb-0 mt-2 d-flex align-items-center flex-shrink-0">
-              <span className="fw-bold me-2">Location ID</span>
-              <span className="text-muted">{String(assetLocationId)}</span>
+              <span className="fw-bold me-2">{idLabel}</span>
+              {locationDetailHref ? (
+                <a href={locationDetailHref} target="_top">
+                  {idValue}
+                </a>
+              ) : (
+                <span className="text-muted">{idValue}</span>
+              )}
             </div>
-          ) : (
-            !isAGOLSign && (
-              <div className="mb-0 mt-2 d-flex align-items-center flex-shrink-0">
-                <span className="fw-bold me-2">Spatial ID</span>
-                <span className="text-muted">{popupInfo.spatialId}</span>
-              </div>
-            )
           )}
 
           {/* Sign messages (AGOL-sourced, or merged into Knack pin) */}
