@@ -27,6 +27,11 @@ export interface Sign {
   isLocationDetailPage: boolean;
   /** source of the sign data - 'knack' for existing data, 'agol' for ArcGIS Online */
   source?: "knack" | "agol";
+  /**
+   * True for Knack signs that were saved without an AGOL asset location id
+   * (i.e. created via the "Create Location" flow rather than selected from AGOL).
+   */
+  isNewLocation?: boolean;
   /** additional attributes from AGOL or other sources */
   attributes?: Record<string, unknown>;
 }

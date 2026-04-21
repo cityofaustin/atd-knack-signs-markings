@@ -56,6 +56,8 @@ export const useFormatSignsRecords = (
       (acc: Sign[], sign) => {
         if (sign.field_3300_raw.latitude && sign.field_3300_raw.longitude) {
           const assetLocationId = sign.field_4461_raw ?? sign.field_4461;
+          const hasAssetLocationId =
+            assetLocationId != null && String(assetLocationId).trim() !== "";
           const newSign: Sign = {
             id: sign.id,
             lat: sign.field_3300_raw.latitude,
@@ -63,8 +65,8 @@ export const useFormatSignsRecords = (
             spatialId: sign.field_3297,
             workOrderId: knackPayload.payload.workOrderId,
             isLocationDetailPage: sign.id === locationId,
-            ...(assetLocationId != null &&
-            String(assetLocationId).trim() !== ""
+            isNewLocation: !hasAssetLocationId,
+            ...(hasAssetLocationId
               ? { attributes: { ASSET_LOCATION_ID: assetLocationId } }
               : {}),
           };
@@ -101,9 +103,10 @@ export const useFormatLocation = (
  * Takes array of Knack Signs and returns array of map markers.
  * AGOL signs are rendered via a GeoJSON Layer in Map.tsx for performance.
  *
- * Marker color logic:
- * - Red: Location detail page sign (isLocationDetailPage = true)
- * - Default blue: Knack work order signs
+ * Point styling:
+ * - Red dot: Location detail page sign (isLocationDetailPage = true)
+ * - Yellow dot: Existing Knack work order sign
+ * - Green dot with "NEW" label: Sign created via "Create Location" (no AGOL link)
  *
  * @param signs Array of Knack Signs
  * @param setPopupInfo State setter for popup display
@@ -115,22 +118,40 @@ export const useCreateSignPins = (
 ) =>
   useMemo(
     () =>
-      signs.map(
-        (sign: Sign) =>
-          sign.lat &&
-          sign.lng && (
-            <Marker
-              key={`marker-${sign.id}`}
-              longitude={sign.lng}
-              latitude={sign.lat}
-              color={sign.isLocationDetailPage ? "red" : "#FFC600"}
-              onClick={(e) => {
-                e.originalEvent.stopPropagation();
-                setPopupInfo(sign);
-              }}
-            />
-          )
-      ),
+      signs.map((sign: Sign) => {
+        if (!sign.lat || !sign.lng) return null;
+        const modifierClass = sign.isLocationDetailPage
+          ? "work-order-sign-point--detail"
+          : sign.isNewLocation
+            ? "work-order-sign-point--new"
+            : "work-order-sign-point--existing";
+        return (
+          <Marker
+            key={`marker-${sign.id}`}
+            longitude={sign.lng}
+            latitude={sign.lat}
+            anchor="center"
+            onClick={(e) => {
+              e.originalEvent.stopPropagation();
+              setPopupInfo(sign);
+            }}
+          >
+            <div
+              className={`work-order-sign-point ${modifierClass}`}
+              role="button"
+              aria-label={
+                sign.isNewLocation
+                  ? "New work order sign location"
+                  : "Work order sign location"
+              }
+            >
+              {sign.isNewLocation && (
+                <span className="work-order-sign-point__label">NEW</span>
+              )}
+            </div>
+          </Marker>
+        );
+      }),
     [signs, setPopupInfo]
   );
 
