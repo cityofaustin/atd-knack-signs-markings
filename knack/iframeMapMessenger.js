@@ -39,6 +39,67 @@
     };
   }
 
+  /**
+   * Adds a "Fullscreen" button that expands the map iframe to fill the browser
+   * viewport via CSS (not the native Fullscreen API, which requires extra
+   * permissions for cross-origin iframes). Pressing Esc exits fullscreen.
+   *
+   * Styles live in knack/index.css (`.map-fullscreen-btn`,
+   * `body.map-iframe-fullscreen`, `.map-iframe-fullscreen__frame`).
+   */
+  function setupMapFullscreenToggle($iframe) {
+    if (!$iframe || !$iframe.length) return;
+    var $container = $iframe.parent();
+    // Idempotent: iframe `load` can fire more than once per view.
+    if ($container.find(".map-fullscreen-btn").length) return;
+
+    // Anchor for the absolutely-positioned button.
+    if ($container.css("position") === "static") {
+      $container.css("position", "relative");
+    }
+
+    var $btn = $(
+      '<button type="button" class="map-fullscreen-btn" ' +
+        'aria-label="Toggle fullscreen map" ' +
+        'aria-pressed="false" ' +
+        'title="Toggle fullscreen">' +
+        '<span aria-hidden="true">\u26F6</span>' +
+        "</button>",
+    );
+    $container.append($btn);
+
+    function exitFullscreen() {
+      $("body").removeClass("map-iframe-fullscreen");
+      $iframe.removeClass("map-iframe-fullscreen__frame");
+      $btn.attr("aria-pressed", "false");
+    }
+    function enterFullscreen() {
+      $("body").addClass("map-iframe-fullscreen");
+      $iframe.addClass("map-iframe-fullscreen__frame");
+      $btn.attr("aria-pressed", "true");
+    }
+
+    $btn.on("click", function () {
+      if ($("body").hasClass("map-iframe-fullscreen")) {
+        exitFullscreen();
+      } else {
+        enterFullscreen();
+      }
+    });
+
+    // Allow Esc to exit. Namespaced so we can avoid duplicate bindings.
+    $(document)
+      .off("keydown.mapFullscreen")
+      .on("keydown.mapFullscreen", function (e) {
+        if (
+          (e.key === "Escape" || e.keyCode === 27) &&
+          $("body").hasClass("map-iframe-fullscreen")
+        ) {
+          exitFullscreen();
+        }
+      });
+  }
+
   // Start polling...
   checkReady(function ($) {
     var $viewSelector = $(myView);
@@ -46,7 +107,7 @@
     // Add React app as iframe if iframe doesn't already exist
     if ($(myView + " #mapIFrame").length === 0) {
       https: $(
-        `<iframe src=${nextAppUrl} frameborder="0" allow="geolocation" scrolling="yes" \
+        `<iframe src=${nextAppUrl} frameborder="0" allow="geolocation; fullscreen" scrolling="yes" \
         id="mapIFrame" style="width: 100%;height: 523px;"></iframe>`,
       ).appendTo($viewSelector);
     }
@@ -241,28 +302,33 @@
     // Location Details Page - Editable
     $("#view_2609 #mapIFrame").on("load", function () {
       locationDetailsMapMessage("view_2609");
+      setupMapFullscreenToggle($("#view_2609 #mapIFrame"));
     });
 
     // Location Details Page - Viewer
     $("#view_2733 #mapIFrame").on("load", function () {
       locationDetailsMapMessage("view_2733");
+      setupMapFullscreenToggle($("#view_2733 #mapIFrame"));
     });
 
     // Work Order Details Page - Editable
     $("#view_2573 #mapIFrame").on("load", function () {
       workOrdersDetailsMapMessage("view_2573");
       $("#lat-lon-form").css("visibility", "visible");
+      setupMapFullscreenToggle($("#view_2573 #mapIFrame"));
     });
     // Work Order Details Page - Viewable
     $("#view_2619 #mapIFrame").on("load", function () {
       workOrdersDetailsMapMessage("view_2619");
       $("#lat-lon-form").css("visibility", "visible");
+      setupMapFullscreenToggle($("#view_2619 #mapIFrame"));
     });
 
     // Edit Location Page
     $("#view_2682 #mapIFrame").on("load", function () {
       sendLocationMapMessage("view_2682");
       $("#lat-lon-form").css("visibility", "visible");
+      setupMapFullscreenToggle($("#view_2682 #mapIFrame"));
     });
   });
 })();
