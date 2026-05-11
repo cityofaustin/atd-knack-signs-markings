@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import bbox from "@turf/bbox";
+import distance from "@turf/distance";
 import { lineString } from "@turf/helpers";
 import { LngLatBoundsLike } from "mapbox-gl";
 import { Marker } from "react-map-gl/mapbox";
@@ -247,30 +248,13 @@ export function agolFeatureToSign(feature: unknown): Sign | null {
 
 const COLOCATION_THRESHOLD_METERS = 5;
 
-function haversineDistanceMeters(
-  lat1: number,
-  lng1: number,
-  lat2: number,
-  lng2: number
-): number {
-  const R = 6371000;
-  const toRad = (d: number) => (d * Math.PI) / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLng = toRad(lng2 - lng1);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
 /**
  * For each Knack sign, find the nearest co-located AGOL feature (within ~5 m)
  * and merge its properties into the sign's `attributes`.
  *
- * Returns the (possibly-enriched) signs and the set of AGOL `OBJECTID_1` values
- * that were matched, so the caller can filter them out of the AGOL layer.
+ * Distance is computed via @turf/distance. Returns
+ * the (possibly-enriched) signs and the set of AGOL `OBJECTID_1` values that
+ * were matched, so the caller can filter them out of the AGOL layer.
  */
 export function enrichKnackSignsWithAgol(
   knackSigns: Sign[],
@@ -285,6 +269,7 @@ export function enrichKnackSignsWithAgol(
   const matchedAgolObjectIds = new Set<unknown>();
 
   const enrichedSigns = knackSigns.map((sign) => {
+    const signCoord: [number, number] = [sign.lng, sign.lat];
     let bestMatch: (typeof agolFeatures)[number] | null = null;
     let bestDist = Infinity;
 
@@ -294,8 +279,8 @@ export function enrichKnackSignsWithAgol(
         feature.geometry.coordinates.length < 2
       )
         continue;
-      const [fLng, fLat] = feature.geometry.coordinates;
-      const dist = haversineDistanceMeters(sign.lat, sign.lng, fLat, fLng);
+      const featureCoord = feature.geometry.coordinates as [number, number];
+      const dist = distance(signCoord, featureCoord, { units: "meters" });
       if (dist <= COLOCATION_THRESHOLD_METERS && dist < bestDist) {
         bestDist = dist;
         bestMatch = feature;
