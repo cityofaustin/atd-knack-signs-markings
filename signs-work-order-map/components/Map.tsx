@@ -70,6 +70,7 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
   const handleLocationModeChange = useCallback((mode: LocationMode) => {
     setLocationMode(mode);
     setStoredLocationMode(mode);
+    setPopupInfo(null);
   }, []);
 
   const showLocationToggle =
