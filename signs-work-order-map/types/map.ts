@@ -15,7 +15,7 @@ export interface MapProps {
   editLocation?: LatLon | null;
   messageType?: KnackMapMessageType;
   signs: Sign[];
-  bannerText?: string | null;
+  banner?: { text: string; variant: "success" | "error" } | null;
   onBannerDismiss?: () => void;
 }
 

@@ -196,6 +196,10 @@ a {
   pointer-events: auto;
   white-space: nowrap;
 
+  &--error {
+    background: rgba(220, 53, 69, 0.92);
+  }
+
   &--fade {
     opacity: 0;
     pointer-events: none;

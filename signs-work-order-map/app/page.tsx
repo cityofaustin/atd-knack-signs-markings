@@ -61,7 +61,7 @@ export default function Home() {
   const knackPayload = useIFrameMessenger();
   const editLocation = useFormatLocation(knackPayload);
   const signs = useFormatSignsRecords(knackPayload);
-  const { bannerText, clearBanner } = useBannerMessage();
+  const { banner, clearBanner } = useBannerMessage();
 
   const [showStandalonePrompt, setShowStandalonePrompt] = useState(false);
   const [standaloneOverride, setStandaloneOverride] = useState(false);
@@ -100,7 +100,7 @@ export default function Home() {
             signs={signs}
             messageType={knackPayload?.message}
             editLocation={editLocation}
-            bannerText={bannerText}
+            banner={banner}
             onBannerDismiss={clearBanner}
           />
         </div>

@@ -187,10 +187,11 @@
     // Notify the React app to show a banner if a location was just added or removed
     if (window.__mapLocationAction) {
       var actionMsg = window.__mapLocationAction;
+      var bannerVariant = actionMsg.indexOf("removed") !== -1 ? "error" : "success";
       delete window.__mapLocationAction;
       setTimeout(function () {
         sendMessageToApp(
-          { message: "SHOW_BANNER", text: actionMsg },
+          { message: "SHOW_BANNER", text: actionMsg, variant: bannerVariant },
           $iframe[0].contentWindow,
         );
       }, 300);
@@ -275,6 +276,7 @@
           }, 300);
         }
         if (data.message === "LOCATION_MODE_CHANGE") {
+          window.__mapLocationMode = data.mode;
           var $form = $("#lat-lon-form");
           if (data.mode === "select_existing") {
             $form.css("visibility", "hidden");
@@ -413,10 +415,16 @@
         locationDetailsMapMessage();
       } else if (viewId === "view_2573" || viewId === "view_2619") {
         workOrdersDetailsMapMessage();
-        $("#lat-lon-form").css("visibility", "visible");
+        $("#lat-lon-form").css(
+          "visibility",
+          window.__mapLocationMode === "select_existing" ? "hidden" : "visible",
+        );
       } else if (viewId === "view_2682") {
         sendLocationMapMessage();
-        $("#lat-lon-form").css("visibility", "visible");
+        $("#lat-lon-form").css(
+          "visibility",
+          window.__mapLocationMode === "select_existing" ? "hidden" : "visible",
+        );
       }
       setupMapFullscreenToggle($iframe);
     }

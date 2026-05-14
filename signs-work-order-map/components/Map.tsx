@@ -56,7 +56,7 @@ import {
  * @param signs Array of Signs from knack payload, or empty array
  * @param messageType String from knack payload
  */
-export default function Map({ signs, messageType, editLocation, bannerText, onBannerDismiss }: MapProps) {
+export default function Map({ signs, messageType, editLocation, banner, onBannerDismiss }: MapProps) {
   const mapRef = useRef<MapRef>(null);
   const [popupInfo, setPopupInfo] = useState<Sign | null>(null);
   const [locationMode, setLocationMode] = useState<LocationMode>(
@@ -423,8 +423,8 @@ export default function Map({ signs, messageType, editLocation, bannerText, onBa
       />
       <NavigationControl position="bottom-right" showCompass={false} />
     </MapGL>
-    {bannerText && onBannerDismiss && (
-      <MapBanner text={bannerText} onDismiss={onBannerDismiss} />
+    {banner && onBannerDismiss && (
+      <MapBanner text={banner.text} variant={banner.variant} onDismiss={onBannerDismiss} />
     )}
     </div>
   );

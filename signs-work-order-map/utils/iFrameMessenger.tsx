@@ -26,12 +26,17 @@ export function useIFrameMessenger() {
   return message;
 }
 
+export type BannerVariant = "success" | "error";
+
 /**
  * Listens for SHOW_BANNER postMessages from the Knack parent window.
- * Returns the banner text and a function to clear it.
+ * Returns the banner text, variant, and a function to clear it.
  */
 export function useBannerMessage() {
-  const [bannerText, setBannerText] = useState<string | null>(null);
+  const [banner, setBanner] = useState<{
+    text: string;
+    variant: BannerVariant;
+  } | null>(null);
 
   useEffect(() => {
     const handler = (event: MessageEvent) => {
@@ -39,7 +44,10 @@ export function useBannerMessage() {
       try {
         const data = JSON.parse(event.data);
         if (data.message === "SHOW_BANNER" && data.text) {
-          setBannerText(data.text);
+          setBanner({
+            text: data.text,
+            variant: data.variant === "error" ? "error" : "success",
+          });
         }
       } catch {
         /* ignore non-JSON messages */
@@ -49,9 +57,9 @@ export function useBannerMessage() {
     return () => window.removeEventListener("message", handler);
   }, []);
 
-  const clearBanner = useCallback(() => setBannerText(null), []);
+  const clearBanner = useCallback(() => setBanner(null), []);
 
-  return { bannerText, clearBanner };
+  return { banner, clearBanner };
 }
 
 export function sendLatLonToParent(coords: LatLon) {

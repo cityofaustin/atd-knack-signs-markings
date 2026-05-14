@@ -1,15 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
+import type { BannerVariant } from "@/utils/iFrameMessenger";
 
 interface MapBannerProps {
   text: string;
+  variant?: BannerVariant;
   onDismiss: () => void;
 }
 
 const FADE_DELAY_MS = 5000;
 const FADE_DURATION_MS = 500;
 
-export default function MapBanner({ text, onDismiss }: MapBannerProps) {
+export default function MapBanner({ text, variant = "success", onDismiss }: MapBannerProps) {
   const [fading, setFading] = useState(false);
 
   useEffect(() => {
@@ -22,9 +24,11 @@ export default function MapBanner({ text, onDismiss }: MapBannerProps) {
     };
   }, [text, onDismiss]);
 
+  const variantClass = variant === "error" ? " map-banner--error" : "";
+
   return (
     <div
-      className={`map-banner${fading ? " map-banner--fade" : ""}`}
+      className={`map-banner${variantClass}${fading ? " map-banner--fade" : ""}`}
       role="status"
     >
       <span>{text}</span>
