@@ -1,27 +1,57 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { KnackToIFrameMessage, LatLon, LocationMode } from "@/types/map";
 
 export function useIFrameMessenger() {
   const [message, setMessage] = useState<KnackToIFrameMessage | null>(null);
 
   useEffect(() => {
-    const consoleMessage = (event: MessageEvent) => {
+    const handler = (event: MessageEvent) => {
       if (event.origin !== "https://atd.knack.com") {
         return;
       }
 
-      const data: KnackToIFrameMessage = JSON.parse(event?.data);
-      setMessage(data);
+      const data = JSON.parse(event?.data);
+      // Skip non-map-data messages so they don't overwrite the active payload
+      if (data.message === "SHOW_BANNER") return;
+      setMessage(data as KnackToIFrameMessage);
     };
-    window.addEventListener("message", consoleMessage);
+    window.addEventListener("message", handler);
 
     return () => {
-      window.removeEventListener("message", consoleMessage);
+      window.removeEventListener("message", handler);
     };
   }, []);
 
   return message;
+}
+
+/**
+ * Listens for SHOW_BANNER postMessages from the Knack parent window.
+ * Returns the banner text and a function to clear it.
+ */
+export function useBannerMessage() {
+  const [bannerText, setBannerText] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handler = (event: MessageEvent) => {
+      if (event.origin !== "https://atd.knack.com") return;
+      try {
+        const data = JSON.parse(event.data);
+        if (data.message === "SHOW_BANNER" && data.text) {
+          setBannerText(data.text);
+        }
+      } catch {
+        /* ignore non-JSON messages */
+      }
+    };
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+  }, []);
+
+  const clearBanner = useCallback(() => setBannerText(null), []);
+
+  return { bannerText, clearBanner };
 }
 
 export function sendLatLonToParent(coords: LatLon) {

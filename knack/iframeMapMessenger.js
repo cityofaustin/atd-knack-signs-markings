@@ -131,9 +131,21 @@
     // Move #lat-lon-form INSIDE the map container (after the iframe) so its
     // margin-top: -88px pulls it up into the map's visual area, not into
     // the gap between the map and the table.
-    var $latLonForm = $("#lat-lon-form");
-    if ($latLonForm.length && !$latLonForm.parent().is($container)) {
-      $container.append($latLonForm);
+    // On initial page load the form may not exist yet (Knack renders it
+    // asynchronously), so poll briefly until it appears.
+    function moveLatLonForm() {
+      var $f = $("#lat-lon-form");
+      if ($f.length && !$f.parent().is($container)) {
+        $container.append($f);
+        return true;
+      }
+      return $f.length > 0;
+    }
+    if (!moveLatLonForm()) {
+      var formPoll = setInterval(function () {
+        if (moveLatLonForm()) clearInterval(formPoll);
+      }, 100);
+      setTimeout(function () { clearInterval(formPoll); }, 10000);
     }
 
     // Stabilize layout during Knack table re-renders: give the view a
@@ -172,37 +184,15 @@
       }, 200);
     }
 
-    /**
-     * Shows a transient banner overlaying the top of the map.
-     * Auto-fades after 5 seconds and is dismissable via the close button.
-     */
-    function showMapBanner(message) {
-      $container.find(".map-banner").remove();
-      var $banner = $(
-        '<div class="map-banner">' +
-          "<span>" + message + "</span>" +
-          '<button type="button" class="map-banner__close" aria-label="Dismiss">&times;</button>' +
-          "</div>",
-      );
-      $container.append($banner);
-
-      function dismiss() {
-        $banner.addClass("map-banner--fade");
-        setTimeout(function () {
-          $banner.remove();
-        }, 500);
-      }
-
-      $banner.find(".map-banner__close").on("click", dismiss);
-      setTimeout(dismiss, 5000);
-    }
-
-    // Show banner if a location was just added or removed
+    // Notify the React app to show a banner if a location was just added or removed
     if (window.__mapLocationAction) {
       var actionMsg = window.__mapLocationAction;
       delete window.__mapLocationAction;
       setTimeout(function () {
-        showMapBanner(actionMsg);
+        sendMessageToApp(
+          { message: "SHOW_BANNER", text: actionMsg },
+          $iframe[0].contentWindow,
+        );
       }, 300);
     }
 

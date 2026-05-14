@@ -171,6 +171,53 @@ a {
 }
 
 /**
+ * Map Action Banner
+ * Transient overlay shown when a location is added or removed.
+ * Auto-fades after 5 seconds and is dismissable.
+ */
+.map-banner {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  background: rgba(22, 163, 74, 0.92);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  opacity: 1;
+  transition: opacity 0.5s ease;
+  pointer-events: auto;
+  white-space: nowrap;
+
+  &--fade {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &__close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    opacity: 0.8;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+/**
  * Location Mode Toggle
  * Button group overlay for switching between Create Location and Select Existing modes
  */

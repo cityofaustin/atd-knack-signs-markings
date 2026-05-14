@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import styles from "./page.module.css";
-import { useIFrameMessenger } from "@/utils/iFrameMessenger";
+import { useIFrameMessenger, useBannerMessage } from "@/utils/iFrameMessenger";
 import { useFormatSignsRecords, useFormatLocation } from "@/utils/mapUtils";
 
 const STANDALONE_TIMEOUT_MS = 3000;
@@ -61,6 +61,7 @@ export default function Home() {
   const knackPayload = useIFrameMessenger();
   const editLocation = useFormatLocation(knackPayload);
   const signs = useFormatSignsRecords(knackPayload);
+  const { bannerText, clearBanner } = useBannerMessage();
 
   const [showStandalonePrompt, setShowStandalonePrompt] = useState(false);
   const [standaloneOverride, setStandaloneOverride] = useState(false);
@@ -99,6 +100,8 @@ export default function Home() {
             signs={signs}
             messageType={knackPayload?.message}
             editLocation={editLocation}
+            bannerText={bannerText}
+            onBannerDismiss={clearBanner}
           />
         </div>
       </main>

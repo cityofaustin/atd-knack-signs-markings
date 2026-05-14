@@ -20,6 +20,7 @@ import MapGL, {
 import GeocoderControl from "@/components/MapGeocoderControl";
 import SignPopup from "./SignPopup";
 import LocationModeToggle from "./LocationModeToggle";
+import MapBanner from "./MapBanner";
 import { MapStatusIndicator } from "./MapStatusIndicator";
 import {
   sendLatLonToParent,
@@ -55,7 +56,7 @@ import {
  * @param signs Array of Signs from knack payload, or empty array
  * @param messageType String from knack payload
  */
-export default function Map({ signs, messageType, editLocation }: MapProps) {
+export default function Map({ signs, messageType, editLocation, bannerText, onBannerDismiss }: MapProps) {
   const mapRef = useRef<MapRef>(null);
   const [popupInfo, setPopupInfo] = useState<Sign | null>(null);
   const [locationMode, setLocationMode] = useState<LocationMode>(
@@ -422,6 +423,9 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
       />
       <NavigationControl position="bottom-right" showCompass={false} />
     </MapGL>
+    {bannerText && onBannerDismiss && (
+      <MapBanner text={bannerText} onDismiss={onBannerDismiss} />
+    )}
     </div>
   );
 }
