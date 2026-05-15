@@ -95,6 +95,9 @@ export default function Map({ signs, messageType, editLocation, banner, onBanner
   const locationModeRef = useRef<LocationMode>(locationMode);
   locationModeRef.current = locationMode;
 
+  /** Tracks which sign record IDs we've already fitted the camera to — avoids refit on identical refresh */
+  const prevSignIdsRef = useRef<Set<string>>(new Set());
+
   const updateCenterMarker = useCallback((event: ViewStateChangeEvent) => {
     // truncate values to our preferred precision
     const latitude = +event.viewState.latitude.toFixed(
@@ -267,22 +270,63 @@ export default function Map({ signs, messageType, editLocation, banner, onBanner
   }, [initialCenter]);
 
   /**
-   * Zoom to bounding box containing sign location pins
-   * and set "add location marker" coordinates to center
+   * When sign data changes: initial / delete / mixed → fit bounds.
+   * Pure addition (new row(s), no removals) → keep current zoom and center on the new pin.
+   * Identical sign set (Knack re-sent same records) → no camera change.
    */
   useEffect(() => {
-    if (!mapRef?.current || !signLocationBounds) {
+    const map = mapRef.current;
+    if (!map || !mapLoaded) return;
+
+    if (signs.length === 0 || !signLocationBounds) {
+      prevSignIdsRef.current = new Set();
       return;
     }
 
-    mapRef.current.fitBounds(signLocationBounds, SIGN_LOCATION_BOUNDS_FIT_OPTIONS);
+    const currentIds = new Set(signs.map((s) => s.id));
+    const prevIds = prevSignIdsRef.current;
 
-    const { lng, lat } = mapRef.current.getCenter();
-    setMapLatLon({
-      latitude: +lat.toFixed(MAP_COORDINATE_PRECISION),
-      longitude: +lng.toFixed(MAP_COORDINATE_PRECISION),
-    });
-  }, [signLocationBounds]);
+    const sameIds =
+      currentIds.size === prevIds.size &&
+      [...currentIds].every((id) => prevIds.has(id));
+    if (sameIds) {
+      return;
+    }
+
+    const newIds = [...currentIds].filter((id) => !prevIds.has(id));
+    const hadRemoval = [...prevIds].some((id) => !currentIds.has(id));
+
+    const afterFitCenter = () => {
+      const { lng, lat } = map.getCenter();
+      setMapLatLon({
+        latitude: +lat.toFixed(MAP_COORDINATE_PRECISION),
+        longitude: +lng.toFixed(MAP_COORDINATE_PRECISION),
+      });
+    };
+
+    if (prevIds.size === 0) {
+      map.fitBounds(signLocationBounds, SIGN_LOCATION_BOUNDS_FIT_OPTIONS);
+      afterFitCenter();
+    } else if (newIds.length > 0 && !hadRemoval) {
+      const newSign = signs.find((s) => newIds.includes(s.id));
+      if (newSign) {
+        const z = map.getZoom();
+        map.jumpTo({
+          center: [newSign.lng, newSign.lat],
+          zoom: z,
+        });
+        setMapLatLon({
+          latitude: +newSign.lat.toFixed(MAP_COORDINATE_PRECISION),
+          longitude: +newSign.lng.toFixed(MAP_COORDINATE_PRECISION),
+        });
+      }
+    } else {
+      map.fitBounds(signLocationBounds, SIGN_LOCATION_BOUNDS_FIT_OPTIONS);
+      afterFitCenter();
+    }
+
+    prevSignIdsRef.current = currentIds;
+  }, [signs, signLocationBounds, mapLoaded]);
 
   const statusIndicatorPosition = useMemo(
     () => ({
@@ -343,6 +387,7 @@ export default function Map({ signs, messageType, editLocation, banner, onBanner
           };
           setMapLatLon(center);
           sendLatLonToParent(center);
+          prevSignIdsRef.current = new Set(signs.map((s) => s.id));
         } else if (initialCenter) {
           map.jumpTo({
             center: [initialCenter.longitude, initialCenter.latitude],
