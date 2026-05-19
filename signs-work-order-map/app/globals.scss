@@ -126,6 +126,51 @@ a {
 }
 
 /**
+ * Work Order Sign Point
+ * Circle marker for Knack signs that mirrors the AGOL signs layer symbology.
+ * Includes an optional "NEW" label for freshly-created locations.
+ */
+.work-order-sign-point {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+
+  &--existing {
+    background: #ffc600; // yellow: existing sign
+  }
+
+  &--new {
+    background: #28a745; // green: newly created (no AGOL link)
+  }
+
+  &--detail {
+    background: #dc3545; // red: active location details page sign
+  }
+
+  &__label {
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #28a745;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+    padding: 3px 6px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/**
  * Location Mode Toggle
  * Button group overlay for switching between Create Location and Select Existing modes
  */

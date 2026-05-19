@@ -38,6 +38,7 @@ import {
   useAGOLSignAssets,
   getMapBounds,
   agolFeatureToSign,
+  enrichKnackSignsWithAgol,
 } from "@/utils/mapUtils";
 import {
   DEFAULT_MAP_PARAMS,
@@ -156,7 +157,33 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
     () => signs.map((sign) => ({ ...sign, source: "knack" as const })),
     [signs]
   );
-  const signPins = useCreateSignPins(knackSigns, setPopupInfo);
+
+  // Merge AGOL attributes into co-located Knack signs and filter those
+  // AGOL features out of the layer so they don't render on top of Knack pins.
+  const { enrichedSigns, filteredAgolGeoJSON } = useMemo(() => {
+    if (!isZoomedInEnough || agolSignsGeoJSON.features.length === 0) {
+      return {
+        enrichedSigns: knackSigns,
+        filteredAgolGeoJSON: agolSignsGeoJSON,
+      };
+    }
+    const result = enrichKnackSignsWithAgol(
+      knackSigns,
+      agolSignsGeoJSON.features
+    );
+    const filtered =
+      result.matchedAgolObjectIds.size > 0
+        ? {
+            ...agolSignsGeoJSON,
+            features: agolSignsGeoJSON.features.filter(
+              (f) => !result.matchedAgolObjectIds.has(f.properties.OBJECTID_1)
+            ),
+          }
+        : agolSignsGeoJSON;
+    return { enrichedSigns: result.enrichedSigns, filteredAgolGeoJSON: filtered };
+  }, [knackSigns, agolSignsGeoJSON, isZoomedInEnough]);
+
+  const signPins = useCreateSignPins(enrichedSigns, setPopupInfo);
 
   const handleMouseEnter = useCallback(() => {
     if (mapRef.current) {
@@ -340,8 +367,8 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
 
       {signPins}
 
-      {isZoomedInEnough && agolSignsGeoJSON.features.length > 0 && (
-        <Source id={AGOL_SIGNS_SOURCE_ID} type="geojson" data={agolSignsGeoJSON}>
+      {isZoomedInEnough && filteredAgolGeoJSON.features.length > 0 && (
+        <Source id={AGOL_SIGNS_SOURCE_ID} type="geojson" data={filteredAgolGeoJSON}>
           <Layer {...AGOL_SIGNS_LAYER_STYLE} />
         </Source>
       )}

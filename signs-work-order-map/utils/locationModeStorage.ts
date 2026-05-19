@@ -10,14 +10,14 @@ function isLocationMode(value: string | null): value is LocationMode {
  * Persists Create Location vs Select Existing across iframe reloads (same tab / origin).
  */
 export function getStoredLocationMode(): LocationMode {
-  if (typeof window === "undefined") return "create";
+  if (typeof window === "undefined") return "select_existing";
   try {
     const raw = sessionStorage.getItem(STORAGE_KEY);
     if (isLocationMode(raw)) return raw;
   } catch {
     // private mode / quota
   }
-  return "create";
+  return "select_existing";
 }
 
 export function setStoredLocationMode(mode: LocationMode): void {
