@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import bbox from "@turf/bbox";
-import distance from "@turf/distance";
 import { lineString } from "@turf/helpers";
 import { LngLatBoundsLike } from "mapbox-gl";
 import { Marker } from "react-map-gl/mapbox";
@@ -47,13 +46,25 @@ export const useFormatSignsRecords = (
       return [];
     }
 
+    if (
+      knackPayload.message !== "LOAD_WORK_ORDER_DETAILS_PAGE" &&
+      knackPayload.message !== "LOAD_WORK_ORDER_LOCATION_DETAILS_PAGE"
+    ) {
+      return [];
+    }
+
+    const records = knackPayload.payload?.records;
+    if (!Array.isArray(records)) {
+      return [];
+    }
+
     const locationId =
       knackPayload.message === "LOAD_WORK_ORDER_LOCATION_DETAILS_PAGE"
-        ? knackPayload?.payload?.locationRecordId
+        ? knackPayload.payload.locationRecordId
         : null;
 
     // Knack will save undefined latitudes and longitudes, this filters those out.
-    const signsArray: Sign[] = knackPayload.payload.records.reduce(
+    const signsArray: Sign[] = records.reduce(
       (acc: Sign[], sign) => {
         if (sign.field_3300_raw.latitude && sign.field_3300_raw.longitude) {
           const assetLocationId = sign.field_4461_raw ?? sign.field_4461;
@@ -246,47 +257,73 @@ export function agolFeatureToSign(feature: unknown): Sign | null {
   };
 }
 
-const COLOCATION_THRESHOLD_METERS = 5;
+type AgolFeature = {
+  properties: Record<string, unknown>;
+  geometry: { type: string; coordinates: number[] };
+};
+
+function normalizeAssetLocationId(id: unknown): string | null {
+  if (id == null) return null;
+  const normalized = String(id).trim();
+  return normalized === "" ? null : normalized;
+}
+
+function isAgolPointFeature(
+  feature: AgolFeature
+): feature is AgolFeature & {
+  geometry: { type: "Point"; coordinates: [number, number] };
+} {
+  return (
+    feature.geometry.type === "Point" &&
+    feature.geometry.coordinates.length >= 2
+  );
+}
+
+function buildAgolIndexes(agolFeatures: ReadonlyArray<AgolFeature>) {
+  const byLocationId = new Map<string, AgolFeature>();
+
+  for (const feature of agolFeatures) {
+    if (!isAgolPointFeature(feature)) continue;
+
+    const locationId = normalizeAssetLocationId(
+      feature.properties.ASSET_LOCATION_ID
+    );
+    if (locationId && !byLocationId.has(locationId)) {
+      byLocationId.set(locationId, feature);
+    }
+  }
+
+  return { byLocationId };
+}
 
 /**
- * For each Knack sign, find the nearest co-located AGOL feature (within ~5 m)
- * and merge its properties into the sign's `attributes`.
+ * For each Knack sign, find the corresponding AGOL feature and merge its
+ * properties into the sign's `attributes`.
  *
- * Distance is computed via @turf/distance. Returns
- * the (possibly-enriched) signs and the set of AGOL `OBJECTID_1` values that
- * were matched, so the caller can filter them out of the AGOL layer.
+ * Matched on ASSET_LOCATION_ID (Knack field_4461 / AGOL ASSET_LOCATION_ID).
+ * Signs without a location ID are not merged (e.g. Create Location flow).
+ *
+ * Returns the enriched signs and matched AGOL `OBJECTID_1` values so the caller
+ * can filter them out of the AGOL layer.
  */
 export function enrichKnackSignsWithAgol(
   knackSigns: Sign[],
-  agolFeatures: ReadonlyArray<{
-    properties: Record<string, unknown>;
-    geometry: { type: string; coordinates: number[] };
-  }>
+  agolFeatures: ReadonlyArray<AgolFeature>
 ): {
   enrichedSigns: Sign[];
   matchedAgolObjectIds: Set<unknown>;
 } {
   const matchedAgolObjectIds = new Set<unknown>();
+  const { byLocationId } = buildAgolIndexes(agolFeatures);
 
   const enrichedSigns = knackSigns.map((sign) => {
-    const signCoord: [number, number] = [sign.lng, sign.lat];
-    let bestMatch: (typeof agolFeatures)[number] | null = null;
-    let bestDist = Infinity;
+    const signLocationId = normalizeAssetLocationId(
+      sign.attributes?.ASSET_LOCATION_ID
+    );
 
-    for (const feature of agolFeatures) {
-      if (
-        feature.geometry.type !== "Point" ||
-        feature.geometry.coordinates.length < 2
-      )
-        continue;
-      const featureCoord = feature.geometry.coordinates as [number, number];
-      const dist = distance(signCoord, featureCoord, { units: "meters" });
-      if (dist <= COLOCATION_THRESHOLD_METERS && dist < bestDist) {
-        bestDist = dist;
-        bestMatch = feature;
-      }
-    }
+    if (!signLocationId) return sign;
 
+    const bestMatch = byLocationId.get(signLocationId);
     if (!bestMatch) return sign;
 
     matchedAgolObjectIds.add(bestMatch.properties.OBJECTID_1);
