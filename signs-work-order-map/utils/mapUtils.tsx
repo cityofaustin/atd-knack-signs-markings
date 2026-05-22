@@ -4,7 +4,10 @@ import { lineString } from "@turf/helpers";
 import { LngLatBoundsLike } from "mapbox-gl";
 import { Marker } from "react-map-gl/mapbox";
 import { Sign, KnackToIFrameMessage, LatLon } from "@/types/map";
-import { MAP_COORDINATE_PRECISION } from "@/config/map";
+import {
+  MAP_COORDINATE_PRECISION,
+  getSignPointStyleAtZoom,
+} from "@/config/map";
 import { useSignAssetsFeatureService } from "@/utils/agol";
 
 /**
@@ -126,11 +129,14 @@ export const useFormatLocation = (
  */
 export const useCreateSignPins = (
   signs: Sign[],
-  setPopupInfo: React.Dispatch<React.SetStateAction<Sign | null>>
+  setPopupInfo: React.Dispatch<React.SetStateAction<Sign | null>>,
+  zoom: number
 ) =>
-  useMemo(
-    () =>
-      signs.map((sign: Sign) => {
+  useMemo(() => {
+    const { diameter: pointSizePx, borderWidth: pointBorderPx } =
+      getSignPointStyleAtZoom(zoom);
+
+    return signs.map((sign: Sign) => {
         if (!sign.lat || !sign.lng) return null;
         const modifierClass = sign.isLocationDetailPage
           ? "work-order-sign-point--detail"
@@ -150,6 +156,11 @@ export const useCreateSignPins = (
           >
             <div
               className={`work-order-sign-point ${modifierClass}`}
+              style={{
+                width: pointSizePx,
+                height: pointSizePx,
+                borderWidth: pointBorderPx,
+              }}
               role="button"
               aria-label={
                 sign.isNewLocation
@@ -163,9 +174,8 @@ export const useCreateSignPins = (
             </div>
           </Marker>
         );
-      }),
-    [signs, setPopupInfo]
-  );
+      });
+  }, [signs, setPopupInfo, zoom]);
 
 /**
  * @returns If geolocation permissions are on, return LatLon

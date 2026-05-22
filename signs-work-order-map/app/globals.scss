@@ -129,13 +129,15 @@ a {
  * Work Order Sign Point
  * Circle marker for Knack signs that mirrors the AGOL signs layer symbology.
  * Includes an optional "NEW" label for freshly-created locations.
+ * Width/height/borderWidth are set inline from getSignPointStyleAtZoom() in config/map.ts
+ * so pins stay the same size as cyan AGOL dots at the current zoom (iPad touch tuning).
  */
 .work-order-sign-point {
   position: relative;
-  width: 16px;
-  height: 16px;
   border-radius: 50%;
-  border: 2px solid #ffffff;
+  border-style: solid;
+  border-color: #ffffff;
+  box-sizing: border-box;
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
   cursor: pointer;
 
