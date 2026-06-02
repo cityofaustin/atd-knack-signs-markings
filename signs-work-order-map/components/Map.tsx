@@ -188,7 +188,7 @@ export default function Map({ signs, messageType, editLocation, banner, onBanner
     return { enrichedSigns: result.enrichedSigns, filteredAgolGeoJSON: filtered };
   }, [knackSigns, agolSignsGeoJSON, isZoomedInEnough]);
 
-  const signPins = useCreateSignPins(enrichedSigns, setPopupInfo);
+  const signPins = useCreateSignPins(enrichedSigns, setPopupInfo, zoom);
 
   const handleMouseEnter = useCallback(() => {
     if (mapRef.current) {
