@@ -1,0 +1,224 @@
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+@import "../node_modules/bootstrap/scss/bootstrap";
+
+/**
+ * Map Status Indicator Styles
+ * Overlay indicators for loading and error states on the map
+ */
+.map-status-indicator {
+  position: absolute;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  &--loading {
+    background: rgba(255, 255, 255, 0.9);
+    color: #000000;
+  }
+
+  &--error {
+    background: rgba(255, 0, 0, 0.9);
+    color: #ffffff;
+  }
+  &--column {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+}
+
+/**
+ * Map container wrapper
+ * Full-size wrapper with fade-in transition; opacity/pointer-events toggled in JS
+ */
+.map-container-wrapper {
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.2s ease-out;
+}
+
+/**
+ * Mapbox Popup Customizations
+ */
+
+//  Makes popup wider to accommodate title & X close button.
+// See: https://github.com/cityofaustin/atd-knack-signs-markings/pull/338#discussion_r2723053051
+.mapboxgl-popup {
+  min-width: 215px;
+}
+
+.mapboxgl-popup-close-button {
+  color: #000000 !important;
+  padding: 0.25rem 0.75rem 0.75rem 0.75rem;
+  font-size: 1.5rem;
+
+  &:hover {
+    color: #333333 !important;
+  }
+}
+
+.mapboxgl-popup.sign-popup .mapboxgl-popup-content {
+  box-sizing: border-box;
+  min-width: 175px;
+  width: 100%;
+  padding: 10px 2.5rem 12px 12px;
+}
+
+.sign-popup-agol__inner {
+  max-height: min(45vh, 300px);
+  min-height: 0;
+}
+
+.sign-popup-agol__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  margin-right: -2.5rem;
+  padding-right: 2.5rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+/**
+ * Work Order Sign Point
+ * Circle marker for Knack signs that mirrors the AGOL signs layer symbology.
+ * Includes an optional "NEW" label for freshly-created locations.
+ * Width/height/borderWidth are set inline from getSignPointStyleAtZoom() in config/map.ts
+ * so pins stay the same size as cyan AGOL dots at the current zoom (iPad touch tuning).
+ */
+.work-order-sign-point {
+  position: relative;
+  border-radius: 50%;
+  border-style: solid;
+  border-color: #ffffff;
+  box-sizing: border-box;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+
+  &--existing {
+    background: #ffc600; // yellow: existing sign
+  }
+
+  &--new {
+    background: #28a745; // green: newly created (no AGOL link)
+  }
+
+  &--detail {
+    background: #dc3545; // red: active location details page sign
+  }
+
+  &__label {
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #28a745;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+    padding: 3px 6px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/**
+ * Location Mode Toggle
+ * Button group overlay for switching between Create Location and Select Existing modes
+ */
+.location-mode-toggle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1001;
+  display: flex;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+
+  &__btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+      background 0.15s,
+      color 0.15s;
+
+    &:first-child {
+      border-right: none;
+      border-radius: 6px 0 0 6px;
+    }
+
+    &:last-child {
+      border-radius: 0 6px 6px 0;
+    }
+
+    &:hover:not(&--active) {
+      background: rgba(240, 240, 240, 0.95);
+    }
+
+    &--active {
+      background: #2563eb;
+      color: #fff;
+      border-color: #2563eb;
+    }
+  }
+}
