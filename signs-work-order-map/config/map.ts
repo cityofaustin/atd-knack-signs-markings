@@ -31,13 +31,52 @@ export const SIGN_LOCATION_BOUNDS_FIT_OPTIONS = {
  */
 export const AGOL_SIGNS_MIN_ZOOM = 15.5;
 
+/** Touch-friendly sign size; stops match AGOL_SIGNS_LAYER_STYLE below */
+const SIGN_POINT_SIZE = {
+  zMin: 15,
+  zMax: 20,
+  radius: [6, 18],
+  stroke: [1, 4],
+} as const;
+
+/** Size between "zoomed out" and "zoomed in" values for the current map zoom */
+function scaleSignPointByZoom(
+  zoom: number,
+  sizeWhenZoomedOut: number,
+  sizeWhenZoomedIn: number
+): number {
+  const { zMin, zMax } = SIGN_POINT_SIZE;
+  const blend = Math.max(0, Math.min(1, (zoom - zMin) / (zMax - zMin)));
+  return sizeWhenZoomedOut + (sizeWhenZoomedIn - sizeWhenZoomedOut) * blend;
+}
+
+/** Knack pin dimensions at zoom — kept in sync with cyan AGOL circles */
+export function getSignPointStyleAtZoom(zoom: number) {
+  const borderWidth = Math.round(
+    scaleSignPointByZoom(
+      zoom,
+      SIGN_POINT_SIZE.stroke[0],
+      SIGN_POINT_SIZE.stroke[1]
+    )
+  );
+  const radius = scaleSignPointByZoom(
+    zoom,
+    SIGN_POINT_SIZE.radius[0],
+    SIGN_POINT_SIZE.radius[1]
+  );
+  return {
+    diameter: Math.round(radius * 2 + borderWidth * 2),
+    borderWidth,
+  };
+}
+
 /** Mapbox source and layer ids for the AGOL signs GeoJSON layer */
 export const AGOL_SIGNS_SOURCE_ID = "agol-signs";
 export const AGOL_SIGNS_LAYER_ID = "agol-signs-layer";
 
 /**
  * Mapbox circle layer style for AGOL sign points.
- * Single WebGL layer for performance; radius tuned for touch (e.g. iPad).
+ * Single WebGL layer for performance; radius grows with zoom for touch targets.
  */
 export const AGOL_SIGNS_LAYER_STYLE: CircleLayerSpecification = {
   id: AGOL_SIGNS_LAYER_ID,
@@ -50,20 +89,22 @@ export const AGOL_SIGNS_LAYER_STYLE: CircleLayerSpecification = {
       "interpolate",
       ["linear"],
       ["zoom"],
-      // Just above min zoom for signs
-      15,
-      6,
-      // Very close in
-      20,
-      18,
+      SIGN_POINT_SIZE.zMin,
+      SIGN_POINT_SIZE.radius[0],
+      SIGN_POINT_SIZE.zMax,
+      SIGN_POINT_SIZE.radius[1],
     ],
-    // Base fill color; tuned for contrast over aerial imagery.
     "circle-color": "#00FFFF",
-    // White stroke to improve contrast between overlapping points
-    // and against dark / light aerial backgrounds.
     "circle-stroke-color": "#FFFFFF",
-    // Thicker stroke at higher zoom to match larger circles
-    "circle-stroke-width": ["interpolate", ["linear"], ["zoom"], 15, 1, 20, 4],
+    "circle-stroke-width": [
+      "interpolate",
+      ["linear"],
+      ["zoom"],
+      SIGN_POINT_SIZE.zMin,
+      SIGN_POINT_SIZE.stroke[0],
+      SIGN_POINT_SIZE.zMax,
+      SIGN_POINT_SIZE.stroke[1],
+    ],
   },
 };
 

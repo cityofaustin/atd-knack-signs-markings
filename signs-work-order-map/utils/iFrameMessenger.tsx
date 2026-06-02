@@ -2,22 +2,56 @@
 import { useEffect, useState } from "react";
 import { KnackToIFrameMessage, LatLon, LocationMode } from "@/types/map";
 
+const KNACK_TO_IFRAME_MESSAGE_TYPES = [
+  "LOAD_WORK_ORDER_LOCATION_DETAILS_PAGE",
+  "LOAD_WORK_ORDER_DETAILS_PAGE",
+  "OPEN_LOCATION_EDITOR",
+] as const;
+
+function parseMessageEventData(data: unknown): unknown {
+  if (data == null) return null;
+  if (typeof data === "string") {
+    try {
+      return JSON.parse(data);
+    } catch {
+      return null;
+    }
+  }
+  if (typeof data === "object") return data;
+  return null;
+}
+
+function isKnackToIFrameMessage(value: unknown): value is KnackToIFrameMessage {
+  if (!value || typeof value !== "object" || !("message" in value)) {
+    return false;
+  }
+  const { message } = value as { message: unknown };
+  return (
+    typeof message === "string" &&
+    (KNACK_TO_IFRAME_MESSAGE_TYPES as readonly string[]).includes(message)
+  );
+}
+
 export function useIFrameMessenger() {
   const [message, setMessage] = useState<KnackToIFrameMessage | null>(null);
 
   useEffect(() => {
-    const consoleMessage = (event: MessageEvent) => {
+    const onMessage = (event: MessageEvent) => {
       if (event.origin !== "https://atd.knack.com") {
         return;
       }
 
-      const data: KnackToIFrameMessage = JSON.parse(event?.data);
-      setMessage(data);
+      const parsed = parseMessageEventData(event.data);
+      if (!isKnackToIFrameMessage(parsed)) {
+        return;
+      }
+
+      setMessage(parsed);
     };
-    window.addEventListener("message", consoleMessage);
+    window.addEventListener("message", onMessage);
 
     return () => {
-      window.removeEventListener("message", consoleMessage);
+      window.removeEventListener("message", onMessage);
     };
   }, []);
 
