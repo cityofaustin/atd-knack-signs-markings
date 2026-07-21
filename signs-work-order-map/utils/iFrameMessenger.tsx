@@ -94,6 +94,27 @@ export function useBannerMessage() {
   return { banner, clearBanner };
 }
 
+/**
+ * Forwards Escape key presses to the Knack parent window.
+ * The parent's own keydown listener cannot fire while keyboard focus is inside
+ * this cross-origin iframe (i.e. after the user clicks or pans the map), so
+ * this message is what lets Esc reliably exit the CSS fullscreen mode.
+ */
+export function useForwardEscapeToParent() {
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        window.parent.postMessage(
+          { message: "EXIT_FULLSCREEN" },
+          "https://atd.knack.com"
+        );
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+}
+
 export function sendLatLonToParent(coords: LatLon) {
   // send location to Knack
   window.parent.postMessage(

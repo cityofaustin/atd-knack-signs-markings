@@ -328,12 +328,17 @@ export default function Map({ signs, messageType, editLocation, banner, onBanner
     prevSignIdsRef.current = currentIds;
   }, [signs, signLocationBounds, mapLoaded]);
 
+  // Top-center so the messages don't overlap the mode toggle (top-right,
+  // in-app) or the fullscreen button (top-right, injected by the Knack parent).
+  // See https://github.com/cityofaustin/atd-knack-signs-markings/pull/344#discussion
   const statusIndicatorPosition = useMemo(
-    () => ({
-      top: showLocationToggle ? "48px" : "10px",
-      right: "10px",
-    }),
-    [showLocationToggle]
+    () =>
+      ({
+        top: "10px",
+        left: "50%",
+        transform: "translateX(-50%)",
+      }) as const,
+    []
   );
 
   return (
