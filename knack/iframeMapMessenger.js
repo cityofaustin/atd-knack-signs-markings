@@ -10,9 +10,9 @@
 (function () {
   var myView = window.viewIdsArray.shift(0);
 
-  // const nextAppUrl =
-  //   "https://deploy-preview-339--nextjs-knack-signs-markings.netlify.app";
-  const nextAppUrl = "http://localhost:3000";
+  const nextAppUrl =
+    "https://mateo-26881-fullscreen--nextjs-knack-signs-markings.netlify.app";
+  // const nextAppUrl = "http://localhost:3000";
 
   // Import jQuery into this file from CDN
   // https://stackoverflow.com/questions/34338411/how-to-import-jquery-using-es6-syntax
@@ -73,14 +73,23 @@
 
     function exitFullscreen() {
       $("body").removeClass("map-iframe-fullscreen");
+      // The page scrollbar belongs to <html>, not <body> — restore it too.
+      $("html").removeClass("map-iframe-fullscreen-root");
       $iframe.removeClass("map-iframe-fullscreen__frame");
       $btn.attr("aria-pressed", "false");
     }
     function enterFullscreen() {
       $("body").addClass("map-iframe-fullscreen");
+      $("html").addClass("map-iframe-fullscreen-root");
       $iframe.addClass("map-iframe-fullscreen__frame");
       $btn.attr("aria-pressed", "true");
     }
+
+    // Exposed so the postMessage listener can exit fullscreen when the React
+    // app forwards an Escape keypress. Keydown events fired while focus is
+    // inside the cross-origin iframe never reach this document's listener,
+    // so the EXIT_FULLSCREEN message is the only reliable path in that case.
+    window.__exitMapFullscreen = exitFullscreen;
 
     $btn.on("click", function () {
       if ($("body").hasClass("map-iframe-fullscreen")) {
@@ -119,7 +128,7 @@
       $iframe = $(
         '<iframe src="' +
           nextAppUrl +
-          '" frameborder="0" allow="geolocation; fullscreen" scrolling="yes" ' +
+          '" frameborder="0" allow="geolocation; fullscreen" scrolling="no" ' +
           'id="mapIFrame" style="width:100%;height:523px;"></iframe>',
       );
       $container.append($iframe);
@@ -145,7 +154,9 @@
       var formPoll = setInterval(function () {
         if (moveLatLonForm()) clearInterval(formPoll);
       }, 100);
-      setTimeout(function () { clearInterval(formPoll); }, 10000);
+      setTimeout(function () {
+        clearInterval(formPoll);
+      }, 10000);
     }
 
     // Stabilize layout during Knack table re-renders: give the view a
@@ -187,7 +198,8 @@
     // Notify the React app to show a banner if a location was just added or removed
     if (window.__mapLocationAction) {
       var actionMsg = window.__mapLocationAction;
-      var bannerVariant = actionMsg.indexOf("removed") !== -1 ? "error" : "success";
+      var bannerVariant =
+        actionMsg.indexOf("removed") !== -1 ? "error" : "success";
       delete window.__mapLocationAction;
       setTimeout(function () {
         sendMessageToApp(
@@ -202,7 +214,12 @@
       window.__mapDeleteBound = true;
       $(document).on(
         "click",
-        myView + " .kn-action-link, " + myView + " .fa-trash-o, " + myView + " .fa-times",
+        myView +
+          " .kn-action-link, " +
+          myView +
+          " .fa-trash-o, " +
+          myView +
+          " .fa-times",
         function () {
           window.__mapLocationAction = "Location removed";
         },
@@ -274,6 +291,11 @@
               $submitBtn.trigger("click");
             }
           }, 300);
+        }
+        if (data.message === "EXIT_FULLSCREEN") {
+          if (typeof window.__exitMapFullscreen === "function") {
+            window.__exitMapFullscreen();
+          }
         }
         if (data.message === "LOCATION_MODE_CHANGE") {
           window.__mapLocationMode = data.mode;
