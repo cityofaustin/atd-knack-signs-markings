@@ -20,6 +20,7 @@ import MapGL, {
 import GeocoderControl from "@/components/MapGeocoderControl";
 import SignPopup from "./SignPopup";
 import LocationModeToggle from "./LocationModeToggle";
+import MapBanner from "./MapBanner";
 import { MapStatusIndicator } from "./MapStatusIndicator";
 import {
   sendLatLonToParent,
@@ -55,7 +56,7 @@ import {
  * @param signs Array of Signs from knack payload, or empty array
  * @param messageType String from knack payload
  */
-export default function Map({ signs, messageType, editLocation }: MapProps) {
+export default function Map({ signs, messageType, editLocation, banner, onBannerDismiss }: MapProps) {
   const mapRef = useRef<MapRef>(null);
   const [popupInfo, setPopupInfo] = useState<Sign | null>(null);
   const [locationMode, setLocationMode] = useState<LocationMode>(
@@ -70,6 +71,7 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
   const handleLocationModeChange = useCallback((mode: LocationMode) => {
     setLocationMode(mode);
     setStoredLocationMode(mode);
+    setPopupInfo(null);
   }, []);
 
   const showLocationToggle =
@@ -92,6 +94,9 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
   const [zoom, setZoom] = useState<number>(DEFAULT_MAP_PAN_ZOOM.zoom);
   const locationModeRef = useRef<LocationMode>(locationMode);
   locationModeRef.current = locationMode;
+
+  /** Tracks which sign record IDs we've already fitted the camera to — avoids refit on identical refresh */
+  const prevSignIdsRef = useRef<Set<string>>(new Set());
 
   const updateCenterMarker = useCallback((event: ViewStateChangeEvent) => {
     // truncate values to our preferred precision
@@ -265,29 +270,75 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
   }, [initialCenter]);
 
   /**
-   * Zoom to bounding box containing sign location pins
-   * and set "add location marker" coordinates to center
+   * When sign data changes: initial / delete / mixed → fit bounds.
+   * Pure addition (new row(s), no removals) → keep current zoom and center on the new pin.
+   * Identical sign set (Knack re-sent same records) → no camera change.
    */
   useEffect(() => {
-    if (!mapRef?.current || !signLocationBounds) {
+    const map = mapRef.current;
+    if (!map || !mapLoaded) return;
+
+    if (signs.length === 0 || !signLocationBounds) {
+      prevSignIdsRef.current = new Set();
       return;
     }
 
-    mapRef.current.fitBounds(signLocationBounds, SIGN_LOCATION_BOUNDS_FIT_OPTIONS);
+    const currentIds = new Set(signs.map((s) => s.id));
+    const prevIds = prevSignIdsRef.current;
 
-    const { lng, lat } = mapRef.current.getCenter();
-    setMapLatLon({
-      latitude: +lat.toFixed(MAP_COORDINATE_PRECISION),
-      longitude: +lng.toFixed(MAP_COORDINATE_PRECISION),
-    });
-  }, [signLocationBounds]);
+    const sameIds =
+      currentIds.size === prevIds.size &&
+      [...currentIds].every((id) => prevIds.has(id));
+    if (sameIds) {
+      return;
+    }
 
+    const newIds = [...currentIds].filter((id) => !prevIds.has(id));
+    const hadRemoval = [...prevIds].some((id) => !currentIds.has(id));
+
+    const afterFitCenter = () => {
+      const { lng, lat } = map.getCenter();
+      setMapLatLon({
+        latitude: +lat.toFixed(MAP_COORDINATE_PRECISION),
+        longitude: +lng.toFixed(MAP_COORDINATE_PRECISION),
+      });
+    };
+
+    if (prevIds.size === 0) {
+      map.fitBounds(signLocationBounds, SIGN_LOCATION_BOUNDS_FIT_OPTIONS);
+      afterFitCenter();
+    } else if (newIds.length > 0 && !hadRemoval) {
+      const newSign = signs.find((s) => newIds.includes(s.id));
+      if (newSign) {
+        const z = map.getZoom();
+        map.jumpTo({
+          center: [newSign.lng, newSign.lat],
+          zoom: z,
+        });
+        setMapLatLon({
+          latitude: +newSign.lat.toFixed(MAP_COORDINATE_PRECISION),
+          longitude: +newSign.lng.toFixed(MAP_COORDINATE_PRECISION),
+        });
+      }
+    } else {
+      map.fitBounds(signLocationBounds, SIGN_LOCATION_BOUNDS_FIT_OPTIONS);
+      afterFitCenter();
+    }
+
+    prevSignIdsRef.current = currentIds;
+  }, [signs, signLocationBounds, mapLoaded]);
+
+  // Top-center so the messages don't overlap the mode toggle (top-right,
+  // in-app) or the fullscreen button (top-right, injected by the Knack parent).
+  // See https://github.com/cityofaustin/atd-knack-signs-markings/pull/344#discussion
   const statusIndicatorPosition = useMemo(
-    () => ({
-      top: showLocationToggle ? "48px" : "10px",
-      right: "10px",
-    }),
-    [showLocationToggle]
+    () =>
+      ({
+        top: "10px",
+        left: "50%",
+        transform: "translateX(-50%)",
+      }) as const,
+    []
   );
 
   return (
@@ -341,6 +392,7 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
           };
           setMapLatLon(center);
           sendLatLonToParent(center);
+          prevSignIdsRef.current = new Set(signs.map((s) => s.id));
         } else if (initialCenter) {
           map.jumpTo({
             center: [initialCenter.longitude, initialCenter.latitude],
@@ -421,6 +473,9 @@ export default function Map({ signs, messageType, editLocation }: MapProps) {
       />
       <NavigationControl position="bottom-right" showCompass={false} />
     </MapGL>
+    {banner && onBannerDismiss && (
+      <MapBanner text={banner.text} variant={banner.variant} onDismiss={onBannerDismiss} />
+    )}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { KnackToIFrameMessage, LatLon, LocationMode } from "@/types/map";
 
 const KNACK_TO_IFRAME_MESSAGE_TYPES = [
@@ -56,6 +56,63 @@ export function useIFrameMessenger() {
   }, []);
 
   return message;
+}
+
+export type BannerVariant = "success" | "error";
+
+/**
+ * Listens for SHOW_BANNER postMessages from the Knack parent window.
+ * Returns the banner text, variant, and a function to clear it.
+ */
+export function useBannerMessage() {
+  const [banner, setBanner] = useState<{
+    text: string;
+    variant: BannerVariant;
+  } | null>(null);
+
+  useEffect(() => {
+    const handler = (event: MessageEvent) => {
+      if (event.origin !== "https://atd.knack.com") return;
+      try {
+        const data = JSON.parse(event.data);
+        if (data.message === "SHOW_BANNER" && data.text) {
+          setBanner({
+            text: data.text,
+            variant: data.variant === "error" ? "error" : "success",
+          });
+        }
+      } catch {
+        /* ignore non-JSON messages */
+      }
+    };
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+  }, []);
+
+  const clearBanner = useCallback(() => setBanner(null), []);
+
+  return { banner, clearBanner };
+}
+
+/**
+ * Forwards Escape key presses to the Knack parent window.
+ * The parent's own keydown listener cannot fire while keyboard focus is inside
+ * this cross-origin iframe (i.e. after the user clicks or pans the map), so
+ * this message is what lets Esc reliably exit the CSS fullscreen mode.
+ */
+export function useForwardEscapeToParent() {
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        window.parent.postMessage(
+          { message: "EXIT_FULLSCREEN" },
+          "https://atd.knack.com"
+        );
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
 }
 
 export function sendLatLonToParent(coords: LatLon) {
