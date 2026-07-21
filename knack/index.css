@@ -47,6 +47,12 @@ body.map-iframe-fullscreen {
   overflow: hidden;
 }
 
+/* The page scrollbar belongs to the root <html> element, not <body> — hide it
+   there too, otherwise it overlays the map's zoom controls in fullscreen. */
+html.map-iframe-fullscreen-root {
+  overflow: hidden;
+}
+
 .map-iframe-fullscreen__frame {
   position: fixed !important;
   top: 0 !important;
@@ -90,6 +96,18 @@ body.map-iframe-fullscreen #lat-lon-form button {
   padding-bottom: 16px;
   position: relative;
   z-index: 2;
+  /* The form (and its full-width flex wrappers) is layered over the bottom of
+     the map iframe, which was swallowing clicks meant for the map's zoom
+     controls in the bottom-right corner. Let clicks pass through everywhere
+     except the form's actual controls (re-enabled below). */
+  pointer-events: none;
+}
+
+#lat-lon-form button,
+#lat-lon-form input,
+#lat-lon-form select,
+#lat-lon-form a {
+  pointer-events: auto;
 }
 
 /* Center the submit button horizontally at the bottom of the map */
@@ -366,4 +384,4 @@ a.small-button {
 #view_3217 > div.kn-records-nav > div.js-filter-menu.tabs.is-toggle.is-flush > ul > li:nth-child(6) > a{
   color: white;
   background-color: #000000;
- 
+}
