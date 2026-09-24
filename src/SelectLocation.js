@@ -407,6 +407,7 @@ export default class SelectLocation extends Component {
       switch (data.message) {
         case "SIGNS_API_REQUEST":
           // Use workOrderDetailsViewable state to disable red pin and pulse if user is Viewer role
+          // check if this is working as intended
           if (data.view === "view_2619") {
             thisComponent.setState({ workOrderDetailsViewer: true });
           }
