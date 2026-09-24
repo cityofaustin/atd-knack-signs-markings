@@ -6,18 +6,15 @@
  * Styles are defined in globals.scss (.map-status-indicator)
  */
 
+import type { CSSProperties } from "react";
+
 interface MapStatusIndicatorProps {
   /** Type of status message to display */
   type: "loading" | "error";
   /** Message text to show to the user */
   message: string;
-  /** Optional position override (defaults to top-right) */
-  position?: {
-    top?: string;
-    right?: string;
-    bottom?: string;
-    left?: string;
-  };
+  /** Optional position override (defaults to top-center) */
+  position?: CSSProperties;
 }
 
 /** Icon mapping for each indicator type */
@@ -44,7 +41,7 @@ const typeIcons: Record<MapStatusIndicatorProps["type"], string> = {
 export const MapStatusIndicator = ({
   type,
   message,
-  position = { top: "10px", right: "10px" },
+  position = { top: "10px", left: "50%", transform: "translateX(-50%)" },
 }: MapStatusIndicatorProps) => {
   return (
     <div
